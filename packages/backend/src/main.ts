@@ -1,7 +1,7 @@
 import http from 'node:http';
 
-const PORT = process.env.PORT || 3000;
-const HOST = process.env.HOST || 'localhost';
+const PORT = process.env.PORT as unknown as number;
+const HOST = process.env.HOST as string;
 
 const server = http.createServer((req, res) => {
   res.setHeader('Content-Type', 'application/json');
