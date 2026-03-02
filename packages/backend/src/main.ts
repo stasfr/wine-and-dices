@@ -1,7 +1,8 @@
 import http from 'node:http';
 
-const PORT = process.env.PORT as unknown as number;
-const HOST = process.env.HOST as string;
+const SERVER_PORT = process.env.SERVER_PORT as unknown as number;
+const SERVER_URL = process.env.SERVER_URL as string;
+const SERVER_PROTOCOL = process.env.SERVER_PROTOCOL as string;
 
 const server = http.createServer((req, res) => {
   res.setHeader('Content-Type', 'application/json');
@@ -24,6 +25,8 @@ const server = http.createServer((req, res) => {
   res.end(JSON.stringify({ error: 'Not Found' }));
 });
 
-server.listen(PORT, HOST, () => {
-  console.log(`Server running at http://${HOST}:${PORT}`);
+server.listen(SERVER_PORT, SERVER_URL, () => {
+  console.log(
+    `Server running at ${SERVER_PROTOCOL}://${SERVER_URL}:${SERVER_PORT}`,
+  );
 });
