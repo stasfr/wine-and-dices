@@ -1,32 +1,23 @@
-import http from 'node:http';
+import 'dotenv/config';
+import { createDbClient } from '@/db/client.js';
+import { users } from '@/db/schema/schema.js';
 
-const SERVER_PORT = process.env.SERVER_PORT as unknown as number;
-const SERVER_URL = process.env.SERVER_URL as string;
-const SERVER_PROTOCOL = process.env.SERVER_PROTOCOL as string;
+async function main() {
+  const db = createDbClient();
 
-const server = http.createServer((req, res) => {
-  res.setHeader('Content-Type', 'application/json');
+  const newUser = await db
+    .insert(users)
+    .values({
+      email: 'some@test.com',
+      password: 'somepswrd',
+    })
+    .returning();
 
-  if (req.url === '/api/health') {
-    res.statusCode = 200;
-    res.end(
-      JSON.stringify({ status: 'ok', timestamp: new Date().toISOString() }),
-    );
-    return;
-  }
+  console.log('newUser', newUser);
 
-  if (req.url === '/api') {
-    res.statusCode = 200;
-    res.end(JSON.stringify({ message: 'Welcome to Wine & Dices API' }));
-    return;
-  }
+  const usersList = await db.select().from(users);
 
-  res.statusCode = 404;
-  res.end(JSON.stringify({ error: 'Not Found' }));
-});
+  console.log('usersList', usersList);
+}
 
-server.listen(SERVER_PORT, SERVER_URL, () => {
-  console.log(
-    `Server running at ${SERVER_PROTOCOL}://${SERVER_URL}:${SERVER_PORT}`,
-  );
-});
+void main();

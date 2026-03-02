@@ -4,19 +4,25 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "tsx --env-file=.env.development --watch src/main.ts",
+    "dev": "tsx --watch src/main.ts",
     "start": "node server.js",
     "lint": "oxlint",
     "lint:fix": "oxlint --fix",
     "format": "oxfmt",
-    "format:check": "oxfmt --check"
+    "format:check": "oxfmt --check",
+    "db:push": "drizzle-kit push",
+    "db:studio": "drizzle-kit studio"
   },
   "dependencies": {
+    "dotenv": "^17.3.1",
+    "drizzle-orm": "1.0.0-beta.15-859cf75",
     "pg": "^8.19.0"
   },
   "devDependencies": {
     "@tsconfig/node24": "^24.0.4",
     "@types/node": "^24.11.0",
+    "@types/pg": "^8.18.0",
+    "drizzle-kit": "1.0.0-beta.15-859cf75",
     "oxfmt": "^0.36.0",
     "oxlint": "^1.51.0",
     "oxlint-tsgolint": "^0.15.0",
