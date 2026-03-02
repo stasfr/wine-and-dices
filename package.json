@@ -14,7 +14,9 @@
     "lint": "oxlint",
     "lint:fix": "oxlint --fix",
     "format": "oxfmt",
-    "format:check": "oxfmt --check"
+    "format:check": "oxfmt --check",
+    "docker:up": "docker compose -f packages/backend/docker-compose.dev.yml --env-file packages/backend/.env.development up --build -d",
+    "docker:down": "docker compose -f packages/backend/docker-compose.dev.yml --env-file packages/backend/.env.development down"
   },
   "devDependencies": {
     "oxfmt": "^0.36.0",
