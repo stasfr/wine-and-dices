@@ -4,6 +4,9 @@ import fastify from 'fastify';
 import fCookie from '@fastify/cookie';
 import fastifyStatic from '@fastify/static';
 
+import { authenticate } from '@/server/decorators/authenticate.js';
+
+import { authRoutes } from '@/modules/auth/authRoutes.js';
 import { userRoutes } from '@/modules/user/userRoutes.js';
 
 import type { AppConfig } from '@/config.js';
@@ -11,6 +14,8 @@ import type { DbClient } from '@/db/client.js';
 
 export function buildServer(config: AppConfig, db: DbClient) {
   const server = fastify();
+
+  server.decorate('authenticate', authenticate);
 
   server.decorate('db', db);
   server.decorate('config', config);
@@ -27,6 +32,7 @@ export function buildServer(config: AppConfig, db: DbClient) {
 
   server.register(
     (fastify, _, done) => {
+      fastify.register(authRoutes, { prefix: '/auth' });
       fastify.register(userRoutes, { prefix: '/user' });
       done();
     },

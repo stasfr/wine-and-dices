@@ -42,6 +42,17 @@ export const users = pgTable('users', {
   deletedAt,
 });
 
+export const userActivations = pgTable('user_activations', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  userId: uuid('user_id')
+    .notNull()
+    .references(() => users.id, {
+      onDelete: 'cascade',
+      onUpdate: 'cascade',
+    }),
+  createdAt,
+});
+
 export const userSessions = pgTable(
   'user_sessions',
   {
@@ -61,14 +72,21 @@ export const userSessions = pgTable(
   (table) => [index('sessions_user_id_idx').on(table.userId)],
 );
 
-export const relations = defineRelations({ users, userSessions }, (r) => ({
-  userSessions: {
-    user: r.one.users({
-      from: r.userSessions.userId,
-      to: r.users.id,
-    }),
-  },
-  users: {
-    sessions: r.many.userSessions(),
-  },
-}));
+export const relations = defineRelations(
+  { users, userSessions, userActivations },
+  (r) => ({
+    userSessions: {
+      user: r.one.users({
+        from: r.userSessions.userId,
+        to: r.users.id,
+      }),
+    },
+    users: {
+      sessions: r.many.userSessions(),
+      activation: r.one.userActivations({
+        from: r.users.id,
+        to: r.userActivations.userId,
+      }),
+    },
+  }),
+);
