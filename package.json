@@ -15,8 +15,14 @@
     "lint:fix": "oxlint --fix",
     "format": "oxfmt",
     "format:check": "oxfmt --check",
-    "docker:up": "docker compose -f packages/backend/docker-compose.dev.yml --env-file packages/backend/.env.development up --build -d",
-    "docker:down": "docker compose -f packages/backend/docker-compose.dev.yml --env-file packages/backend/.env.development down"
+    "docker:up": "docker compose -f packages/backend/docker-compose.dev.yml --env-file packages/backend/.env up --build -d",
+    "docker:down": "docker compose -f packages/backend/docker-compose.dev.yml --env-file packages/backend/.env down"
+  },
+  "dependencies": {
+    "@fastify/cookie": "^11.0.2",
+    "@fastify/static": "^9.0.0",
+    "argon2": "^0.44.0",
+    "nodemailer": "^8.0.1"
   },
   "devDependencies": {
     "oxfmt": "^0.36.0",
@@ -26,11 +32,5 @@
   "engines": {
     "node": ">=24.0.0"
   },
-  "packageManager": "pnpm@10.30.1",
-  "dependencies": {
-    "@fastify/cookie": "^11.0.2",
-    "@fastify/static": "^9.0.0",
-    "argon2": "^0.44.0",
-    "nodemailer": "^8.0.1"
-  }
+  "packageManager": "pnpm@10.30.1"
 }
