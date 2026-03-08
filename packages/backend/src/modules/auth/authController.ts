@@ -194,7 +194,7 @@ export async function loginHandler(
     secure: request.server.config.NODE_ENV === 'production',
   });
 
-  return await reply.status(200);
+  return await reply.status(200).send();
 }
 
 export async function logoutHandler(
@@ -297,5 +297,5 @@ export async function activateHandler(
     .set({ isActive: true })
     .where(eq(usersTable.id, userId));
 
-  return await reply.status(200);
+  return await reply.status(200).send();
 }
