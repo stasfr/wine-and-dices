@@ -257,14 +257,18 @@ export async function activateHandler(
   request: FastifyRequest,
   reply: FastifyReply,
 ) {
-  const db = request.server.db;
-
   if (!request.user) {
     throw new Error('Unauthorized: No user provided', { cause: 401 });
   }
 
+  const { id: userId, isActive: userIsActive } = request.user;
+
+  if (userIsActive === true) {
+    throw new Error('User is already activated', { cause: 400 });
+  }
+
+  const db = request.server.db;
   const { activationId } = request.params as { activationId: string };
-  const { id: userId } = request.user;
 
   const userActivationResult = await db
     .select()
