@@ -38,7 +38,7 @@ export interface AppConfig {
   FULL_SERVER_URL: string;
 }
 
-function loadConfig() {
+export function loadConfig() {
   envs.forEach((env) => {
     const value = process.env[env];
 
@@ -85,5 +85,3 @@ function loadConfig() {
     FULL_SERVER_URL: `${SERVER_PROTOCOL!}://${SERVER_URL!}:${SERVER_PORT!}`,
   } as const satisfies AppConfig;
 }
-
-export const config = loadConfig();

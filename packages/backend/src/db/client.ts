@@ -12,3 +12,5 @@ export function createDbClient() {
 
   return drizzle(DB_URL, { relations });
 }
+
+export type DbClient = ReturnType<typeof createDbClient>;
