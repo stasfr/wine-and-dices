@@ -1,7 +1,7 @@
 import { loadConfig } from '@/config.js';
 import { createDbClient } from '@/db/client.js';
 
-import { buildServer } from '@/server.js';
+import { buildServer } from '@/server/server.js';
 
 async function main() {
   try {

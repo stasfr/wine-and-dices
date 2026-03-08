@@ -13,6 +13,7 @@ export function buildServer(config: AppConfig, db: DbClient) {
   const server = fastify();
 
   server.decorate('db', db);
+  server.decorate('config', config);
 
   server.register(fCookie, {
     hook: 'preHandler',
