@@ -1,6 +1,7 @@
 import {
   timestamp,
   pgTable,
+  pgEnum,
   uuid,
   varchar,
   index,
@@ -72,8 +73,64 @@ export const userSessions = pgTable(
   (table) => [index('sessions_user_id_idx').on(table.userId)],
 );
 
+export const gameModeEnum = pgEnum('game_mode', [
+  'one_vs_one',
+  'two_vs_two',
+  'three_vs_three',
+  'king_of_the_hill',
+]);
+
+export const characters = pgTable('characters', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  name: text('name').unique().notNull(), // e.g. "John Doe"
+  key: text('key').unique().notNull(), // e.g. "john-doe"
+  createdAt,
+  updatedAt,
+  deletedAt,
+});
+
+export const games = pgTable('games', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  mode: gameModeEnum('mode').notNull(),
+  comment: text('comment'),
+  date: timestamp('date', {
+    mode: 'string',
+    withTimezone: true,
+  })
+    .defaultNow()
+    .notNull(),
+  createdAt,
+  updatedAt,
+  deletedAt,
+});
+
+export const gameParticipants = pgTable('game_participants', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  gameId: uuid('game_id')
+    .notNull()
+    .references(() => games.id, {
+      onDelete: 'restrict',
+      onUpdate: 'cascade',
+    }),
+  userId: uuid('user_id').references(() => users.id, {
+    onDelete: 'restrict',
+    onUpdate: 'cascade',
+  }),
+  playerName: text('player_name'),
+  characterId: uuid('character_id')
+    .notNull()
+    .references(() => characters.id, {
+      onDelete: 'restrict',
+      onUpdate: 'cascade',
+    }),
+  winner: boolean('winner').default(false).notNull(),
+  createdAt,
+  updatedAt,
+  deletedAt,
+});
+
 export const relations = defineRelations(
-  { users, userSessions, userActivations },
+  { users, userSessions, userActivations, characters, games, gameParticipants },
   (r) => ({
     userSessions: {
       user: r.one.users({
@@ -86,6 +143,25 @@ export const relations = defineRelations(
       activation: r.one.userActivations({
         from: r.users.id,
         to: r.userActivations.userId,
+      }),
+      games: r.many.games({
+        from: r.users.id.through(r.gameParticipants.userId),
+        to: r.games.id.through(r.gameParticipants.gameId),
+      }),
+      characters: r.many.characters({
+        from: r.users.id.through(r.gameParticipants.userId),
+        to: r.characters.id.through(r.gameParticipants.characterId),
+      }),
+    },
+    games: {
+      participants: r.many.users(),
+      characters: r.many.characters(),
+    },
+    characters: {
+      users: r.many.users(),
+      games: r.many.games({
+        from: r.characters.id.through(r.gameParticipants.characterId),
+        to: r.games.id.through(r.gameParticipants.gameId),
       }),
     },
   }),
