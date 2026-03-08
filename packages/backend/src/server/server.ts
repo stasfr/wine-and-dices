@@ -8,6 +8,7 @@ import { authenticate } from '@/server/decorators/authenticate.js';
 
 import { authRoutes } from '@/modules/auth/authRoutes.js';
 import { userRoutes } from '@/modules/user/userRoutes.js';
+import { dicesRoutes } from '@/modules/dices/dicesRoutes.js';
 
 import type { AppConfig } from '@/config.js';
 import type { DbClient } from '@/db/client.js';
@@ -34,6 +35,7 @@ export function buildServer(config: AppConfig, db: DbClient) {
     (fastify, _, done) => {
       fastify.register(authRoutes, { prefix: '/auth' });
       fastify.register(userRoutes, { prefix: '/user' });
+      fastify.register(dicesRoutes, { prefix: '/dices' });
       done();
     },
     { prefix: '/api' },
