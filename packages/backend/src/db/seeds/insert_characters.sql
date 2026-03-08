@@ -1,0 +1,17 @@
+INSERT INTO characters (name, key) VALUES
+  ('Barbarian', 'barbarian'),
+  ('Moon Elf', 'moon-elf'),
+  ('Pyromancer', 'pyromancer'),
+  ('Shadow Thief', 'shadow-thief'),
+  ('Monk', 'monk'),
+  ('Paladin', 'paladin'),
+  ('Ninja', 'ninja'),
+  ('Treant', 'treant'),
+  ('Gunslinger', 'gunslinger'),
+  ('Samurai', 'samurai'),
+  ('Tactician', 'tactician'),
+  ('Huntress', 'huntress'),
+  ('Cursed Pirate', 'cursed-pirate'),
+  ('Artificier', 'artificier'),
+  ('Seraph', 'seraph'),
+  ('Vampire Lord', 'vampire-lord');
