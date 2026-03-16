@@ -25,9 +25,9 @@
     "nodemailer": "^8.0.1"
   },
   "devDependencies": {
-    "oxfmt": "^0.36.0",
-    "oxlint": "^1.51.0",
-    "oxlint-tsgolint": "^0.15.0"
+    "oxfmt": "^0.41.0",
+    "oxlint": "^1.56.0",
+    "oxlint-tsgolint": "^0.17.0"
   },
   "engines": {
     "node": ">=24.0.0"
