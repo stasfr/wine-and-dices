@@ -3,12 +3,9 @@ import path from 'node:path';
 import fastify from 'fastify';
 import fCookie from '@fastify/cookie';
 import fastifyStatic from '@fastify/static';
+import AutoLoad from '@fastify/autoload';
 
 import { authenticate } from '@/server/decorators/authenticate.js';
-
-import { authRoutes } from '@/modules/auth/authRoutes.js';
-import { userRoutes } from '@/modules/user/userRoutes.js';
-import { dicesRoutes } from '@/modules/dices/dicesRoutes.js';
 
 import type { AppConfig } from '@/config.js';
 import type { DbClient } from '@/db/client.js';
@@ -31,15 +28,14 @@ export function buildServer(config: AppConfig, db: DbClient) {
     prefix: '/files/',
   });
 
-  server.register(
-    (fastify, _, done) => {
-      fastify.register(authRoutes, { prefix: '/auth' });
-      fastify.register(userRoutes, { prefix: '/user' });
-      fastify.register(dicesRoutes, { prefix: '/dices' });
-      done();
+  server.register(AutoLoad, {
+    dir: path.join(import.meta.dirname, '../modules'),
+    dirNameRoutePrefix: false,
+    options: {
+      prefix: '/api',
     },
-    { prefix: '/api' },
-  );
+    matchFilter: (path) => /\.(route|resolver)\.ts$/.test(path),
+  });
 
   return server;
 }

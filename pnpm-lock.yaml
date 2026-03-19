@@ -33,12 +33,15 @@ importers:
 
   packages/backend:
     dependencies:
+      '@fastify/autoload':
+        specifier: ^6.3.1
+        version: 6.3.1
       dotenv:
         specifier: ^17.3.1
         version: 17.3.1
       drizzle-orm:
         specifier: 1.0.0-beta.18-7eb39f0
-        version: 1.0.0-beta.18-7eb39f0(@types/mssql@9.1.9(@azure/core-client@1.10.1))(@types/pg@8.18.0)(mssql@11.0.1(@azure/core-client@1.10.1))(pg@8.19.0)
+        version: 1.0.0-beta.18-7eb39f0(@types/mssql@9.1.9(@azure/core-client@1.10.1))(@types/pg@8.18.0)(mssql@11.0.1(@azure/core-client@1.10.1))(pg@8.19.0)(zod@4.3.6)
       fastify:
         specifier: ^5.8.2
         version: 5.8.2
@@ -668,6 +671,9 @@ packages:
 
   '@fastify/ajv-compiler@4.0.5':
     resolution: {integrity: sha512-KoWKW+MhvfTRWL4qrhUwAAZoaChluo0m0vbiJlGMt2GXvL4LVPQEjt8kSpHI3IBq5Rez8fg+XeH3cneztq+C7A==}
+
+  '@fastify/autoload@6.3.1':
+    resolution: {integrity: sha512-0fsG+lO3m5yEZVjXKpltCe+2eHhM6rfAPQhvlGUgLUFTw/N2wA9WqPTObMtrF3oUCUrxbSDv60HlUIoh+aFM1A==}
 
   '@fastify/cookie@11.0.2':
     resolution: {integrity: sha512-GWdwdGlgJxyvNv+QcKiGNevSspMQXncjMZ1J8IvuDQk0jvkzgWWZFNC2En3s+nHndZBGV8IbLwOI/sxCZw/mzA==}
@@ -2805,6 +2811,9 @@ packages:
     engines: {node: '>= 14.6'}
     hasBin: true
 
+  zod@4.3.6:
+    resolution: {integrity: sha512-rftlrkhHZOcjDwkGlnUtZZkvaPHCsDATp4pGpuOOMDaTdDDXF91wuVDJoWoPsKX/3YPQ5fHuF3STjcYyKr+Qhg==}
+
 snapshots:
 
   '@azure-rest/core-client@2.5.1':
@@ -3309,6 +3318,8 @@ snapshots:
       ajv: 8.18.0
       ajv-formats: 3.0.1(ajv@8.18.0)
       fast-uri: 3.1.0
+
+  '@fastify/autoload@6.3.1': {}
 
   '@fastify/cookie@11.0.2':
     dependencies:
@@ -4125,13 +4136,14 @@ snapshots:
       get-tsconfig: 4.13.6
       jiti: 2.6.1
 
-  drizzle-orm@1.0.0-beta.18-7eb39f0(@types/mssql@9.1.9(@azure/core-client@1.10.1))(@types/pg@8.18.0)(mssql@11.0.1(@azure/core-client@1.10.1))(pg@8.19.0):
+  drizzle-orm@1.0.0-beta.18-7eb39f0(@types/mssql@9.1.9(@azure/core-client@1.10.1))(@types/pg@8.18.0)(mssql@11.0.1(@azure/core-client@1.10.1))(pg@8.19.0)(zod@4.3.6):
     dependencies:
       '@types/mssql': 9.1.9(@azure/core-client@1.10.1)
       mssql: 11.0.1(@azure/core-client@1.10.1)
     optionalDependencies:
       '@types/pg': 8.18.0
       pg: 8.19.0
+      zod: 4.3.6
 
   ecdsa-sig-formatter@1.0.11:
     dependencies:
@@ -5156,3 +5168,6 @@ snapshots:
   yallist@3.1.1: {}
 
   yaml@2.8.2: {}
+
+  zod@4.3.6:
+    optional: true
