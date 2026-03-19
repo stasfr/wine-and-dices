@@ -6,6 +6,7 @@ export default async function userList(fastify: FastifyInstance) {
   fastify.route({
     method: 'GET',
     url: '/v1/user/list',
+    preHandler: [fastify.authenticate],
     handler: async (request, reply) => {
       const users = await request.server.db
         .select({
