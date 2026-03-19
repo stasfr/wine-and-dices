@@ -1,4 +1,4 @@
-import { FastifyInstance } from 'fastify';
+import { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';
 
 import crypto from 'node:crypto';
 import nodemailer from 'nodemailer';
@@ -15,7 +15,20 @@ export default async function authRegister(fastify: FastifyInstance) {
   fastify.route({
     method: 'POST',
     url: '/v1/auth/register',
-    handler: async (request, reply) => {
+    schema: {
+      body: {
+        type: 'object',
+        properties: {
+          email: { type: 'string' },
+          password: { type: 'string' },
+        },
+        required: ['email', 'password'],
+      } as const,
+    },
+    handler: async (
+      request: FastifyRequest<{ Body: { email: string; password: string } }>,
+      reply: FastifyReply,
+    ) => {
       const db = request.server.db;
 
       const body = request.body;
@@ -26,11 +39,7 @@ export default async function authRegister(fastify: FastifyInstance) {
         throw new Error('Unauthorized: No user agent provided', { cause: 401 });
       }
 
-      const { password, ...rest } = body as {
-        email: string;
-        password: string;
-        name: string;
-      };
+      const { password, ...rest } = body;
 
       const passwordHash = await hash(password);
 

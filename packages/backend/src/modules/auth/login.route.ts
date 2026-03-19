@@ -1,4 +1,4 @@
-import { FastifyInstance } from 'fastify';
+import { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';
 
 import { eq } from 'drizzle-orm';
 import crypto from 'node:crypto';
@@ -14,13 +14,23 @@ export default async function authLogin(fastify: FastifyInstance) {
   fastify.route({
     method: 'POST',
     url: '/v1/auth/login',
-    handler: async (request, reply) => {
+    schema: {
+      body: {
+        type: 'object',
+        properties: {
+          email: { type: 'string' },
+          password: { type: 'string' },
+        },
+        required: ['email', 'password'],
+      } as const,
+    },
+    handler: async (
+      request: FastifyRequest<{ Body: { email: string; password: string } }>,
+      reply: FastifyReply,
+    ) => {
       const db = request.server.db;
 
-      const { email, password } = request.body as {
-        email: string;
-        password: string;
-      };
+      const { email, password } = request.body;
       const userIp = request.ip;
       const userAgent = request.headers['user-agent'];
 
