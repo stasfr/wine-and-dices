@@ -1,19 +1,56 @@
-import { FastifyInstance } from 'fastify';
+import { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';
 
+import { eq, and, SQL } from 'drizzle-orm';
 import { users as usersTable } from '@/db/schema/schema.js';
 
 export default async function userList(fastify: FastifyInstance) {
   fastify.route({
     method: 'GET',
     url: '/v1/user/list',
+    schema: {
+      querystring: {
+        type: 'object',
+        properties: {
+          page: { type: 'number' },
+          perPage: { type: 'number' },
+          email: { type: 'string' },
+          id: { type: 'string' },
+        },
+      },
+    },
     preHandler: [fastify.authenticate],
-    handler: async (request, reply) => {
-      const users = await request.server.db
+    handler: async (
+      request: FastifyRequest<{
+        Querystring: {
+          page?: number;
+          perPage?: number;
+          email?: string;
+          id?: string;
+        };
+      }>,
+      reply: FastifyReply,
+    ) => {
+      const db = request.server.db;
+      const { page = 1, perPage = 25, email, id } = request.query;
+
+      const filters: SQL[] = [];
+
+      if (email) {
+        filters.push(eq(usersTable.email, email));
+      }
+      if (id) {
+        filters.push(eq(usersTable.id, id));
+      }
+
+      const users = await db
         .select({
           email: usersTable.email,
           id: usersTable.id,
         })
-        .from(usersTable);
+        .from(usersTable)
+        .limit(perPage)
+        .offset((page - 1) * perPage)
+        .where(and(...filters));
 
       return reply.status(200).send({ data: users });
     },
