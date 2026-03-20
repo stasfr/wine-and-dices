@@ -6,7 +6,7 @@ import { users as usersTable } from '@/db/schema/schema.js';
 export default async function userUserId(fastify: FastifyInstance) {
   fastify.route({
     method: 'GET',
-    url: '/v1/user/:userId',
+    url: '/v1/users/:userId',
     schema: {
       params: {
         type: 'object',
