@@ -42,11 +42,9 @@ export default async function dicesCharactersList(fastify: FastifyInstance) {
       if (key) {
         filters.push(eq(charactersTable.key, key));
       }
-
       if (name) {
         filters.push(eq(charactersTable.name, name));
       }
-
       if (id) {
         filters.push(eq(charactersTable.id, id));
       }
@@ -57,6 +55,7 @@ export default async function dicesCharactersList(fastify: FastifyInstance) {
         .limit(perPage)
         .offset((page - 1) * perPage)
         .where(and(...filters));
+
       await reply.send({ data: characters });
     },
   });
