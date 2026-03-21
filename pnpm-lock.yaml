@@ -7,19 +7,6 @@ settings:
 importers:
 
   .:
-    dependencies:
-      '@fastify/cookie':
-        specifier: ^11.0.2
-        version: 11.0.2
-      '@fastify/static':
-        specifier: ^9.0.0
-        version: 9.0.0
-      argon2:
-        specifier: ^0.44.0
-        version: 0.44.0
-      nodemailer:
-        specifier: ^8.0.1
-        version: 8.0.1
     devDependencies:
       oxfmt:
         specifier: ^0.41.0
@@ -36,6 +23,15 @@ importers:
       '@fastify/autoload':
         specifier: ^6.3.1
         version: 6.3.1
+      '@fastify/cookie':
+        specifier: ^11.0.2
+        version: 11.0.2
+      '@fastify/static':
+        specifier: ^9.0.0
+        version: 9.0.0
+      argon2:
+        specifier: ^0.44.0
+        version: 0.44.0
       dotenv:
         specifier: ^17.3.1
         version: 17.3.1
@@ -45,6 +41,9 @@ importers:
       fastify:
         specifier: ^5.8.2
         version: 5.8.2
+      nodemailer:
+        specifier: ^8.0.1
+        version: 8.0.1
       pg:
         specifier: ^8.19.0
         version: 8.19.0
