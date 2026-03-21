@@ -41,3 +41,7 @@ __screenshots__/
 .env
 .env.*
 !.env.example
+
+# Backend
+packages/backend/public/files/character
+packages/backend/public/files/portrait
