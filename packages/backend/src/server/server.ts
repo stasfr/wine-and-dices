@@ -25,7 +25,6 @@ export function buildServer(config: AppConfig, db: DbClient) {
 
   server.register(fastifyStatic, {
     root: path.resolve('public'),
-    prefix: '/files/',
   });
 
   server.register(AutoLoad, {
