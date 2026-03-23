@@ -214,6 +214,30 @@ export default async function dicesGamesCreate(fastify: FastifyInstance) {
         }
       }
 
+      const userIdsSet = new Set<string>();
+      for (const participant of participants) {
+        if (participant.userId) {
+          if (userIdsSet.has(participant.userId)) {
+            throw new Error(
+              `Duplicate userId "${participant.userId}" in participants. Each user can participate only once per game.`,
+              { cause: 400 },
+            );
+          }
+          userIdsSet.add(participant.userId);
+        }
+      }
+
+      const characterIdsSet = new Set<string>();
+      for (const participant of participants) {
+        if (characterIdsSet.has(participant.characterId)) {
+          throw new Error(
+            `Duplicate characterId "${participant.characterId}" in participants. Each character can be used only once per game.`,
+            { cause: 400 },
+          );
+        }
+        characterIdsSet.add(participant.characterId);
+      }
+
       const characterIds = participants.map((p) => p.characterId);
       const userIds = participants
         .map((p) => p.userId)
