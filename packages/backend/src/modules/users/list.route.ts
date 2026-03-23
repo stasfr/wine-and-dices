@@ -1,7 +1,9 @@
 import { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';
 
-import { eq, and, SQL } from 'drizzle-orm';
+import { eq, and, ilike, or } from 'drizzle-orm';
 import { users as usersTable } from '@/db/schema/schema.js';
+
+import type { SQL } from 'drizzle-orm';
 
 export default async function userList(fastify: FastifyInstance) {
   fastify.route({
@@ -15,6 +17,7 @@ export default async function userList(fastify: FastifyInstance) {
           perPage: { type: 'number' },
           email: { type: 'string' },
           id: { type: 'string' },
+          search: { type: 'string' },
         },
       },
     },
@@ -26,12 +29,13 @@ export default async function userList(fastify: FastifyInstance) {
           perPage?: number;
           email?: string;
           id?: string;
+          search?: string;
         };
       }>,
       reply: FastifyReply,
     ) => {
       const db = request.server.db;
-      const { page = 1, perPage = 25, email, id } = request.query;
+      const { page = 1, perPage = 25, email, id, search } = request.query;
 
       const filters: SQL[] = [];
 
@@ -40,6 +44,17 @@ export default async function userList(fastify: FastifyInstance) {
       }
       if (id) {
         filters.push(eq(usersTable.id, id));
+      }
+      if (search) {
+        filters.push(
+          or(
+            ilike(usersTable.firstName, `%${search}%`),
+            ilike(usersTable.lastName, `%${search}%`),
+            ilike(usersTable.middleName, `%${search}%`),
+            ilike(usersTable.email, `%${search}%`),
+            // FIXME: check typing for or expression and remove "!"
+          )!,
+        );
       }
 
       const users = await db
