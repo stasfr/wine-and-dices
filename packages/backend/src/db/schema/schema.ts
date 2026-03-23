@@ -8,6 +8,7 @@ import {
   text,
   inet,
   boolean,
+  integer,
 } from 'drizzle-orm/pg-core';
 import { defineRelations } from 'drizzle-orm';
 
@@ -80,6 +81,7 @@ export const gameModeEnum = pgEnum('game_mode', [
   'one_vs_one',
   'two_vs_two',
   'three_vs_three',
+  'two_vs_two_vs_two',
   'king_of_the_hill',
 ]);
 
@@ -128,6 +130,7 @@ export const gameParticipants = pgTable('game_participants', {
       onUpdate: 'cascade',
     }),
   winner: boolean('winner').default(false).notNull(),
+  teamIndex: integer('team_index').notNull(),
   createdAt,
   updatedAt,
   deletedAt,
