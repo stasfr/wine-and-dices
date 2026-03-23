@@ -19,7 +19,17 @@ export default async function authMe(fastify: FastifyInstance) {
       const { id } = request.user;
 
       const userResult = await db
-        .select()
+        .select({
+          id: usersTable.id,
+          email: usersTable.email,
+          isActive: usersTable.isActive,
+          lastName: usersTable.lastName,
+          firstName: usersTable.firstName,
+          middleName: usersTable.middleName,
+          createdAt: usersTable.createdAt,
+          updatedAt: usersTable.updatedAt,
+          deletedAt: usersTable.deletedAt,
+        })
         .from(usersTable)
         .where(eq(usersTable.id, id));
 
@@ -29,13 +39,13 @@ export default async function authMe(fastify: FastifyInstance) {
 
       const user = userResult[0];
 
-      const { email, isActive } = user;
+      if (!user) {
+        return await reply.code(404).send({ message: 'User not found' });
+      }
 
       return await reply.status(200).send({
         data: {
-          email,
-          id,
-          isActive,
+          ...user,
         },
       });
     },

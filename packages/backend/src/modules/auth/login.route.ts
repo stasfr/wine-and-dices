@@ -40,17 +40,23 @@ export default async function authLogin(fastify: FastifyInstance) {
         .where(eq(usersTable.email, email));
 
       if (!userResult.length) {
-        throw new Error('Invalid email or password: User not found', {
+        throw new Error('Invalid credentials', {
           cause: 401,
         });
       }
 
       const user = userResult[0];
 
+      if (!user) {
+        throw new Error('Invalid credentials', {
+          cause: 401,
+        });
+      }
+
       const correctPassword = await verify(user.password, password);
 
       if (!correctPassword) {
-        throw new Error('Invalid email or password: Password is incorrect', {
+        throw new Error('Invalid credentials', {
           cause: 401,
         });
       }

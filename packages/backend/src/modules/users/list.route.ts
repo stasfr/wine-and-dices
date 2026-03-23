@@ -44,8 +44,12 @@ export default async function userList(fastify: FastifyInstance) {
 
       const users = await db
         .select({
-          email: usersTable.email,
           id: usersTable.id,
+          email: usersTable.email,
+          isActive: usersTable.isActive,
+          lastName: usersTable.lastName,
+          firstName: usersTable.firstName,
+          middleName: usersTable.middleName,
         })
         .from(usersTable)
         .limit(perPage)

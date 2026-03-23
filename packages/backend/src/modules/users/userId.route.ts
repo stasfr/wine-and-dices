@@ -29,8 +29,12 @@ export default async function userUserId(fastify: FastifyInstance) {
       const { userId } = request.params;
       const userSelectResult = await db
         .select({
-          email: usersTable.email,
           id: usersTable.id,
+          email: usersTable.email,
+          isActive: usersTable.isActive,
+          lastName: usersTable.lastName,
+          firstName: usersTable.firstName,
+          middleName: usersTable.middleName,
         })
         .from(usersTable)
         .where(eq(usersTable.id, userId));

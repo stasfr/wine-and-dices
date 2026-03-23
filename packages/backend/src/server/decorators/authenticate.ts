@@ -30,6 +30,9 @@ export async function authenticate(
           id: usersTable.id,
           email: usersTable.email,
           isActive: usersTable.isActive,
+          lastName: usersTable.lastName,
+          firstName: usersTable.firstName,
+          middleName: usersTable.middleName,
         },
       })
       .from(userSessionsTable)
