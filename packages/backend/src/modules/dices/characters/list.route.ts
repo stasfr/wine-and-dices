@@ -1,6 +1,6 @@
 import { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';
 
-import { eq, and } from 'drizzle-orm';
+import { eq, and, or, ilike, sql } from 'drizzle-orm';
 import { characters as charactersTable } from '@/db/schema/schema.js';
 
 import type { SQL } from 'drizzle-orm';
@@ -18,6 +18,7 @@ export default async function dicesCharactersList(fastify: FastifyInstance) {
           key: { type: 'string' },
           name: { type: 'string' },
           id: { type: 'string' },
+          search: { type: 'string' },
         },
       },
     },
@@ -30,12 +31,13 @@ export default async function dicesCharactersList(fastify: FastifyInstance) {
           key?: string;
           name?: string;
           id?: string;
+          search?: string;
         };
       }>,
       reply: FastifyReply,
     ) => {
       const db = request.server.db;
-      const { page = 1, perPage = 25, key, name, id } = request.query;
+      const { page = 1, perPage = 25, key, name, id, search } = request.query;
 
       const filters: SQL[] = [];
 
@@ -47,6 +49,17 @@ export default async function dicesCharactersList(fastify: FastifyInstance) {
       }
       if (id) {
         filters.push(eq(charactersTable.id, id));
+      }
+      if (search) {
+        const searchPattern = `%${search}%`;
+        filters.push(
+          or(
+            ilike(charactersTable.name, searchPattern),
+            ilike(charactersTable.ruName, searchPattern),
+            ilike(charactersTable.key, searchPattern),
+            // FIXME: check typing for or expression and remove "!"
+          )!,
+        );
       }
 
       const characters = await db
