@@ -2,13 +2,19 @@ import { drizzle } from 'drizzle-orm/node-postgres';
 import { relations } from '#server/db/schema/schema';
 
 export function useDb() {
-  const { DB_NAME, DB_HOST, DB_PASSWORD, DB_PORT, DB_USER } = process.env;
+  const config = useRuntimeConfig();
 
-  if (!DB_HOST || !DB_NAME || !DB_USER || !DB_PASSWORD || !DB_PORT) {
+  if (
+    !config.dbHost ||
+    !config.dbName ||
+    !config.dbUser ||
+    !config.dbPassword ||
+    !config.dbPort
+  ) {
     throw new Error('One or more PostgreSQL environment variables are missing');
   }
 
-  const DB_URL = `postgresql://${DB_USER}:${DB_PASSWORD}@${DB_HOST}:${DB_PORT}/${DB_NAME}`;
+  const DB_URL = `postgresql://${config.dbUser}:${config.dbPassword}@${config.dbHost}:${config.dbPort}/${config.dbName}`;
 
   return drizzle(DB_URL, { relations });
 }
