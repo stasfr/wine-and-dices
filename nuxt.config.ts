@@ -11,7 +11,6 @@ export default defineNuxtConfig({
     '@pinia/nuxt',
     '@vueuse/nuxt',
     '@nuxtjs/color-mode',
-    '@nuxtjs/tailwindcss',
     '@formkit/auto-animate',
     '@pinia/colada-nuxt',
   ],
