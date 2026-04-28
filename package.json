@@ -1,30 +1,17 @@
 {
   "name": "wine-and-dices",
-  "version": "0.0.0",
+  "type": "module",
   "private": true,
-  "description": "Monorepo for Wine-and-dices project",
-  "keywords": [],
-  "license": "ISC",
-  "author": "stas_fr",
   "scripts": {
-    "dev:web": "pnpm --filter @wine-and-dices/web dev",
-    "dev:backend": "pnpm --filter @wine-and-dices/backend dev",
-    "dev": "pnpm --parallel dev",
-    "build": "pnpm -r build",
-    "lint": "oxlint",
-    "lint:fix": "oxlint --fix",
-    "format": "oxfmt",
-    "format:check": "oxfmt --check",
-    "docker:up": "docker compose -f packages/backend/docker-compose.dev.yml --env-file packages/backend/.env up --build -d",
-    "docker:down": "docker compose -f packages/backend/docker-compose.dev.yml --env-file packages/backend/.env down"
+    "build": "nuxt build",
+    "dev": "nuxt dev",
+    "generate": "nuxt generate",
+    "preview": "nuxt preview",
+    "postinstall": "nuxt prepare"
   },
-  "devDependencies": {
-    "oxfmt": "^0.41.0",
-    "oxlint": "^1.56.0",
-    "oxlint-tsgolint": "^0.17.0"
-  },
-  "engines": {
-    "node": ">=24.0.0"
-  },
-  "packageManager": "pnpm@10.32.1"
+  "dependencies": {
+    "nuxt": "^4.4.2",
+    "vue": "^3.5.33",
+    "vue-router": "^5.0.6"
+  }
 }
