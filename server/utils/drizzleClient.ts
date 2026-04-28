@@ -1,7 +1,7 @@
 import { drizzle } from 'drizzle-orm/node-postgres';
 import { relations } from '#server/db/schema/schema';
 
-export function createDbClient() {
+export function useDb() {
   const { DB_NAME, DB_HOST, DB_PASSWORD, DB_PORT, DB_USER } = process.env;
 
   if (!DB_HOST || !DB_NAME || !DB_USER || !DB_PASSWORD || !DB_PORT) {
@@ -13,4 +13,4 @@ export function createDbClient() {
   return drizzle(DB_URL, { relations });
 }
 
-export type DbClient = ReturnType<typeof createDbClient>;
+export type DbClient = ReturnType<typeof useDb>;
