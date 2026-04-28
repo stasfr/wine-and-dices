@@ -15,4 +15,27 @@ export default defineNuxtConfig({
     '@pinia/colada-nuxt',
   ],
   css: ['~/assets/css/main.css'],
+
+  runtimeConfig: {
+    // Private (server-only)
+    nodeEnv: '',
+    serverPort: '',
+    serverUrl: '',
+    serverProtocol: '',
+    dbUser: '',
+    dbPassword: '',
+    dbHost: '',
+    dbPort: '',
+    dbName: '',
+    cookieSecret: '',
+    smtpUser: '',
+    smtpPassword: '',
+
+    // Public (available on client)
+    public: {
+      clientPort: '',
+      clientUrl: '',
+      clientProtocol: '',
+    },
+  },
 });
