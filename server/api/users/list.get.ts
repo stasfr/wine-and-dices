@@ -1,18 +1,37 @@
+import * as v from 'valibot';
 import { eq, and, ilike, or } from 'drizzle-orm';
 import { users as usersTable } from '#server/db/schema/schema.js';
 import type { SQL } from 'drizzle-orm';
+
+const querySchema = v.object({
+  page: v.optional(
+    v.pipe(v.string(), v.toNumber(), v.number(), v.integer(), v.minValue(1)),
+    '1',
+  ),
+  perPage: v.optional(
+    v.pipe(
+      v.string(),
+      v.toNumber(),
+      v.number(),
+      v.integer(),
+      v.minValue(1),
+      v.maxValue(100),
+    ),
+    '20',
+  ),
+  email: v.optional(v.pipe(v.string(), v.minLength(1), v.email())),
+  id: v.optional(v.pipe(v.string(), v.minLength(1))),
+  search: v.optional(v.pipe(v.string(), v.minLength(1))),
+});
 
 export default defineEventHandler(async (event) => {
   const db = useDb();
   await requireAuth(event);
 
-  const query = getQuery(event);
-
-  const page = Number(query.page) || 1;
-  const perPage = Number(query.perPage) || 25;
-  const email = query.email ? String(query.email) : undefined;
-  const id = query.id ? String(query.id) : undefined;
-  const search = query.search ? String(query.search) : undefined;
+  const { page, perPage, email, id, search } = await getValidatedQuery(
+    event,
+    (data) => v.parse(querySchema, data),
+  );
 
   const filters: SQL[] = [];
 
