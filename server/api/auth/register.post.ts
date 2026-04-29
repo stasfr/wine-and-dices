@@ -69,11 +69,11 @@ export default defineEventHandler(async (event) => {
 
     return {
       ...createdUser,
-      activation: [createdActivation],
+      activation: createdActivation,
     };
   });
 
-  if (!user || !user.activation[0]) {
+  if (!user || !user.activation) {
     throw createError({
       status: 500,
       statusText: 'Failed to create user',
@@ -83,7 +83,7 @@ export default defineEventHandler(async (event) => {
   const mailer = useNodemailerClient();
 
   const hrefLink = `${config.clientProtocol}://${config.clientUrl}:${config.clientPort}`;
-  const activationId = user.activation[0].id;
+  const activationId = user.activation.id;
 
   const mailOptions = {
     from: '"Wine and Dices" <sfworking@yandex.ru>',
