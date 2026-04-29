@@ -40,6 +40,23 @@ export async function requireAuth(event: H3Event) {
     });
   }
 
+  const userAgent = getHeader(event, 'user-agent');
+  const userIp = getRequestIP(event);
+
+  if (
+    (session.userAgent && session.userAgent !== userAgent) ||
+    (session.userIp && session.userIp !== userIp)
+  ) {
+    await db
+      .delete(userSessionsTable)
+      .where(eq(userSessionsTable.id, session.id));
+
+    throw createError({
+      status: 401,
+      statusText: 'Unauthorized: Invalid session token',
+    });
+  }
+
   const userResult = await db
     .select()
     .from(usersTable)
