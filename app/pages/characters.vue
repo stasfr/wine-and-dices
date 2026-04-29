@@ -1,8 +1,11 @@
 <script setup lang="ts">
+const requestFetch = useRequestFetch();
 const { data } = useQuery({
   key: ['characters'],
-  query: () => $fetch('/api/dices/characters/list'),
+  query: () => requestFetch('/api/dices/characters/list'),
 });
+
+const charactersList = computed(() => data.value?.data || []);
 </script>
 
 <template>
@@ -10,25 +13,19 @@ const { data } = useQuery({
     <UPageHeader title="Dice Throne Characters List" />
 
     <UPageBody>
-      <UPageList>
+      <div class="flex gap-8 flex-wrap">
         <UPageCard
-          v-for="(character, index) in data"
-          :key="index"
-          variant="ghost"
-          :to="character.to"
-          :target="character.target"
+          v-for="character in charactersList"
+          :key="character.id"
+          :title="character.name"
         >
-          <template #body>
-            <UUser
-              :name="user.name"
-              :description="user.description"
-              :avatar="user.avatar"
-              size="xl"
-              class="relative"
-            />
-          </template>
+          <NuxtImg
+            :src="`images/portraits/${character.key}.png`"
+            :alt="character.name"
+            class="w-30 rounded-lg"
+          />
         </UPageCard>
-      </UPageList>
+      </div>
     </UPageBody>
   </UPage>
 </template>
