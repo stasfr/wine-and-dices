@@ -30,12 +30,8 @@ export default defineNuxtConfig({
     cookieSecret: '',
     smtpUser: '',
     smtpPassword: '',
-
-    // Public (available on client)
-    public: {
-      clientPort: '',
-      clientUrl: '',
-      clientProtocol: '',
-    },
+    clientPort: '',
+    clientUrl: '',
+    clientProtocol: '',
   },
 });
