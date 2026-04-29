@@ -3,22 +3,18 @@ import type { NavigationMenuItem } from '@nuxt/ui';
 
 const items = computed<NavigationMenuItem[]>(() => [
   {
-    label: 'About',
-    to: '/about',
+    label: 'Characters',
+    to: '/characters',
   },
   {
-    label: 'Portfolio',
-    to: '/portfolio',
-  },
-  {
-    label: 'Contacts',
-    to: '/contacts',
+    label: 'Games',
+    to: '/games',
   },
 ]);
 </script>
 
 <template>
-  <UHeader title="App" to="/">
+  <UHeader title="W&D" to="/">
     <UNavigationMenu :items="items" color="neutral" />
 
     <template #right>
