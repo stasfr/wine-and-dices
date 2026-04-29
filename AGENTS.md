@@ -50,3 +50,9 @@ const bodySchema = v.object({
 
 const { email } = await readValidatedBody(event, (data) => v.parse(bodySchema, data));
 ```
+
+- To check TypeScript types, do not run `npx nuxt typecheck` or `npx vue-tsc` — they fail because `vue-tsc` and `@vue/language-core` are not installed in this project.  
+  Use `tsc` directly against the generated Nuxt tsconfigs instead:
+  - Server code: `npx tsc --noEmit --project .nuxt/tsconfig.server.json`
+  - Client code: `npx tsc --noEmit --project .nuxt/tsconfig.app.json`
+  If the `.nuxt` directory is missing, run `npx nuxt prepare` first.
