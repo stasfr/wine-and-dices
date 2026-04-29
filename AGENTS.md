@@ -23,3 +23,30 @@ if (!user.name) {
 
 const username = user.name
 ```
+
+- When creating API endpoints, always validate incoming data (params, query, body) using Valibot schemas
+
+```typescript
+// GOOD - router params
+const paramsSchema = v.object({
+  userId: v.pipe(v.string(), v.minLength(1)),
+});
+
+const params = await getValidatedRouterParams(event, (data) =>
+  v.parse(paramsSchema, data),
+);
+
+// GOOD - query
+const querySchema = v.object({
+  page: v.optional(v.pipe(v.string(), v.toNumber(), v.number(), v.integer(), v.minValue(1)), '1'),
+});
+
+const { page } = await getValidatedQuery(event, (data) => v.parse(querySchema, data));
+
+// GOOD - body
+const bodySchema = v.object({
+  email: v.pipe(v.string(), v.minLength(1), v.email()),
+});
+
+const { email } = await readValidatedBody(event, (data) => v.parse(bodySchema, data));
+```
