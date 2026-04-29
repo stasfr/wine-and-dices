@@ -13,6 +13,7 @@ export default defineNuxtConfig({
     '@nuxtjs/color-mode',
     '@formkit/auto-animate',
     '@pinia/colada-nuxt',
+    '@regle/nuxt',
   ],
   css: ['~/assets/css/main.css'],
 
