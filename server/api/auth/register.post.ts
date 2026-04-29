@@ -24,6 +24,15 @@ export default defineEventHandler(async (event) => {
   }
 
   const { password, email } = body as { password: string; email: string };
+  const userAgent = getHeader(event, 'user-agent');
+  const userIp = getRequestIP(event);
+
+  if (!userAgent) {
+    throw createError({
+      status: 401,
+      statusText: 'Unauthorized: No user agent provided',
+    });
+  }
 
   const user = await db.transaction(async (tx) => {
     const passwordHash = await hash(password);
@@ -92,14 +101,13 @@ export default defineEventHandler(async (event) => {
   await mailer.sendMail(mailOptions);
 
   const sessionToken = crypto.randomUUID();
-  const hashedSessionToken = crypto
-    .createHash('sha256')
-    .update(sessionToken)
-    .digest('hex');
+  const hashedSessionToken = hashSessionToken(sessionToken);
   const session = {
     id: crypto.randomUUID(),
     sessionToken: hashedSessionToken,
+    userAgent,
     userId: user.id,
+    userIp,
     expiresAt: new Date(Date.now() + 60 * 60 * 24 * 30 * 1000).toISOString(),
   };
 
