@@ -1,3 +1,4 @@
+import * as v from 'valibot';
 import crypto from 'node:crypto';
 import { eq } from 'drizzle-orm';
 import { verify } from 'argon2';
@@ -7,19 +8,17 @@ import {
 } from '#server/db/schema/schema.js';
 import { hashSessionToken } from '#server/utils/hash.js';
 
+const bodySchema = v.object({
+  email: v.pipe(v.string(), v.minLength(1), v.email()),
+  password: v.pipe(v.string(), v.minLength(1)),
+});
+
 export default defineEventHandler(async (event) => {
   const db = useDb();
   const config = useRuntimeConfig();
-  const body = await readBody(event);
-
-  if (!body?.email || !body?.password) {
-    throw createError({
-      status: 400,
-      statusText: 'Email and password are required',
-    });
-  }
-
-  const { email, password } = body as { email: string; password: string };
+  const { email, password } = await readValidatedBody(event, (data) =>
+    v.parse(bodySchema, data),
+  );
   const userAgent = getHeader(event, 'user-agent');
   const userIp = getRequestIP(event);
 

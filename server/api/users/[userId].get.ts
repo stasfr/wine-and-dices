@@ -1,15 +1,20 @@
+import * as v from 'valibot';
 import { eq } from 'drizzle-orm';
 import { users as usersTable } from '#server/db/schema/schema.js';
+
+const paramsSchema = v.object({
+  userId: v.pipe(v.string(), v.minLength(1)),
+});
 
 export default defineEventHandler(async (event) => {
   const db = useDb();
   await requireAuth(event);
 
-  const userId = getRouterParam(event, 'userId');
+  const params = await getValidatedRouterParams(event, (data) =>
+    v.parse(paramsSchema, data),
+  );
 
-  if (!userId) {
-    throw createError({ status: 400, statusText: 'Missing userId parameter' });
-  }
+  const { userId } = params;
 
   const userSelectResult = await db
     .select({

@@ -5,6 +5,10 @@ export default defineEventHandler(async (event) => {
   const db = useDb();
   const user = await requireAuth(event);
 
+  if (!user) {
+    throw createError({ status: 401, statusText: 'Unauthorized' });
+  }
+
   const userResult = await db
     .select({
       id: usersTable.id,
@@ -18,7 +22,7 @@ export default defineEventHandler(async (event) => {
       deletedAt: usersTable.deletedAt,
     })
     .from(usersTable)
-    .where(eq(usersTable.id, user!.id));
+    .where(eq(usersTable.id, user.id));
 
   if (!userResult.length) {
     throw createError({ status: 404, statusText: 'User not found' });

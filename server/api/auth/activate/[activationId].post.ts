@@ -1,22 +1,31 @@
+import * as v from 'valibot';
 import { eq } from 'drizzle-orm';
 import {
   userActivations as userActivationsTable,
   users as usersTable,
 } from '#server/db/schema/schema.js';
 
+const paramsSchema = v.object({
+  activationId: v.pipe(v.string(), v.minLength(1)),
+});
+
 export default defineEventHandler(async (event) => {
   const db = useDb();
   const user = await requireAuth(event);
 
-  if (user!.isActive) {
+  if (!user) {
+    throw createError({ status: 401, statusText: 'Unauthorized' });
+  }
+
+  if (user.isActive) {
     throw createError({ status: 400, statusText: 'User is already activated' });
   }
 
-  const activationId = getRouterParam(event, 'activationId');
+  const params = await getValidatedRouterParams(event, (data) =>
+    v.parse(paramsSchema, data),
+  );
 
-  if (!activationId) {
-    throw createError({ status: 400, statusText: 'Activation ID is required' });
-  }
+  const { activationId } = params;
 
   const userActivationResult = await db
     .select()
@@ -32,7 +41,7 @@ export default defineEventHandler(async (event) => {
 
   const userActivation = userActivationResult[0]!;
 
-  if (userActivation.userId !== user!.id) {
+  if (userActivation.userId !== user.id) {
     throw createError({
       status: 404,
       statusText: 'Activation link is invalid: User not found',
@@ -49,7 +58,7 @@ export default defineEventHandler(async (event) => {
   await db
     .update(usersTable)
     .set({ isActive: true })
-    .where(eq(usersTable.id, user!.id));
+    .where(eq(usersTable.id, user.id));
 
   setResponseStatus(event, 200);
 

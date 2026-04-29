@@ -1,3 +1,4 @@
+import * as v from 'valibot';
 import crypto from 'node:crypto';
 import {
   userSessions as userSessionsTable,
@@ -6,24 +7,17 @@ import {
 } from '#server/db/schema/schema.js';
 import { hash } from 'argon2';
 
+const bodySchema = v.object({
+  email: v.pipe(v.string(), v.minLength(1), v.email()),
+  password: v.pipe(v.string(), v.minLength(1)),
+});
+
 export default defineEventHandler(async (event) => {
   const db = useDb();
   const config = useRuntimeConfig();
-  const body = await readBody(event);
-
-  if (!body) {
-    throw createError({ status: 400, statusText: 'No body provided' });
-  }
-
-  if (!body.email) {
-    throw createError({ status: 400, statusText: 'No email provided' });
-  }
-
-  if (!body.password) {
-    throw createError({ status: 400, statusText: 'No password provided' });
-  }
-
-  const { password, email } = body as { password: string; email: string };
+  const { password, email } = await readValidatedBody(event, (data) =>
+    v.parse(bodySchema, data),
+  );
   const userAgent = getHeader(event, 'user-agent');
   const userIp = getRequestIP(event);
 
