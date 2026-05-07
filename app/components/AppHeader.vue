@@ -14,21 +14,25 @@ const items = computed<NavigationMenuItem[]>(() => [
   },
 ]);
 
-const userMenuItems = computed<DropdownMenuItem[]>(() => [
-  {
-    label: 'Profile',
-    icon: 'i-lucide-user',
-    to: '/profile',
-  },
-  {
-    label: 'Logout',
-    icon: 'i-lucide-log-out',
-    color: 'error',
-    onSelect: async () => {
-      await clear();
-      await navigateTo('/');
+const userMenuItems = computed<DropdownMenuItem[][]>(() => [
+  [
+    {
+      label: 'Profile',
+      icon: 'i-lucide-user',
+      to: '/profile',
     },
-  },
+  ],
+  [
+    {
+      label: 'Logout',
+      icon: 'i-lucide-log-out',
+      color: 'error',
+      onSelect: async () => {
+        await clear();
+        await navigateTo('/auth/login');
+      },
+    },
+  ],
 ]);
 </script>
 
@@ -39,11 +43,7 @@ const userMenuItems = computed<DropdownMenuItem[]>(() => [
     <template #right>
       <template v-if="loggedIn">
         <UDropdownMenu :items="userMenuItems">
-          <UButton
-            color="neutral"
-            variant="ghost"
-            icon="i-lucide-circle-user"
-          >
+          <UButton color="neutral" variant="ghost" icon="i-lucide-circle-user">
             <template v-if="user && user.email">
               {{ user.email }}
             </template>
