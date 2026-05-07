@@ -11,13 +11,13 @@ const paramsSchema = v.object({
 
 export default defineEventHandler(async (event) => {
   const db = useDb();
-  const user = await requireAuth(event);
+  const session = await requireUserSession(event);
 
-  if (!user) {
+  if (!session.user) {
     throw createError({ status: 401, statusText: 'Unauthorized' });
   }
 
-  if (user.isActive) {
+  if (session.user.isActive) {
     throw createError({ status: 400, statusText: 'User is already activated' });
   }
 
@@ -39,9 +39,16 @@ export default defineEventHandler(async (event) => {
     });
   }
 
-  const userActivation = userActivationResult[0]!;
+  const userActivation = userActivationResult[0];
 
-  if (userActivation.userId !== user.id) {
+  if (!userActivation) {
+    throw createError({
+      status: 404,
+      statusText: 'Activation link is invalid: Activation not found',
+    });
+  }
+
+  if (userActivation.userId !== session.user.id) {
     throw createError({
       status: 404,
       statusText: 'Activation link is invalid: User not found',
@@ -58,7 +65,16 @@ export default defineEventHandler(async (event) => {
   await db
     .update(usersTable)
     .set({ isActive: true })
-    .where(eq(usersTable.id, user.id));
+    .where(eq(usersTable.id, session.user.id));
+
+  await setUserSession(event, {
+    user: {
+      id: session.user.id,
+      email: session.user.email,
+      isActive: true,
+    },
+    loggedInAt: session.loggedInAt,
+  });
 
   setResponseStatus(event, 200);
 

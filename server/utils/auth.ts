@@ -1,66 +1,23 @@
 import { eq } from 'drizzle-orm';
-import {
-  users as usersTable,
-  userSessions as userSessionsTable,
-} from '#server/db/schema/schema.js';
-import { hashSessionToken } from './hash.js';
+import { users as usersTable } from '#server/db/schema/schema.js';
 import type { H3Event } from 'h3';
 
 export async function requireAuth(event: H3Event) {
-  const sessionToken = getCookie(event, 'sessionToken');
+  const session = await requireUserSession(event);
 
-  if (!sessionToken) {
+  if (!session.user) {
     throw createError({
       status: 401,
-      statusText: 'Unauthorized: No session token provided',
+      statusText: 'Unauthorized: No user in session',
     });
   }
 
   const db = useDb();
-  const hashedSessionToken = hashSessionToken(sessionToken);
-
-  const sessionResult = await db
-    .select()
-    .from(userSessionsTable)
-    .where(eq(userSessionsTable.sessionToken, hashedSessionToken));
-
-  if (!sessionResult.length) {
-    throw createError({
-      status: 401,
-      statusText: 'Unauthorized: Invalid session token',
-    });
-  }
-
-  const session = sessionResult[0]!;
-
-  if (new Date(session.expiresAt) < new Date()) {
-    throw createError({
-      status: 401,
-      statusText: 'Unauthorized: Session expired',
-    });
-  }
-
-  const userAgent = getHeader(event, 'user-agent');
-  const userIp = getRequestIP(event);
-
-  if (
-    (session.userAgent && session.userAgent !== userAgent) ||
-    (session.userIp && session.userIp !== userIp)
-  ) {
-    await db
-      .delete(userSessionsTable)
-      .where(eq(userSessionsTable.id, session.id));
-
-    throw createError({
-      status: 401,
-      statusText: 'Unauthorized: Invalid session token',
-    });
-  }
 
   const userResult = await db
     .select()
     .from(usersTable)
-    .where(eq(usersTable.id, session.userId));
+    .where(eq(usersTable.id, session.user.id));
 
   if (!userResult.length) {
     throw createError({
@@ -69,5 +26,5 @@ export async function requireAuth(event: H3Event) {
     });
   }
 
-  return userResult[0]!;
+  return userResult[0];
 }

@@ -3,9 +3,9 @@ import { users as usersTable } from '#server/db/schema/schema.js';
 
 export default defineEventHandler(async (event) => {
   const db = useDb();
-  const user = await requireAuth(event);
+  const session = await requireUserSession(event);
 
-  if (!user) {
+  if (!session.user) {
     throw createError({ status: 401, statusText: 'Unauthorized' });
   }
 
@@ -22,7 +22,7 @@ export default defineEventHandler(async (event) => {
       deletedAt: usersTable.deletedAt,
     })
     .from(usersTable)
-    .where(eq(usersTable.id, user.id));
+    .where(eq(usersTable.id, session.user.id));
 
   if (!userResult.length) {
     throw createError({ status: 404, statusText: 'User not found' });

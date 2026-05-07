@@ -1,11 +1,9 @@
 import * as v from 'valibot';
 import crypto from 'node:crypto';
 import {
-  userSessions as userSessionsTable,
   userActivations as userActivationsTable,
   users as usersTable,
 } from '#server/db/schema/schema.js';
-import { hash } from 'argon2';
 
 const bodySchema = v.object({
   email: v.pipe(v.string(), v.minLength(1), v.email()),
@@ -18,18 +16,9 @@ export default defineEventHandler(async (event) => {
   const { password, email } = await readValidatedBody(event, (data) =>
     v.parse(bodySchema, data),
   );
-  const userAgent = getHeader(event, 'user-agent');
-  const userIp = getRequestIP(event);
-
-  if (!userAgent) {
-    throw createError({
-      status: 401,
-      statusText: 'Unauthorized: No user agent provided',
-    });
-  }
 
   const user = await db.transaction(async (tx) => {
-    const passwordHash = await hash(password);
+    const passwordHash = await hashPassword(password);
     const userId = crypto.randomUUID();
 
     const [createdUser] = await tx
@@ -86,7 +75,7 @@ export default defineEventHandler(async (event) => {
             <span>Ссылка для активации аккаунта </span><a href="${hrefLink}/auth/activate/${activationId}">тык</a>
             <p>P.S. Потом письмо покрасивше будет, честно-честно</p>
           </div>
-      `,
+    `,
     subject: 'Активация аккаунта на Wine and Dices',
     text: 'Привет! Это тестовое сообщение, отправленное с помощью Nodemailer через Яндекс.Почту.',
     to: user.email,
@@ -94,25 +83,13 @@ export default defineEventHandler(async (event) => {
 
   await mailer.sendMail(mailOptions);
 
-  const sessionToken = crypto.randomUUID();
-  const hashedSessionToken = hashSessionToken(sessionToken);
-  const session = {
-    id: crypto.randomUUID(),
-    sessionToken: hashedSessionToken,
-    userAgent,
-    userId: user.id,
-    userIp,
-    expiresAt: new Date(Date.now() + 60 * 60 * 24 * 30 * 1000).toISOString(),
-  };
-
-  await db.insert(userSessionsTable).values(session);
-
-  setCookie(event, 'sessionToken', sessionToken, {
-    httpOnly: true,
-    maxAge: 60 * 60 * 24 * 30,
-    path: '/',
-    sameSite: 'lax',
-    secure: config.nodeEnv === 'production',
+  await setUserSession(event, {
+    user: {
+      id: user.id,
+      email: user.email,
+      isActive: user.isActive,
+    },
+    loggedInAt: Date.now(),
   });
 
   setResponseStatus(event, 201);
