@@ -4,9 +4,7 @@ import {
   pgEnum,
   uuid,
   varchar,
-  index,
   text,
-  inet,
   boolean,
   integer,
 } from 'drizzle-orm/pg-core';
@@ -28,11 +26,6 @@ const deletedAt = timestamp('deleted_at', {
   mode: 'string',
   withTimezone: true,
 });
-
-const expiresAt = timestamp('expires_at', {
-  mode: 'string',
-  withTimezone: true,
-}).notNull();
 
 export const users = pgTable('users', {
   id: uuid('id').primaryKey().defaultRandom(),
@@ -57,25 +50,6 @@ export const userActivations = pgTable('user_activations', {
     }),
   createdAt,
 });
-
-export const userSessions = pgTable(
-  'user_sessions',
-  {
-    id: uuid('id').primaryKey().defaultRandom(),
-    userId: uuid('user_id')
-      .notNull()
-      .references(() => users.id, {
-        onDelete: 'cascade',
-        onUpdate: 'cascade',
-      }),
-    sessionToken: text('session_token').unique().notNull(),
-    userAgent: text('user_agent'),
-    userIp: inet('user_ip'),
-    createdAt,
-    expiresAt,
-  },
-  (table) => [index('sessions_user_id_idx').on(table.userId)],
-);
 
 export const gameModeEnum = pgEnum('game_mode', [
   'one_vs_one',
@@ -137,16 +111,9 @@ export const gameParticipants = pgTable('game_participants', {
 });
 
 export const relations = defineRelations(
-  { users, userSessions, userActivations, characters, games, gameParticipants },
+  { users, userActivations, characters, games, gameParticipants },
   (r) => ({
-    userSessions: {
-      user: r.one.users({
-        from: r.userSessions.userId,
-        to: r.users.id,
-      }),
-    },
     users: {
-      sessions: r.many.userSessions(),
       activation: r.one.userActivations({
         from: r.users.id,
         to: r.userActivations.userId,
