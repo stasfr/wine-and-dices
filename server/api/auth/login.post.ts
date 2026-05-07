@@ -19,19 +19,25 @@ export default defineEventHandler(async (event) => {
     .where(eq(usersTable.email, email));
 
   if (!userResult.length) {
-    throw createError({ status: 401, statusText: 'Invalid credentials' });
+    throw createError({
+      status: 404,
+      statusMessage: 'User does not exist',
+    });
   }
 
   const user = userResult[0];
 
   if (!user) {
-    throw createError({ status: 401, statusText: 'Invalid credentials' });
+    throw createError({
+      status: 404,
+      statusMessage: 'User does not exist',
+    });
   }
 
   const correctPassword = await verifyPassword(user.password, password);
 
   if (!correctPassword) {
-    throw createError({ status: 401, statusText: 'Invalid credentials' });
+    throw createError({ status: 401, statusMessage: 'Invalid credentials' });
   }
 
   await setUserSession(event, {

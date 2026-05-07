@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import type { NavigationMenuItem } from '@nuxt/ui';
 
+const { loggedIn, user } = useUserSession();
+
 const items = computed<NavigationMenuItem[]>(() => [
   {
     label: 'Characters',
@@ -18,15 +20,29 @@ const items = computed<NavigationMenuItem[]>(() => [
     <UNavigationMenu :items="items" color="neutral" />
 
     <template #right>
-      <UTooltip text="Login or register">
+      <template v-if="loggedIn">
         <UButton
           color="neutral"
           variant="ghost"
-          to="/auth/login"
+          to="/profile"
           icon="i-lucide-circle-user"
-          aria-label="GitHub"
-        />
-      </UTooltip>
+        >
+          <template v-if="user && user.email">
+            {{ user.email }}
+          </template>
+        </UButton>
+      </template>
+      <template v-else>
+        <UTooltip text="Login or register">
+          <UButton
+            color="neutral"
+            variant="ghost"
+            to="/auth/login"
+            icon="i-lucide-circle-user"
+            aria-label="Login or register"
+          />
+        </UTooltip>
+      </template>
 
       <UColorModeButton />
     </template>
