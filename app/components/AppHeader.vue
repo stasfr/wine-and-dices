@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import type { NavigationMenuItem } from '@nuxt/ui';
+import type { DropdownMenuItem, NavigationMenuItem } from '@nuxt/ui';
 
-const { loggedIn, user } = useUserSession();
+const { loggedIn, user, clear } = useUserSession();
 
 const items = computed<NavigationMenuItem[]>(() => [
   {
@@ -13,6 +13,21 @@ const items = computed<NavigationMenuItem[]>(() => [
     to: '/games',
   },
 ]);
+
+const userMenuItems = computed<DropdownMenuItem[]>(() => [
+  {
+    label: 'Profile',
+    icon: 'i-lucide-user',
+    to: '/profile',
+  },
+  {
+    label: 'Logout',
+    icon: 'i-lucide-log-out',
+    onSelect: () => {
+      clear();
+    },
+  },
+]);
 </script>
 
 <template>
@@ -21,16 +36,17 @@ const items = computed<NavigationMenuItem[]>(() => [
 
     <template #right>
       <template v-if="loggedIn">
-        <UButton
-          color="neutral"
-          variant="ghost"
-          to="/profile"
-          icon="i-lucide-circle-user"
-        >
-          <template v-if="user && user.email">
-            {{ user.email }}
-          </template>
-        </UButton>
+        <UDropdownMenu :items="userMenuItems">
+          <UButton
+            color="neutral"
+            variant="ghost"
+            icon="i-lucide-circle-user"
+          >
+            <template v-if="user && user.email">
+              {{ user.email }}
+            </template>
+          </UButton>
+        </UDropdownMenu>
       </template>
       <template v-else>
         <UTooltip text="Login or register">
