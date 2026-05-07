@@ -27,6 +27,7 @@
     "@regle/rules": "^1.24.0",
     "@vueuse/nuxt": "14.2.1",
     "argon2": "^0.44.0",
+    "date-fns": "^4.1.0",
     "drizzle-orm": "1.0.0-beta.22",
     "nodemailer": "^8.0.7",
     "nuxt": "^4.4.2",
