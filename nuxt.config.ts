@@ -14,6 +14,7 @@ export default defineNuxtConfig({
     '@formkit/auto-animate',
     '@pinia/colada-nuxt',
     '@regle/nuxt',
+    'nuxt-auth-utils',
   ],
   css: ['~/assets/css/main.css'],
 
