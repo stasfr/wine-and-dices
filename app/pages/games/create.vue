@@ -30,7 +30,11 @@ const gameModeItems = [
 ];
 
 const schema = v.object({
-  date: v.pipe(v.string(), v.minLength(1)),
+  date: v.custom<CalendarDate>(
+    (input) => input instanceof CalendarDate,
+    'Date is required',
+  ),
+  time: v.custom<Time>((input) => input instanceof Time, 'Time is required'),
   comment: v.optional(v.pipe(v.string(), v.minLength(1))),
   mode: v.picklist([
     'one_vs_one',
@@ -51,10 +55,13 @@ const schema = v.object({
 
 type Schema = v.InferOutput<typeof schema>;
 
-const state = reactive<Schema>({
-  date: '',
+const inputDate = useTemplateRef('inputDate');
+
+const state = reactive({
+  date: undefined as CalendarDate | undefined,
+  time: undefined as Time | undefined,
   comment: '',
-  mode: 'king_of_the_hill',
+  mode: 'king_of_the_hill' as const,
   participants: [
     { playerName: '', characterId: '', winner: false, teamIndex: 0 },
     { playerName: '', characterId: '', winner: false, teamIndex: 1 },
@@ -79,30 +86,67 @@ function removeParticipant(index: number) {
 }
 
 async function onSubmit(event: FormSubmitEvent<Schema>) {
-  createGame(event.data, {
-    onSuccess: () => {
-      toast.add({
-        title: 'Game created',
-        color: 'success',
-      });
-      state.date = '';
-      state.comment = '';
-      state.mode = 'king_of_the_hill';
-      state.participants = [
-        { playerName: '', characterId: '', winner: false, teamIndex: 0 },
-        { playerName: '', characterId: '', winner: false, teamIndex: 1 },
-        { playerName: '', characterId: '', winner: false, teamIndex: 2 },
-      ];
-      navigateTo('/games');
+  const { date, time, comment, mode, participants } = event.data;
+
+  if (!date) {
+    toast.add({
+      title: 'Date is required',
+      color: 'error',
+    });
+    return;
+  }
+
+  if (!time) {
+    toast.add({
+      title: 'Time is required',
+      color: 'error',
+    });
+    return;
+  }
+
+  const dateTime = new CalendarDateTime(
+    date.year,
+    date.month,
+    date.day,
+    time.hour,
+    time.minute,
+    time.second || 0,
+    time.millisecond || 0,
+  );
+
+  createGame(
+    {
+      date: dateTime.toString(),
+      comment,
+      mode,
+      participants,
     },
-    onError: (error) => {
-      toast.add({
-        title: 'Failed to create game',
-        description: error.message,
-        color: 'error',
-      });
+    {
+      onSuccess: () => {
+        toast.add({
+          title: 'Game created',
+          color: 'success',
+        });
+        state.date = undefined;
+        state.time = undefined;
+        state.comment = '';
+        state.mode = 'king_of_the_hill';
+        state.participants = [
+          { playerName: '', characterId: '', winner: false, teamIndex: 0 },
+          { playerName: '', characterId: '', winner: false, teamIndex: 1 },
+          { playerName: '', characterId: '', winner: false, teamIndex: 2 },
+        ];
+        navigateTo('/games');
+      },
+      onError: (error) => {
+        toast.add({
+          title: 'Failed to create game',
+          description: error.message,
+          color: 'error',
+        });
+      },
     },
-  });
+  );
 }
 </script>
 
@@ -121,9 +165,32 @@ async function onSubmit(event: FormSubmitEvent<Schema>) {
         class="space-y-4"
         @submit="onSubmit"
       >
-        <UFormField label="Date" name="date">
-          <UInput v-model="state.date" type="datetime-local" />
-        </UFormField>
+        <div class="flex gap-2">
+          <UFormField label="Date" name="date">
+            <UInputDate ref="inputDate" v-model="state.date">
+              <template #trailing>
+                <UPopover :reference="inputDate?.inputsRef[3]?.$el">
+                  <UButton
+                    color="neutral"
+                    variant="link"
+                    size="sm"
+                    icon="i-lucide-calendar"
+                    aria-label="Select a date"
+                    class="px-0"
+                  />
+
+                  <template #content>
+                    <UCalendar v-model="state.date" class="p-2" />
+                  </template>
+                </UPopover>
+              </template>
+            </UInputDate>
+          </UFormField>
+
+          <UFormField label="Time" name="time">
+            <UInputTime v-model="state.time" :hour-cycle="24" />
+          </UFormField>
+        </div>
 
         <UFormField label="Mode" name="mode">
           <USelect v-model="state.mode" :items="gameModeItems" />
