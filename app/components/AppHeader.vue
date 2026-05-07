@@ -18,18 +18,17 @@ const items = computed<NavigationMenuItem[]>(() => [
     <UNavigationMenu :items="items" color="neutral" />
 
     <template #right>
-      <UColorModeButton />
-
-      <UTooltip text="Open on GitHub" :kbds="['meta', 'G']">
+      <UTooltip text="Login or register">
         <UButton
           color="neutral"
           variant="ghost"
-          to="https://github.com/stasfr"
-          target="_blank"
-          icon="i-simple-icons-github"
+          to="/auth/login"
+          icon="i-lucide-circle-user"
           aria-label="GitHub"
         />
       </UTooltip>
+
+      <UColorModeButton />
     </template>
   </UHeader>
 </template>

@@ -4,6 +4,7 @@ import type { FormSubmitEvent } from '@nuxt/ui';
 
 const FORM_ID = 'login-form';
 
+const loading = ref(false);
 const schema = v.object({
   email: v.pipe(v.string(), v.email('Invalid email')),
   password: v.pipe(v.string(), v.minLength(8, 'Must be at least 8 characters')),
@@ -40,21 +41,27 @@ async function onSubmit(event: FormSubmitEvent<Schema>) {
 </script>
 
 <template>
-  <UForm
-    :id="FORM_ID"
-    :schema="schema"
-    :state="formData"
-    class="space-y-4"
-    @submit="onSubmit"
-  >
-    <UFormField label="Email" name="email">
-      <UInput v-model="formData.email" />
-    </UFormField>
+  <div class="flex flex-col items-center justify-center gap-4 p-4 flex-1">
+    <UPageCard title="Login" class="w-full max-w-md">
+      <UForm
+        :id="FORM_ID"
+        :schema="schema"
+        :state="formData"
+        class="space-y-4"
+        @submit="onSubmit"
+      >
+        <UFormField label="Email" name="email">
+          <UInput v-model="formData.email" type="email" class="w-full" />
+        </UFormField>
 
-    <UFormField label="Password" name="password">
-      <UInput v-model="formData.password" type="password" />
-    </UFormField>
+        <UFormField label="Password" name="password">
+          <UInput v-model="formData.password" type="password" class="w-full" />
+        </UFormField>
 
-    <UButton type="submit"> Submit </UButton>
-  </UForm>
+        <UButton :loading="loading" type="submit" class="w-full">
+          <span class="text-center w-full"> Login or register </span>
+        </UButton>
+      </UForm>
+    </UPageCard>
+  </div>
 </template>
