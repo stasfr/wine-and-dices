@@ -53,6 +53,7 @@ async function onSubmit(event: FormSubmitEvent<Schema>) {
         },
       });
 
+      await useUserSession().fetch();
       await navigateTo('/profile');
     } else {
       if (formData.value.password !== formData.value.confirmPassword) {
@@ -71,6 +72,8 @@ async function onSubmit(event: FormSubmitEvent<Schema>) {
           password: formData.value.password,
         },
       });
+
+      await useUserSession().fetch();
 
       toast.add({
         title: 'Success',
