@@ -51,7 +51,7 @@ const bodySchema = v.object({
 
 export default defineEventHandler(async (event) => {
   const db = useDb();
-  await requireAuth(event);
+  await requireUserSession(event);
 
   const { date, comment, mode, participants } = await readValidatedBody(
     event,

@@ -8,7 +8,7 @@ const paramsSchema = v.object({
 
 export default defineEventHandler(async (event) => {
   const db = useDb();
-  await requireAuth(event);
+  await requireUserSession(event);
 
   const params = await getValidatedRouterParams(event, (data) =>
     v.parse(paramsSchema, data),
