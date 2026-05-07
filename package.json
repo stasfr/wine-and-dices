@@ -31,6 +31,7 @@
     "nodemailer": "^8.0.7",
     "nuxt": "^4.4.2",
     "nuxt-auth-utils": "0.5.29",
+    "nuxt-nodemailer": "^1.1.4",
     "pg": "^8.20.0",
     "pinia": "^3.0.4",
     "tailwindcss": "^4.2.4",
@@ -42,7 +43,6 @@
   "devDependencies": {
     "@iconify-json/lucide": "^1.2.105",
     "@iconify-json/simple-icons": "^1.2.81",
-    "@types/nodemailer": "^8.0.0",
     "dotenv": "^17.4.2",
     "drizzle-kit": "1.0.0-beta.22"
   }

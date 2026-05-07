@@ -15,7 +15,19 @@ export default defineNuxtConfig({
     '@pinia/colada-nuxt',
     '@regle/nuxt',
     'nuxt-auth-utils',
+    'nuxt-nodemailer',
   ],
+  nodemailer: {
+    from: '"Wine and Dices" <sfworking@yandex.ru>',
+    host: 'smtp.yandex.ru',
+    port: 465,
+    secure: true,
+    auth: {
+      user: '',
+      pass: '',
+    },
+  },
+
   css: ['~/assets/css/main.css'],
 
   runtimeConfig: {
@@ -30,8 +42,6 @@ export default defineNuxtConfig({
     dbPort: '',
     dbName: '',
     cookieSecret: '',
-    smtpUser: '',
-    smtpPassword: '',
     clientPort: '',
     clientUrl: '',
     clientProtocol: '',

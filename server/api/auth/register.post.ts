@@ -63,13 +63,12 @@ export default defineEventHandler(async (event) => {
     });
   }
 
-  const mailer = useNodemailerClient();
+  const { sendMail } = useNodeMailer();
 
   const hrefLink = `${config.clientProtocol}://${config.clientUrl}:${config.clientPort}`;
   const activationId = user.activation.id;
 
-  const mailOptions = {
-    from: '"Wine and Dices" <sfworking@yandex.ru>',
+  await sendMail({
     html: `
           <div>
             <span>Ссылка для активации аккаунта </span><a href="${hrefLink}/auth/activate/${activationId}">тык</a>
@@ -79,9 +78,7 @@ export default defineEventHandler(async (event) => {
     subject: 'Активация аккаунта на Wine and Dices',
     text: 'Привет! Это тестовое сообщение, отправленное с помощью Nodemailer через Яндекс.Почту.',
     to: user.email,
-  };
-
-  await mailer.sendMail(mailOptions);
+  });
 
   await setUserSession(event, {
     user: {
