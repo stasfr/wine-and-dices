@@ -56,3 +56,15 @@ const { email } = await readValidatedBody(event, (data) => v.parse(bodySchema, d
 - Never split the code into multiple files (like vue composables or utility functions). Keep all related code in a single file. If the user asks to split into files, then split
 - Always extract types into separate files in the types directory
 - Always use tailwind v4 classes for styling. Always make their values multiples of 2 (`w-8`, `p-2` - this is good. `w-7`, `p-3` - this is bad)
+- When using `useTemplateRef`, do not add the "Ref" suffix to the variable name. For component refs, use the component name as the variable name. For element refs, add the "Element" suffix to the variable name.
+
+```typescript
+// BAD
+const fooRef = useTemplateRef('fooRef')
+
+// GOOD - component ref
+const foo = useTemplateRef('foo')
+
+// GOOD - element ref
+const fooElement = useTemplateRef('foo')
+```
