@@ -53,4 +53,6 @@ const { email } = await readValidatedBody(event, (data) => v.parse(bodySchema, d
 
 - To check TypeScript types, run `pnpm nuxt typecheck`
 - Run all package related commands using `pnpm`
-- Never split the code into multiple files (like vue composables or utility functions). Keep all related code in a single file
+- Never split the code into multiple files (like vue composables or utility functions). Keep all related code in a single file. If the user asks to split into files, then split
+- Always extract types into separate files in the types directory
+- Always use tailwind v4 classes for styling. Always make their values multiples of 2 (`w-8`, `p-2` - this is good. `w-7`, `p-3` - this is bad)
