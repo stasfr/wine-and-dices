@@ -23,6 +23,6 @@ export const useCreateGame = defineMutation(() => {
 
   return {
     ...mutation,
-    createGame: mutate,
+    createGame: mutation.mutateAsync,
   };
 });

@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import * as v from 'valibot';
 import { CalendarDate, Time, CalendarDateTime } from '@internationalized/date';
+import { shallowRef } from 'vue';
 
 import type { FormSubmitEvent } from '@nuxt/ui';
 
@@ -60,8 +61,8 @@ type Schema = v.InferOutput<typeof schema>;
 const inputDate = useTemplateRef('inputDate');
 
 const state = reactive({
-  date: undefined as CalendarDate | undefined,
-  time: undefined as Time | undefined,
+  date: shallowRef<CalendarDate | undefined>(undefined),
+  time: shallowRef<Time | undefined>(undefined),
   comment: '',
   mode: 'king_of_the_hill' as const,
   participants: [
@@ -116,39 +117,36 @@ async function onSubmit(event: FormSubmitEvent<Schema>) {
     time.millisecond || 0,
   );
 
-  createGame(
-    {
+  try {
+    await createGame({
       date: dateTime.toString(),
       comment,
       mode,
       participants,
-    },
-    {
-      onSuccess: () => {
-        toast.add({
-          title: 'Game created',
-          color: 'success',
-        });
-        state.date = undefined;
-        state.time = undefined;
-        state.comment = '';
-        state.mode = 'king_of_the_hill';
-        state.participants = [
-          { playerName: '', characterId: '', winner: false, teamIndex: 0 },
-          { playerName: '', characterId: '', winner: false, teamIndex: 1 },
-          { playerName: '', characterId: '', winner: false, teamIndex: 2 },
-        ];
-        navigateTo('/games');
-      },
-      onError: (error) => {
-        toast.add({
-          title: 'Failed to create game',
-          description: error.message,
-          color: 'error',
-        });
-      },
-    },
-  );
+    });
+
+    toast.add({
+      title: 'Game created',
+      color: 'success',
+    });
+    state.date = undefined;
+    state.time = undefined;
+    state.comment = '';
+    state.mode = 'king_of_the_hill';
+    state.participants = [
+      { playerName: '', characterId: '', winner: false, teamIndex: 0 },
+      { playerName: '', characterId: '', winner: false, teamIndex: 1 },
+      { playerName: '', characterId: '', winner: false, teamIndex: 2 },
+    ];
+    navigateTo('/games');
+  } catch (err) {
+    const error = err instanceof Error ? err : new Error(String(err));
+    toast.add({
+      title: 'Failed to create game',
+      description: error.message,
+      color: 'error',
+    });
+  }
 }
 </script>
 
