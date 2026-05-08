@@ -68,3 +68,31 @@ const foo = useTemplateRef('foo')
 // GOOD - element ref
 const fooElement = useTemplateRef('foo')
 ```
+
+- Always use props in components via a variable, and extract their types into a separate interface inside the component's script tag
+
+```vue
+<!-- GOOD -->
+<script setup lang="ts">
+interface Props {
+  someProp: string;
+}
+
+const props = defineProps<Props>();
+</script>
+
+<template>
+  {{ props.someProp }}
+</template>
+
+<!-- BAD -->
+<script setup lang="ts">
+defineProps<{
+  someProp?: string;
+}>();
+</script>
+
+<template>
+  {{ someProp }}
+</template>
+```
