@@ -29,12 +29,12 @@ const modeTeamCount: Record<GameMode, number> = {
 
 const bodySchema = v.object({
   date: v.pipe(v.string(), v.minLength(1)),
-  comment: v.optional(v.pipe(v.string(), v.minLength(1))),
+  comment: v.optional(v.string()),
   mode: v.picklist(gameModeEnum.enumValues),
   participants: v.array(
     v.union([
       v.object({
-        userId: v.pipe(v.string(), v.minLength(1)),
+        email: v.pipe(v.string(), v.minLength(1), v.email()),
         characterId: v.pipe(v.string(), v.minLength(1)),
         winner: v.boolean(),
         teamIndex: v.pipe(v.number(), v.integer(), v.minValue(0)),
@@ -53,10 +53,59 @@ export default defineEventHandler(async (event) => {
   const db = useDb();
   await requireUserSession(event);
 
-  const { date, comment, mode, participants } = await readValidatedBody(
+  const { date, comment, mode, participants: bodyParticipants } = await readValidatedBody(
     event,
     (data) => v.parse(bodySchema, data),
   );
+
+  const emails: string[] = [];
+  for (const participant of bodyParticipants) {
+    if ('email' in participant) {
+      emails.push(participant.email);
+    }
+  }
+
+  const emailToUserId = new Map<string, string>();
+  if (emails.length > 0) {
+    const usersByEmail = await db
+      .select({ email: usersTable.email, id: usersTable.id })
+      .from(usersTable)
+      .where(inArray(usersTable.email, emails));
+
+    for (const user of usersByEmail) {
+      emailToUserId.set(user.email, user.id);
+    }
+
+    for (const participant of bodyParticipants) {
+      if ('email' in participant && !emailToUserId.has(participant.email)) {
+        throw createError({
+          status: 400,
+          statusText: `User with email "${participant.email}" does not exist`,
+        });
+      }
+    }
+  }
+
+  const normalizedParticipants = bodyParticipants.map((participant) => {
+    if ('email' in participant) {
+      const userId = emailToUserId.get(participant.email);
+      if (!userId) {
+        throw createError({
+          status: 400,
+          statusText: `User with email "${participant.email}" does not exist`,
+        });
+      }
+      return {
+        userId,
+        characterId: participant.characterId,
+        winner: participant.winner,
+        teamIndex: participant.teamIndex,
+      };
+    }
+    return participant;
+  });
+
+  const participants = normalizedParticipants;
 
   if (new Date(date) > new Date()) {
     throw createError({
