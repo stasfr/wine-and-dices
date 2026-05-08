@@ -145,7 +145,12 @@ async function onSubmit() {
 </script>
 
 <template>
-  <form :id="FORM_ID" class="space-y-4" @submit.prevent="onSubmit">
+  <form
+    :id="FORM_ID"
+    class="space-y-4"
+    @submit.prevent="onSubmit"
+    @keydown.enter.prevent
+  >
     <div class="flex gap-2">
       <UFormField label="Date" name="date">
         <UInputDate ref="inputDate" v-model="date">
