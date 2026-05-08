@@ -1,9 +1,13 @@
 <script setup lang="ts">
-import * as v from 'valibot';
-import { CalendarDate, Time, CalendarDateTime } from '@internationalized/date';
+import {
+  Time,
+  CalendarDateTime,
+  today,
+  getLocalTimeZone,
+} from '@internationalized/date';
 import { shallowRef } from 'vue';
 
-import type { FormSubmitEvent } from '@nuxt/ui';
+const FORM_ID = 'create-game-form';
 
 const requestFetch = useRequestFetch();
 const toast = useToast();
@@ -32,37 +36,12 @@ const gameModeItems = [
   { label: 'King of the Hill', value: 'king_of_the_hill' },
 ];
 
-const schema = v.object({
-  date: v.custom<CalendarDate>(
-    (input) => input instanceof CalendarDate,
-    'Date is required',
-  ),
-  time: v.custom<Time>((input) => input instanceof Time, 'Time is required'),
-  comment: v.optional(v.pipe(v.string(), v.minLength(1))),
-  mode: v.picklist([
-    'one_vs_one',
-    'two_vs_two',
-    'three_vs_three',
-    'two_vs_two_vs_two',
-    'king_of_the_hill',
-  ]),
-  participants: v.array(
-    v.object({
-      playerName: v.pipe(v.string(), v.minLength(1)),
-      characterId: v.pipe(v.string(), v.minLength(1)),
-      winner: v.boolean(),
-      teamIndex: v.pipe(v.number(), v.integer(), v.minValue(0)),
-    }),
-  ),
-});
-
-type Schema = v.InferOutput<typeof schema>;
-
 const inputDate = useTemplateRef('inputDate');
 
-const state = reactive({
-  date: shallowRef<CalendarDate | undefined>(undefined),
-  time: shallowRef<Time | undefined>(undefined),
+const date = shallowRef(today(getLocalTimeZone()));
+const time = shallowRef(new Time());
+
+const formData = ref({
   comment: '',
   mode: 'king_of_the_hill' as const,
   participants: [
@@ -73,25 +52,27 @@ const state = reactive({
 });
 
 function addParticipant() {
-  state.participants.push({
+  formData.value.participants.push({
     playerName: '',
     characterId: '',
     winner: false,
-    teamIndex: state.participants.length,
+    teamIndex: formData.value.participants.length,
   });
 }
 
 function removeParticipant(index: number) {
-  state.participants.splice(index, 1);
-  state.participants.forEach((p, i) => {
+  formData.value.participants.splice(index, 1);
+  formData.value.participants.forEach((p, i) => {
     p.teamIndex = i;
   });
 }
 
-async function onSubmit(event: FormSubmitEvent<Schema>) {
-  const { date, time, comment, mode, participants } = event.data;
+async function onSubmit() {
+  const { comment, mode, participants } = formData.value;
+  const currentDate = date.value;
+  const currentTime = time.value;
 
-  if (!date) {
+  if (!currentDate) {
     toast.add({
       title: 'Date is required',
       color: 'error',
@@ -99,7 +80,7 @@ async function onSubmit(event: FormSubmitEvent<Schema>) {
     return;
   }
 
-  if (!time) {
+  if (!currentTime) {
     toast.add({
       title: 'Time is required',
       color: 'error',
@@ -108,13 +89,13 @@ async function onSubmit(event: FormSubmitEvent<Schema>) {
   }
 
   const dateTime = new CalendarDateTime(
-    date.year,
-    date.month,
-    date.day,
-    time.hour,
-    time.minute,
-    time.second || 0,
-    time.millisecond || 0,
+    currentDate.year,
+    currentDate.month,
+    currentDate.day,
+    currentTime.hour,
+    currentTime.minute,
+    currentTime.second || 0,
+    currentTime.millisecond || 0,
   );
 
   try {
@@ -129,11 +110,11 @@ async function onSubmit(event: FormSubmitEvent<Schema>) {
       title: 'Game created',
       color: 'success',
     });
-    state.date = undefined;
-    state.time = undefined;
-    state.comment = '';
-    state.mode = 'king_of_the_hill';
-    state.participants = [
+    date.value = today(getLocalTimeZone());
+    time.value = new Time();
+    formData.value.comment = '';
+    formData.value.mode = 'king_of_the_hill';
+    formData.value.participants = [
       { playerName: '', characterId: '', winner: false, teamIndex: 0 },
       { playerName: '', characterId: '', winner: false, teamIndex: 1 },
       { playerName: '', characterId: '', winner: false, teamIndex: 2 },
@@ -159,15 +140,10 @@ async function onSubmit(event: FormSubmitEvent<Schema>) {
     </UPageHeader>
 
     <UPageBody>
-      <UForm
-        :schema="schema"
-        :state="state"
-        class="space-y-4"
-        @submit="onSubmit"
-      >
+      <form :id="FORM_ID" class="space-y-4" @submit.prevent="onSubmit">
         <div class="flex gap-2">
           <UFormField label="Date" name="date">
-            <UInputDate ref="inputDate" v-model="state.date">
+            <UInputDate ref="inputDate" v-model="date">
               <template #trailing>
                 <UPopover :reference="inputDate?.inputsRef[3]?.$el">
                   <UButton
@@ -180,7 +156,7 @@ async function onSubmit(event: FormSubmitEvent<Schema>) {
                   />
 
                   <template #content>
-                    <UCalendar v-model="state.date" class="p-2" />
+                    <UCalendar v-model="date" class="p-2" />
                   </template>
                 </UPopover>
               </template>
@@ -188,16 +164,16 @@ async function onSubmit(event: FormSubmitEvent<Schema>) {
           </UFormField>
 
           <UFormField label="Time" name="time">
-            <UInputTime v-model="state.time" :hour-cycle="24" />
+            <UInputTime v-model="time" :hour-cycle="24" />
           </UFormField>
         </div>
 
         <UFormField label="Mode" name="mode">
-          <USelect v-model="state.mode" :items="gameModeItems" />
+          <USelect v-model="formData.mode" :items="gameModeItems" />
         </UFormField>
 
         <UFormField label="Comment" name="comment">
-          <UTextarea v-model="state.comment" />
+          <UTextarea v-model="formData.comment" />
         </UFormField>
 
         <div class="space-y-2">
@@ -214,7 +190,7 @@ async function onSubmit(event: FormSubmitEvent<Schema>) {
           </div>
 
           <div
-            v-for="(participant, index) in state.participants"
+            v-for="(participant, index) in formData.participants"
             :key="index"
             class="p-3 border rounded-lg space-y-2"
           >
@@ -279,7 +255,7 @@ async function onSubmit(event: FormSubmitEvent<Schema>) {
             :loading="createAsyncStatus === 'loading'"
           />
         </div>
-      </UForm>
+      </form>
     </UPageBody>
   </UPage>
 </template>
