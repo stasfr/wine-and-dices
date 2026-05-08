@@ -1,39 +1,9 @@
 <script setup lang="ts">
 import type { InputMenuItem } from '@nuxt/ui';
-
 import type { IUserListItem } from '../types/users';
 
-interface Props {
-  placeholder?: string;
-}
-
-const props = defineProps<Props>();
-
-const modelValue = defineModel<string>({ required: true });
-
 const requestFetch = useRequestFetch();
-
-const searchTerm = ref('');
-const debouncedSearchTerm = ref('');
-
-watchDebounced(
-  searchTerm,
-  (term) => {
-    debouncedSearchTerm.value = term;
-  },
-  { debounce: 200 },
-);
-
-const { data: usersData, asyncStatus } = useQuery({
-  key: () => ['users', 'search', debouncedSearchTerm.value],
-  query: () =>
-    requestFetch<{ data: IUserListItem[] }>('/api/users/list', {
-      query: { search: debouncedSearchTerm.value },
-    }),
-  enabled: () => debouncedSearchTerm.value.length >= 1,
-});
-
-function formatUserName(user: IUserListItem): string {
+function formatUserName(user: IUserListItem) {
   const parts: string[] = [];
   if (user.lastName) {
     parts.push(user.lastName);
@@ -50,13 +20,27 @@ function formatUserName(user: IUserListItem): string {
   return user.email;
 }
 
+const modelValue = defineModel<string>({ required: true });
+const searchTerm = ref('');
+const debouncedSearchTerm = refDebounced(searchTerm, 300);
+
+const { data: usersData, asyncStatus } = useQuery({
+  key: () => ['users', 'search', debouncedSearchTerm.value],
+  query: () =>
+    requestFetch<{ data: IUserListItem[] }>('/api/users/list', {
+      query: { search: debouncedSearchTerm.value },
+    }),
+  enabled: () => debouncedSearchTerm.value.length >= 1,
+});
+
 const items = computed<InputMenuItem[]>(() => {
   if (!usersData.value) {
     return [];
   }
+
   return usersData.value.data.map((user) => ({
     label: formatUserName(user),
-    value: formatUserName(user),
+    value: user.id,
     email: user.email,
   }));
 });
@@ -71,8 +55,7 @@ const items = computed<InputMenuItem[]>(() => {
     :loading="asyncStatus === 'loading'"
     ignore-filter
     icon="i-lucide-user"
-    :placeholder="props.placeholder || 'Search user...'"
-    :content="{ hideWhenEmpty: true }"
+    placeholder="Search user..."
   >
     <template #item-label="{ item }">
       <template v-if="item && typeof item === 'object'">

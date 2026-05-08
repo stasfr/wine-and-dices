@@ -211,12 +211,11 @@ async function onSubmit() {
           />
         </div>
 
-        <!-- TODO: create to component to search users by email and create plain name if not found -->
         <UFormField
           :name="`participants.${index}.playerName`"
           label="Player Name"
         >
-          <UInput v-model="participant.playerName" />
+          <UserSearchInput v-model="participant.playerName" />
         </UFormField>
 
         <!-- TODO: move to its own component -->
