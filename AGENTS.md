@@ -9,7 +9,7 @@ interface User {
 }
 
 // BAD
-const username = user.name!
+const username = user.name!;
 
 // GOOD
 if (!user.name) {
@@ -18,10 +18,10 @@ if (!user.name) {
   // or
   return;
   // or
-  createError({status: 400, statusText: 'some error'})
+  createError({ status: 400, statusText: 'some error' });
 }
 
-const username = user.name
+const username = user.name;
 ```
 
 - When creating API endpoints, always validate incoming data (params, query, body) using Valibot schemas
@@ -38,17 +38,24 @@ const params = await getValidatedRouterParams(event, (data) =>
 
 // GOOD - query
 const querySchema = v.object({
-  page: v.optional(v.pipe(v.string(), v.toNumber(), v.number(), v.integer(), v.minValue(1)), '1'),
+  page: v.optional(
+    v.pipe(v.string(), v.toNumber(), v.number(), v.integer(), v.minValue(1)),
+    '1',
+  ),
 });
 
-const { page } = await getValidatedQuery(event, (data) => v.parse(querySchema, data));
+const { page } = await getValidatedQuery(event, (data) =>
+  v.parse(querySchema, data),
+);
 
 // GOOD - body
 const bodySchema = v.object({
   email: v.pipe(v.string(), v.minLength(1), v.email()),
 });
 
-const { email } = await readValidatedBody(event, (data) => v.parse(bodySchema, data));
+const { email } = await readValidatedBody(event, (data) =>
+  v.parse(bodySchema, data),
+);
 ```
 
 - To check TypeScript types, run `pnpm nuxt typecheck`
@@ -60,13 +67,13 @@ const { email } = await readValidatedBody(event, (data) => v.parse(bodySchema, d
 
 ```typescript
 // BAD
-const fooRef = useTemplateRef('fooRef')
+const fooRef = useTemplateRef('fooRef');
 
 // GOOD - component ref
-const foo = useTemplateRef('foo')
+const foo = useTemplateRef('foo');
 
 // GOOD - element ref
-const fooElement = useTemplateRef('foo')
+const fooElement = useTemplateRef('foo');
 ```
 
 - Always use props in components via a variable, and extract their types into a separate interface inside the component's script tag
@@ -96,3 +103,8 @@ defineProps<{
   {{ someProp }}
 </template>
 ```
+
+- Prefer interfaces over types
+- Never use `?` in types. Explicitly indicate that a variable can be `undefined`
+- Do not write function return types
+- Prefer function declarations over arrow functions
