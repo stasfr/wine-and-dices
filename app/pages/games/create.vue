@@ -5,12 +5,14 @@ import {
   today,
   getLocalTimeZone,
 } from '@internationalized/date';
+import { useMutation, useQueryCache } from '@pinia/colada';
 import { shallowRef } from 'vue';
 
 const FORM_ID = 'create-game-form';
 
 const requestFetch = useRequestFetch();
 const toast = useToast();
+const queryCache = useQueryCache();
 
 const { data: charactersData } = useQuery({
   key: ['characters'],
@@ -26,7 +28,28 @@ const characterItems = computed(() =>
   })),
 );
 
-const { createGame, asyncStatus: createAsyncStatus } = useCreateGame();
+interface CreateGameBody {
+  date: string;
+  comment?: string;
+  mode: string;
+  participants: {
+    playerName: string;
+    characterId: string;
+    winner: boolean;
+    teamIndex: number;
+  }[];
+}
+
+const { mutate: createGame, asyncStatus: createAsyncStatus } = useMutation({
+  mutation: (data: CreateGameBody) =>
+    requestFetch('/api/dices/games/create', {
+      method: 'POST',
+      body: data,
+    }),
+  onSettled: () => {
+    queryCache.invalidateQueries({ key: ['games'] });
+  },
+});
 
 const gameModeItems = [
   { label: '1v1', value: 'one_vs_one' },
