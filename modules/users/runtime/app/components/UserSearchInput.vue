@@ -3,6 +3,7 @@ import type { InputMenuItem } from '@nuxt/ui';
 import type { IUserListItem } from '../types/users';
 
 const requestFetch = useRequestFetch();
+
 function formatUserName(user: IUserListItem) {
   const parts: string[] = [];
   if (user.lastName) {
@@ -40,8 +41,8 @@ const items = computed<InputMenuItem[]>(() => {
 
   return usersData.value.data.map((user) => ({
     label: formatUserName(user),
-    value: user.id,
-    email: user.email,
+    description: user.email,
+    value: user.email,
   }));
 });
 </script>
@@ -50,20 +51,13 @@ const items = computed<InputMenuItem[]>(() => {
   <UInputMenu
     v-model="modelValue"
     v-model:search-term="searchTerm"
-    autocomplete
     :items="items"
     :loading="asyncStatus === 'loading'"
+    autocomplete
     ignore-filter
+    clear
     icon="i-lucide-user"
     placeholder="Search user..."
-  >
-    <template #item-label="{ item }">
-      <template v-if="item && typeof item === 'object'">
-        {{ 'label' in item ? item.label : '' }}
-        <span v-if="'email' in item" class="text-muted">
-          {{ item.email }}
-        </span>
-      </template>
-    </template>
-  </UInputMenu>
+    value-key="value"
+  />
 </template>
