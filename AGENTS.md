@@ -53,3 +53,4 @@ const { email } = await readValidatedBody(event, (data) => v.parse(bodySchema, d
 
 - To check TypeScript types, run `pnpm nuxt typecheck`
 - Run all package related commands using `pnpm`
+- Never split the code into multiple files (like vue composables or utility functions). Keep all related code in a single file
