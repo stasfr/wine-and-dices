@@ -34,43 +34,48 @@ function handleRemove() {
 </script>
 
 <template>
-  <UForm
-    :name="`participants.${props.index}`"
-    :schema="participantSchema"
-    nested
-    class="p-2 border rounded-lg space-y-2 flex flex-col w-full"
-  >
-    <div class="flex items-center justify-between">
-      <span class="text-sm font-medium">
-        Player
-      </span>
-      <UButton
-        v-if="props.removable"
-        type="button"
-        size="xs"
-        color="error"
-        variant="ghost"
-        label="Remove"
-        @click="handleRemove"
+  <UCard class="w-full">
+    <template #header>
+      <div class="flex items-center justify-between">
+        <span class="text-sm font-medium"> Player </span>
+        <UButton
+          v-if="props.removable"
+          type="button"
+          size="xs"
+          color="error"
+          variant="ghost"
+          label="Remove"
+          @click="handleRemove"
+        />
+      </div>
+    </template>
+
+    <UForm
+      :name="`participants.${props.index}`"
+      :schema="participantSchema"
+      nested
+      class="space-y-2 flex flex-col w-full"
+    >
+      <UFormField name="playerName" label="Player Name">
+        <UserSearchInput
+          v-model="props.participant.playerName"
+          class="w-full"
+        />
+      </UFormField>
+
+      <UFormField name="characterId" label="Character">
+        <GameCharacterSelect
+          v-model="props.participant.characterId"
+          :disabled-characters="props.disabledCharacters"
+          class="w-full"
+        />
+      </UFormField>
+
+      <UCheckbox
+        name="winner"
+        v-model="props.participant.winner"
+        label="Winner"
       />
-    </div>
-
-    <UFormField name="playerName" label="Player Name">
-      <UserSearchInput v-model="props.participant.playerName" class="w-full" />
-    </UFormField>
-
-    <UFormField name="characterId" label="Character">
-      <GameCharacterSelect
-        v-model="props.participant.characterId"
-        :disabled-characters="props.disabledCharacters"
-        class="w-full"
-      />
-    </UFormField>
-
-    <UCheckbox
-      name="winner"
-      v-model="props.participant.winner"
-      label="Winner"
-    />
-  </UForm>
+    </UForm>
+  </UCard>
 </template>

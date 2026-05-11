@@ -87,9 +87,12 @@ const state = ref<Schema>({
   participants: createDefaultParticipants('one_vs_one'),
 });
 
-watch(() => state.value.mode, (newMode) => {
-  state.value.participants = createDefaultParticipants(newMode);
-});
+watch(
+  () => state.value.mode,
+  (newMode) => {
+    state.value.participants = createDefaultParticipants(newMode);
+  },
+);
 
 const disabledCharacters = computed(() =>
   state.value.participants
@@ -113,7 +116,10 @@ const teamCount = computed(() => {
 });
 
 const groupedParticipants = computed(() => {
-  const groups: Record<number, { participant: Schema['participants'][0]; index: number }[]> = {};
+  const groups: Record<
+    number,
+    { participant: Schema['participants'][0]; index: number }[]
+  > = {};
 
   if (state.value.mode === 'king_of_the_hill') {
     return groups;
@@ -265,41 +271,53 @@ async function onSubmit(event: FormSubmitEvent<Schema>) {
         class="grid gap-4"
         :class="teamCount === 3 ? 'grid-cols-3' : 'grid-cols-2'"
       >
-        <div v-for="teamIdx in teamCount" :key="teamIdx" class="space-y-2">
-          <span class="font-medium text-sm">Team {{ teamIdx }}</span>
-          <GameParticipantForm
-            v-for="item in (groupedParticipants[teamIdx - 1] || [])"
-            :key="item.index"
-            :participant="item.participant"
-            :index="item.index"
-            :disabled-characters="disabledCharacters"
-          />
-        </div>
+        <UCard
+          v-for="teamIdx in teamCount"
+          :key="teamIdx"
+          :title="`Team ${teamIdx}`"
+          class="w-full"
+        >
+          <div class="space-y-4">
+            <GameParticipantForm
+              v-for="item in groupedParticipants[teamIdx - 1] || []"
+              :key="item.index"
+              :participant="item.participant"
+              :index="item.index"
+              :disabled-characters="disabledCharacters"
+            />
+          </div>
+        </UCard>
       </div>
     </div>
 
     <div v-else class="space-y-2">
-      <div class="flex items-center justify-between">
-        <span class="font-medium text-sm">Participants</span>
-        <UButton
-          type="button"
-          size="sm"
-          color="neutral"
-          variant="ghost"
-          label="Add"
-          @click="addParticipant"
-        />
-      </div>
+      <UCard class="w-full">
+        <template #header>
+          <div class="flex items-center justify-between">
+            <span class="font-medium text-sm">Participants</span>
+            <UButton
+              type="button"
+              size="sm"
+              color="neutral"
+              variant="ghost"
+              label="Add"
+              @click="addParticipant"
+            />
+          </div>
+        </template>
 
-      <GameParticipantForm
-        v-for="(participant, index) in state.participants"
-        :key="index"
-        :participant="participant"
-        :index="index"
-        :disabled-characters="disabledCharacters"
-        :removable="state.participants.length > 2"
-        @remove="removeParticipant"
-      />
+        <div class="space-y-2">
+          <GameParticipantForm
+            v-for="(participant, index) in state.participants"
+            :key="index"
+            :participant="participant"
+            :index="index"
+            :disabled-characters="disabledCharacters"
+            :removable="state.participants.length > 2"
+            @remove="removeParticipant"
+          />
+        </div>
+      </UCard>
     </div>
 
     <div class="flex justify-end gap-2">
