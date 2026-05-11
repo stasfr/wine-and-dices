@@ -38,7 +38,7 @@ function handleRemove() {
     :name="`participants.${props.index}`"
     :schema="participantSchema"
     nested
-    class="p-3 border rounded-lg space-y-2"
+    class="p-2 border rounded-lg space-y-2 flex flex-col w-full"
   >
     <div class="flex items-center justify-between">
       <span class="text-sm font-medium">
@@ -56,13 +56,14 @@ function handleRemove() {
     </div>
 
     <UFormField name="playerName" label="Player Name">
-      <UserSearchInput v-model="props.participant.playerName" />
+      <UserSearchInput v-model="props.participant.playerName" class="w-full" />
     </UFormField>
 
     <UFormField name="characterId" label="Character">
       <GameCharacterSelect
         v-model="props.participant.characterId"
         :disabled-characters="props.disabledCharacters"
+        class="w-full"
       />
     </UFormField>
 
