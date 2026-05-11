@@ -16,6 +16,7 @@ interface Props {
     teamIndex: number;
   };
   index: number;
+  disabledCharacters: string[] | undefined;
 }
 
 const props = defineProps<Props>();
@@ -57,7 +58,10 @@ function handleRemove() {
     </UFormField>
 
     <UFormField name="characterId" label="Character">
-      <GameCharacterSelect v-model="props.participant.characterId" />
+      <GameCharacterSelect
+        v-model="props.participant.characterId"
+        :disabled-characters="props.disabledCharacters"
+      />
     </UFormField>
 
     <UFormField name="teamIndex" label="Team Index">

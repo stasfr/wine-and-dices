@@ -58,6 +58,12 @@ const state = ref<Schema>({
   ],
 });
 
+const disabledCharacters = computed(() =>
+  state.value.participants
+    .map((participant) => participant.characterId)
+    .filter((characterId) => characterId !== ''),
+);
+
 function validate() {
   const errors: FormError[] = [];
 
@@ -208,6 +214,7 @@ async function onSubmit(event: FormSubmitEvent<Schema>) {
         :key="index"
         :participant="participant"
         :index="index"
+        :disabled-characters="disabledCharacters"
         @remove="removeParticipant"
       />
     </div>
