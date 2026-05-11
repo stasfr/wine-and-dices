@@ -26,3 +26,6 @@ logs
 # For static files like characters images
 public/images/portraits/
 public/images/characters/
+
+# Linter
+.eslintcache
