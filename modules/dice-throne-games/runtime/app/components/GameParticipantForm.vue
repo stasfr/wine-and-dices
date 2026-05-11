@@ -1,0 +1,69 @@
+<script setup lang="ts">
+import * as v from 'valibot';
+
+const participantSchema = v.object({
+  playerName: v.pipe(v.string(), v.minLength(1, 'Player name is required')),
+  characterId: v.pipe(v.string(), v.minLength(1, 'Character is required')),
+  winner: v.boolean(),
+  teamIndex: v.pipe(v.number(), v.integer(), v.minValue(0)),
+});
+
+interface Props {
+  participant: {
+    playerName: string;
+    characterId: string;
+    winner: boolean;
+    teamIndex: number;
+  };
+  index: number;
+}
+
+const props = defineProps<Props>();
+
+const emit = defineEmits<{
+  remove: [index: number];
+}>();
+
+function handleRemove() {
+  emit('remove', props.index);
+}
+</script>
+
+<template>
+  <UForm
+    :name="`participants.${props.index}`"
+    :schema="participantSchema"
+    nested
+    class="p-3 border rounded-lg space-y-2"
+  >
+    <div class="flex items-center justify-between">
+      <span class="text-sm font-medium"> Participant {{ props.index + 1 }} </span>
+      <UButton
+        type="button"
+        size="xs"
+        color="error"
+        variant="ghost"
+        label="Remove"
+        @click="handleRemove"
+      />
+    </div>
+
+    <UFormField name="playerName" label="Player Name">
+      <UserSearchInput v-model="props.participant.playerName" />
+    </UFormField>
+
+    <UFormField name="characterId" label="Character">
+      <GameCharacterSelect v-model="props.participant.characterId" />
+    </UFormField>
+
+    <UFormField name="teamIndex" label="Team Index">
+      <UInput v-model="props.participant.teamIndex" type="number" />
+    </UFormField>
+
+    <UCheckbox
+      name="winner"
+      v-model="props.participant.winner"
+      label="Winner"
+    />
+  </UForm>
+</template>

@@ -213,50 +213,13 @@ async function onSubmit(event: FormSubmitEvent<Schema>) {
         />
       </div>
 
-      <div
+      <GameParticipantForm
         v-for="(participant, index) in state.participants"
         :key="index"
-        class="p-3 border rounded-lg space-y-2"
-      >
-        <div class="flex items-center justify-between">
-          <span class="text-sm font-medium"> Participant {{ index + 1 }} </span>
-          <UButton
-            type="button"
-            size="xs"
-            color="error"
-            variant="ghost"
-            label="Remove"
-            @click="removeParticipant(index)"
-          />
-        </div>
-
-        <UFormField
-          :name="`participants.${index}.playerName`"
-          label="Player Name"
-        >
-          <UserSearchInput v-model="participant.playerName" />
-        </UFormField>
-
-        <UFormField
-          :name="`participants.${index}.characterId`"
-          label="Character"
-        >
-          <GameCharacterSelect v-model="participant.characterId" />
-        </UFormField>
-
-        <UFormField
-          :name="`participants.${index}.teamIndex`"
-          label="Team Index"
-        >
-          <UInput v-model="participant.teamIndex" type="number" />
-        </UFormField>
-
-        <UCheckbox
-          :name="`participants.${index}.winner`"
-          v-model="participant.winner"
-          label="Winner"
-        />
-      </div>
+        :participant="participant"
+        :index="index"
+        @remove="removeParticipant"
+      />
     </div>
 
     <div class="flex justify-end gap-2">
