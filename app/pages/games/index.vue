@@ -1,6 +1,13 @@
 <script setup lang="ts">
+import type { IGameListItem } from '#shared/types/games';
+
 const { data: gamesData, asyncStatus: gamesAsyncStatus } = useGamesList();
 const gamesList = computed(() => gamesData.value?.data || []);
+const isLoading = computed(() => gamesAsyncStatus.value === 'loading');
+
+function handleViewGame(game: IGameListItem) {
+  navigateTo(`/games/${game.id}`);
+}
 </script>
 
 <template>
@@ -17,9 +24,15 @@ const gamesList = computed(() => gamesData.value?.data || []);
     </UPageHeader>
 
     <UPageBody>
-      <div v-if="gamesAsyncStatus === 'loading'">Loading...</div>
-      <div v-else-if="gamesList.length === 0">No games found</div>
-      <pre v-else>{{ JSON.stringify(gamesList, null, 2) }}</pre>
+      <div v-if="!isLoading && gamesList.length === 0" class="text-center py-8 text-muted">
+        No games found
+      </div>
+      <GamesTable
+        v-else
+        :data="gamesList"
+        :loading="isLoading"
+        @view="handleViewGame"
+      />
     </UPageBody>
   </UPage>
 </template>
