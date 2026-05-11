@@ -19,9 +19,14 @@ const { data: charactersData } = useQuery({
 const charactersList = computed(() => charactersData.value?.data || []);
 
 const characterItems = computed(() =>
-  charactersList.value.map((c: { id: string; name: string }) => ({
+  charactersList.value.map((c: { id: string; name: string; key: string }) => ({
     label: c.name,
     value: c.id,
+    avatar: {
+      src: `images/portraits/${c.key}.png`,
+      alt: c.name,
+      loading: 'lazy' as const,
+    },
   })),
 );
 
@@ -33,12 +38,18 @@ const value = computed({
     emit('update:modelValue', newValue);
   },
 });
+
+const avatar = computed(() =>
+  characterItems.value.find((item) => item.value === value.value)?.avatar,
+);
 </script>
 
 <template>
   <USelect
     v-model="value"
     :items="characterItems"
+    value-key="value"
+    :avatar="avatar"
     placeholder="Select character"
   />
 </template>
