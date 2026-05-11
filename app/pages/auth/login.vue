@@ -59,7 +59,7 @@ async function onSubmit(event: FormSubmitEvent<Schema>) {
       if (formData.value.password !== formData.value.confirmPassword) {
         toast.add({
           title: 'Error',
-          description: 'Пароли не совпадают',
+          description: 'Passwords do not match',
           color: 'error',
         });
         return;
@@ -77,7 +77,7 @@ async function onSubmit(event: FormSubmitEvent<Schema>) {
 
       toast.add({
         title: 'Success',
-        description: 'Регистрация прошла успешно',
+        description: 'Registration completed successfully',
         color: 'success',
       });
 
@@ -125,7 +125,7 @@ async function onSubmit(event: FormSubmitEvent<Schema>) {
 
         <UFormField
           v-if="mode === 'register'"
-          label="Подтвердите пароль"
+          label="Confirm password"
           name="confirmPassword"
         >
           <UInput
