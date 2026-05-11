@@ -94,6 +94,23 @@ watch(
   },
 );
 
+const isFormValid = computed(() => {
+  const schemaResult = v.safeParse(schema, state.value);
+  if (!schemaResult.success) {
+    return false;
+  }
+
+  if (!date.value) {
+    return false;
+  }
+
+  if (!time.value) {
+    return false;
+  }
+
+  return true;
+});
+
 const disabledCharacters = computed(() =>
   state.value.participants
     .map((participant) => participant.characterId)
@@ -332,6 +349,7 @@ async function onSubmit(event: FormSubmitEvent<Schema>) {
         type="submit"
         label="Create"
         :loading="createAsyncStatus === 'loading'"
+        :disabled="!isFormValid"
       />
     </div>
   </UForm>
