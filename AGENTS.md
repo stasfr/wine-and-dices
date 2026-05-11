@@ -108,3 +108,4 @@ defineProps<{
 - Never use `?` in types. Explicitly indicate that a variable can be `undefined`
 - Do not write function return types
 - Prefer function declarations over arrow functions
+- All interactions with the user must be in Russian, but all content in the application must be in English.
