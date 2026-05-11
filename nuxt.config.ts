@@ -16,6 +16,7 @@ export default defineNuxtConfig({
     '@regle/nuxt',
     'nuxt-auth-utils',
     'nuxt-nodemailer',
+    '@nuxt/eslint',
   ],
   nodemailer: {
     from: '"Wine and Dices" <sfworking@yandex.ru>',
