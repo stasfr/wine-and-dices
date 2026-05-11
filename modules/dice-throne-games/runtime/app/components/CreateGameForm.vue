@@ -48,14 +48,47 @@ const schema = v.object({
 
 type Schema = v.InferOutput<typeof schema>;
 
+function createDefaultParticipants(mode: string) {
+  if (mode === 'king_of_the_hill') {
+    return [
+      { playerName: '', characterId: '', winner: false, teamIndex: 0 },
+      { playerName: '', characterId: '', winner: false, teamIndex: 0 },
+      { playerName: '', characterId: '', winner: false, teamIndex: 0 },
+    ];
+  }
+
+  const configs: Record<string, { teams: number; playersPerTeam: number }> = {
+    one_vs_one: { teams: 2, playersPerTeam: 1 },
+    two_vs_two: { teams: 2, playersPerTeam: 2 },
+    three_vs_three: { teams: 2, playersPerTeam: 3 },
+    two_vs_two_vs_two: { teams: 3, playersPerTeam: 2 },
+  };
+
+  const config = configs[mode] || { teams: 2, playersPerTeam: 1 };
+  const participants = [];
+
+  for (let team = 0; team < config.teams; team++) {
+    for (let player = 0; player < config.playersPerTeam; player++) {
+      participants.push({
+        playerName: '',
+        characterId: '',
+        winner: false,
+        teamIndex: team,
+      });
+    }
+  }
+
+  return participants;
+}
+
 const state = ref<Schema>({
   comment: '',
-  mode: 'king_of_the_hill',
-  participants: [
-    { playerName: '', characterId: '', winner: false, teamIndex: 0 },
-    { playerName: '', characterId: '', winner: false, teamIndex: 1 },
-    { playerName: '', characterId: '', winner: false, teamIndex: 2 },
-  ],
+  mode: 'one_vs_one',
+  participants: createDefaultParticipants('one_vs_one'),
+});
+
+watch(() => state.value.mode, (newMode) => {
+  state.value.participants = createDefaultParticipants(newMode);
 });
 
 const disabledCharacters = computed(() =>
@@ -63,6 +96,44 @@ const disabledCharacters = computed(() =>
     .map((participant) => participant.characterId)
     .filter((characterId) => characterId !== ''),
 );
+
+const teamCount = computed(() => {
+  switch (state.value.mode) {
+    case 'one_vs_one':
+      return 2;
+    case 'two_vs_two':
+      return 2;
+    case 'three_vs_three':
+      return 2;
+    case 'two_vs_two_vs_two':
+      return 3;
+    default:
+      return 0;
+  }
+});
+
+const groupedParticipants = computed(() => {
+  const groups: Record<number, { participant: Schema['participants'][0]; index: number }[]> = {};
+
+  if (state.value.mode === 'king_of_the_hill') {
+    return groups;
+  }
+
+  state.value.participants.forEach((participant, index) => {
+    if (!groups[participant.teamIndex]) {
+      groups[participant.teamIndex] = [];
+    }
+
+    const group = groups[participant.teamIndex];
+    if (!group) {
+      return;
+    }
+
+    group.push({ participant, index });
+  });
+
+  return groups;
+});
 
 function validate() {
   const errors: FormError[] = [];
@@ -83,15 +154,12 @@ function addParticipant() {
     playerName: '',
     characterId: '',
     winner: false,
-    teamIndex: state.value.participants.length,
+    teamIndex: 0,
   });
 }
 
 function removeParticipant(index: number) {
   state.value.participants.splice(index, 1);
-  state.value.participants.forEach((participant, i) => {
-    participant.teamIndex = i;
-  });
 }
 
 async function onSubmit(event: FormSubmitEvent<Schema>) {
@@ -134,12 +202,8 @@ async function onSubmit(event: FormSubmitEvent<Schema>) {
     date.value = today(getLocalTimeZone());
     time.value = new Time();
     state.value.comment = '';
-    state.value.mode = 'king_of_the_hill';
-    state.value.participants = [
-      { playerName: '', characterId: '', winner: false, teamIndex: 0 },
-      { playerName: '', characterId: '', winner: false, teamIndex: 1 },
-      { playerName: '', characterId: '', winner: false, teamIndex: 2 },
-    ];
+    state.value.mode = 'one_vs_one';
+    state.value.participants = createDefaultParticipants('one_vs_one');
 
     navigateTo('/games');
   } catch (err) {
@@ -196,7 +260,25 @@ async function onSubmit(event: FormSubmitEvent<Schema>) {
 
     <GameModeSelect v-model="state.mode" />
 
-    <div class="space-y-2">
+    <div v-if="state.mode !== 'king_of_the_hill'" class="space-y-2">
+      <div
+        class="grid gap-4"
+        :class="teamCount === 3 ? 'grid-cols-3' : 'grid-cols-2'"
+      >
+        <div v-for="teamIdx in teamCount" :key="teamIdx" class="space-y-2">
+          <span class="font-medium text-sm">Team {{ teamIdx }}</span>
+          <GameParticipantForm
+            v-for="item in (groupedParticipants[teamIdx - 1] || [])"
+            :key="item.index"
+            :participant="item.participant"
+            :index="item.index"
+            :disabled-characters="disabledCharacters"
+          />
+        </div>
+      </div>
+    </div>
+
+    <div v-else class="space-y-2">
       <div class="flex items-center justify-between">
         <span class="font-medium text-sm">Participants</span>
         <UButton
@@ -215,6 +297,7 @@ async function onSubmit(event: FormSubmitEvent<Schema>) {
         :participant="participant"
         :index="index"
         :disabled-characters="disabledCharacters"
+        :removable="state.participants.length > 2"
         @remove="removeParticipant"
       />
     </div>

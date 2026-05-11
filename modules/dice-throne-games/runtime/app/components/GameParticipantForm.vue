@@ -17,6 +17,7 @@ interface Props {
   };
   index: number;
   disabledCharacters: string[] | undefined;
+  removable?: boolean;
 }
 
 const props = defineProps<Props>();
@@ -41,9 +42,10 @@ function handleRemove() {
   >
     <div class="flex items-center justify-between">
       <span class="text-sm font-medium">
-        Participant {{ props.index + 1 }}
+        Player
       </span>
       <UButton
+        v-if="props.removable"
         type="button"
         size="xs"
         color="error"
@@ -62,10 +64,6 @@ function handleRemove() {
         v-model="props.participant.characterId"
         :disabled-characters="props.disabledCharacters"
       />
-    </UFormField>
-
-    <UFormField name="teamIndex" label="Team Index">
-      <UInput v-model="props.participant.teamIndex" type="number" />
     </UFormField>
 
     <UCheckbox
