@@ -23,6 +23,28 @@ const { mutate: createGame, asyncStatus: createAsyncStatus } = useMutation({
       method: 'POST',
       body: data,
     }),
+  onSuccess: () => {
+    toast.add({
+      title: 'Game created',
+      color: 'success',
+    });
+
+    date.value = today(getLocalTimeZone());
+    time.value = new Time();
+    state.value.comment = '';
+    state.value.mode = 'one_vs_one';
+    state.value.participants = createDefaultParticipants('one_vs_one');
+
+    navigateTo('/games');
+  },
+  onError: (err) => {
+    const error = err instanceof Error ? err : new Error(String(err));
+    toast.add({
+      title: 'Failed to create game',
+      description: error.message,
+      color: 'error',
+    });
+  },
   onSettled: () => {
     queryCache.invalidateQueries({ key: ['games'] });
   },
@@ -306,7 +328,7 @@ function removeParticipant(index: number) {
   state.value.participants.splice(index, 1);
 }
 
-async function onSubmit(event: FormSubmitEvent<Schema>) {
+function onSubmit(event: FormSubmitEvent<Schema>) {
   const currentDate = date.value;
   const currentTime = time.value;
 
@@ -330,34 +352,12 @@ async function onSubmit(event: FormSubmitEvent<Schema>) {
     currentTime.millisecond || 0,
   );
 
-  try {
-    createGame({
-      date: dateTime.toString(),
-      comment,
-      mode,
-      participants,
-    });
-
-    toast.add({
-      title: 'Game created',
-      color: 'success',
-    });
-
-    date.value = today(getLocalTimeZone());
-    time.value = new Time();
-    state.value.comment = '';
-    state.value.mode = 'one_vs_one';
-    state.value.participants = createDefaultParticipants('one_vs_one');
-
-    navigateTo('/games');
-  } catch (err) {
-    const error = err instanceof Error ? err : new Error(String(err));
-    toast.add({
-      title: 'Failed to create game',
-      description: error.message,
-      color: 'error',
-    });
-  }
+  createGame({
+    date: dateTime.toString(),
+    comment,
+    mode,
+    participants,
+  });
 }
 </script>
 
