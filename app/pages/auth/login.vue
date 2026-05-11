@@ -40,7 +40,7 @@ const isFormValid = computed(() => {
 
 const toast = useToast();
 
-async function onSubmit(event: FormSubmitEvent<Schema>) {
+async function onSubmit(_event: FormSubmitEvent<Schema>) {
   loading.value = true;
 
   try {
@@ -83,8 +83,9 @@ async function onSubmit(event: FormSubmitEvent<Schema>) {
 
       await navigateTo('/profile');
     }
-  } catch (error: any) {
-    if (mode.value === 'login' && error.statusCode === 404) {
+  } catch (error: unknown) {
+    const fetchError = error as { statusCode?: number; statusMessage?: string; message?: string };
+    if (mode.value === 'login' && fetchError.statusCode === 404) {
       mode.value = 'register';
       toast.add({
         title: 'Info',
@@ -93,9 +94,15 @@ async function onSubmit(event: FormSubmitEvent<Schema>) {
         color: 'info',
       });
     } else {
+      let description = 'An error occurred';
+      if (typeof error === 'object' && error !== null && 'statusMessage' in error && typeof error.statusMessage === 'string') {
+        description = error.statusMessage;
+      } else if (error instanceof Error) {
+        description = error.message;
+      }
       toast.add({
         title: 'Error',
-        description: error.statusMessage || error.message || 'An error occurred',
+        description,
         color: 'error',
       });
     }

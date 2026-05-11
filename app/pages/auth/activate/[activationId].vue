@@ -34,11 +34,22 @@ onMounted(async () => {
     });
 
     await navigateTo('/profile');
-  } catch (err: any) {
+  } catch (err: unknown) {
     error.value = true;
+    let description = 'Activation failed';
+    if (
+      typeof err === 'object' &&
+      err !== null &&
+      'statusMessage' in err &&
+      typeof err.statusMessage === 'string'
+    ) {
+      description = err.statusMessage;
+    } else if (err instanceof Error) {
+      description = err.message;
+    }
     toast.add({
       title: 'Error',
-      description: err.statusMessage || err.message || 'Activation failed',
+      description,
       color: 'error',
     });
   } finally {
@@ -69,7 +80,9 @@ onMounted(async () => {
 
         <p class="text-center text-neutral-500">
           <span v-if="loading">Activating your account...</span>
-          <span v-else-if="error">Activation failed. Please try again or contact support.</span>
+          <span v-else-if="error"
+            >Activation failed. Please try again or contact support.</span
+          >
           <span v-else>Redirecting to your profile...</span>
         </p>
 

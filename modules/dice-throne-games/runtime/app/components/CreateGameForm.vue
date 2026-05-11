@@ -424,6 +424,7 @@ function onSubmit(event: FormSubmitEvent<Schema>) {
               :disabled-characters="disabledCharacters"
               :disabled-users="disabledUsers"
               @toggle-winner="handleToggleWinner"
+              @update:participant="state.participants[item.index] = $event"
             />
           </div>
         </UCard>
@@ -459,6 +460,7 @@ function onSubmit(event: FormSubmitEvent<Schema>) {
             :removable="state.participants.length > 3"
             @remove="removeParticipant"
             @toggle-winner="handleToggleWinner"
+            @update:participant="state.participants[index] = $event"
           />
         </div>
       </UCard>

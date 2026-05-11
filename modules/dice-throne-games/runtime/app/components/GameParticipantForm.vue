@@ -9,12 +9,6 @@ const participantSchema = v.object({
 });
 
 interface Props {
-  participant: {
-    playerName: string;
-    characterId: string;
-    winner: boolean;
-    teamIndex: number;
-  };
   index: number;
   disabledCharacters: string[] | undefined;
   disabledUsers: string[] | undefined;
@@ -33,6 +27,13 @@ const emit = defineEmits<Emits>();
 function handleRemove() {
   emit('remove', props.index);
 }
+
+const participant = defineModel<{
+  playerName: string;
+  characterId: string;
+  winner: boolean;
+  teamIndex: number;
+}>('participant', { required: true });
 </script>
 
 <template>
@@ -61,7 +62,7 @@ function handleRemove() {
     >
       <UFormField name="playerName" label="Player Name">
         <UserSearchInput
-          v-model="props.participant.playerName"
+          v-model="participant.playerName"
           :disabled-users="props.disabledUsers"
           class="w-full"
         />
@@ -69,7 +70,7 @@ function handleRemove() {
 
       <UFormField name="characterId" label="Character">
         <GameCharacterSelect
-          v-model="props.participant.characterId"
+          v-model="participant.characterId"
           :disabled-characters="props.disabledCharacters"
           class="w-full"
         />
@@ -77,7 +78,7 @@ function handleRemove() {
 
       <UCheckbox
         name="winner"
-        :model-value="props.participant.winner"
+        :model-value="participant.winner"
         label="Winner"
         @update:model-value="emit('toggleWinner', props.index)"
       />
