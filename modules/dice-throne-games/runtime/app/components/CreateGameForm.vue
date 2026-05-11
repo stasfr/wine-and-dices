@@ -16,20 +16,6 @@ const requestFetch = useRequestFetch();
 const toast = useToast();
 const queryCache = useQueryCache();
 
-const { data: charactersData } = useQuery({
-  key: ['characters'],
-  query: () => requestFetch('/api/dices/characters/list'),
-});
-
-const charactersList = computed(() => charactersData.value?.data || []);
-
-const characterItems = computed(() =>
-  charactersList.value.map((c: { id: string; name: string }) => ({
-    label: c.name,
-    value: c.id,
-  })),
-);
-
 const { mutate: createGame, asyncStatus: createAsyncStatus } = useMutation({
   mutation: (data: ICreateGameBody) =>
     requestFetch('/api/dices/games/create', {
@@ -223,16 +209,11 @@ async function onSubmit() {
           <UserSearchInput v-model="participant.playerName" />
         </UFormField>
 
-        <!-- TODO: move to its own component -->
         <UFormField
           :name="`participants.${index}.characterId`"
           label="Character"
         >
-          <USelect
-            v-model="participant.characterId"
-            :items="characterItems"
-            placeholder="Select character"
-          />
+          <GameCharacterSelect v-model="participant.characterId" />
         </UFormField>
 
         <UFormField
