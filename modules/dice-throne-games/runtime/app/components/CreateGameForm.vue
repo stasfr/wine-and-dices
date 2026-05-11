@@ -434,6 +434,7 @@ async function onSubmit(event: FormSubmitEvent<Schema>) {
               color="neutral"
               variant="ghost"
               label="Add"
+              icon="i-lucide-plus"
               :disabled="state.participants.length >= 6"
               @click="addParticipant"
             />
@@ -462,10 +463,12 @@ async function onSubmit(event: FormSubmitEvent<Schema>) {
         color="neutral"
         variant="outline"
         label="Cancel"
+        icon="i-lucide-x"
       />
       <UButton
         type="submit"
         label="Create"
+        icon="i-lucide-check"
         :loading="createAsyncStatus === 'loading'"
         :disabled="!isFormValid"
       />

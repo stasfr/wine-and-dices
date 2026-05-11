@@ -46,6 +46,7 @@ function handleRemove() {
           color="error"
           variant="ghost"
           label="Remove"
+          icon="i-lucide-trash"
           @click="handleRemove"
         />
       </div>
