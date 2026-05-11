@@ -36,13 +36,16 @@ const time = shallowRef(new Time());
 const schema = v.object({
   comment: v.string(),
   mode: v.pipe(v.string(), v.minLength(1, 'Mode is required')),
-  participants: v.array(
-    v.object({
-      playerName: v.pipe(v.string(), v.minLength(1, 'Player name is required')),
-      characterId: v.pipe(v.string(), v.minLength(1, 'Character is required')),
-      winner: v.boolean(),
-      teamIndex: v.pipe(v.number(), v.integer(), v.minValue(0)),
-    }),
+  participants: v.pipe(
+    v.array(
+      v.object({
+        playerName: v.pipe(v.string(), v.minLength(1, 'Player name is required')),
+        characterId: v.pipe(v.string(), v.minLength(1, 'Character is required')),
+        winner: v.boolean(),
+        teamIndex: v.pipe(v.number(), v.integer(), v.minValue(0)),
+      }),
+    ),
+    v.maxLength(6),
   ),
 });
 
@@ -235,6 +238,22 @@ function validate() {
     errors.push({ name: 'time', message: 'Time is required' });
   }
 
+  if (state.value.mode === 'king_of_the_hill') {
+    if (state.value.participants.length < 3) {
+      errors.push({
+        name: 'participants',
+        message: 'King of the hill requires at least 3 participants',
+      });
+    }
+
+    if (state.value.participants.length > 6) {
+      errors.push({
+        name: 'participants',
+        message: 'Maximum 6 participants allowed',
+      });
+    }
+  }
+
   errors.push(...validateWinners());
 
   return errors;
@@ -265,6 +284,10 @@ function handleToggleWinner(index: number) {
 }
 
 function addParticipant() {
+  if (state.value.participants.length >= 6) {
+    return;
+  }
+
   state.value.participants.push({
     playerName: '',
     characterId: '',
@@ -411,6 +434,7 @@ async function onSubmit(event: FormSubmitEvent<Schema>) {
               color="neutral"
               variant="ghost"
               label="Add"
+              :disabled="state.participants.length >= 6"
               @click="addParticipant"
             />
           </div>
@@ -423,7 +447,7 @@ async function onSubmit(event: FormSubmitEvent<Schema>) {
             :participant="participant"
             :index="index"
             :disabled-characters="disabledCharacters"
-            :removable="state.participants.length > 2"
+            :removable="state.participants.length > 3"
             @remove="removeParticipant"
             @toggle-winner="handleToggleWinner"
           />

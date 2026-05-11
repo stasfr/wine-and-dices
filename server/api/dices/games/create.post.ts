@@ -31,21 +31,24 @@ const bodySchema = v.object({
   date: v.pipe(v.string(), v.minLength(1)),
   comment: v.optional(v.string()),
   mode: v.picklist(gameModeEnum.enumValues),
-  participants: v.array(
-    v.union([
-      v.object({
-        email: v.pipe(v.string(), v.minLength(1), v.email()),
-        characterId: v.pipe(v.string(), v.minLength(1)),
-        winner: v.boolean(),
-        teamIndex: v.pipe(v.number(), v.integer(), v.minValue(0)),
-      }),
-      v.object({
-        playerName: v.pipe(v.string(), v.minLength(1)),
-        characterId: v.pipe(v.string(), v.minLength(1)),
-        winner: v.boolean(),
-        teamIndex: v.pipe(v.number(), v.integer(), v.minValue(0)),
-      }),
-    ]),
+  participants: v.pipe(
+    v.array(
+      v.union([
+        v.object({
+          email: v.pipe(v.string(), v.minLength(1), v.email()),
+          characterId: v.pipe(v.string(), v.minLength(1)),
+          winner: v.boolean(),
+          teamIndex: v.pipe(v.number(), v.integer(), v.minValue(0)),
+        }),
+        v.object({
+          playerName: v.pipe(v.string(), v.minLength(1)),
+          characterId: v.pipe(v.string(), v.minLength(1)),
+          winner: v.boolean(),
+          teamIndex: v.pipe(v.number(), v.integer(), v.minValue(0)),
+        }),
+      ]),
+    ),
+    v.maxLength(6),
   ),
 });
 
