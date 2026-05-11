@@ -28,14 +28,6 @@ const { mutate: createGame, asyncStatus: createAsyncStatus } = useMutation({
   },
 });
 
-const gameModeItems = [
-  { label: '1v1', value: 'one_vs_one' },
-  { label: '2v2', value: 'two_vs_two' },
-  { label: '3v3', value: 'three_vs_three' },
-  { label: '2v2v2', value: 'two_vs_two_vs_two' },
-  { label: 'King of the Hill', value: 'king_of_the_hill' },
-];
-
 const inputDateRef = useTemplateRef('inputDate');
 
 const date = shallowRef(today(getLocalTimeZone()));
@@ -196,9 +188,7 @@ async function onSubmit(event: FormSubmitEvent<Schema>) {
       <UTextarea v-model="state.comment" class="w-full" />
     </UFormField>
 
-    <UFormField label="Mode" name="mode">
-      <USelect v-model="state.mode" :items="gameModeItems" class="w-full" />
-    </UFormField>
+    <GameModeSelect v-model="state.mode" />
 
     <div class="space-y-2">
       <div class="flex items-center justify-between">
