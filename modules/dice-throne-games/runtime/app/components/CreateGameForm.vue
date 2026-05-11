@@ -186,6 +186,12 @@ const disabledCharacters = computed(() =>
     .filter((characterId) => characterId !== ''),
 );
 
+const disabledUsers = computed(() =>
+  state.value.participants
+    .map((participant) => participant.playerName)
+    .filter((playerName) => playerName !== ''),
+);
+
 const teamCount = computed(() => {
   switch (state.value.mode) {
     case 'one_vs_one':
@@ -416,6 +422,7 @@ async function onSubmit(event: FormSubmitEvent<Schema>) {
               :participant="item.participant"
               :index="item.index"
               :disabled-characters="disabledCharacters"
+              :disabled-users="disabledUsers"
               @toggle-winner="handleToggleWinner"
             />
           </div>
@@ -448,6 +455,7 @@ async function onSubmit(event: FormSubmitEvent<Schema>) {
             :participant="participant"
             :index="index"
             :disabled-characters="disabledCharacters"
+            :disabled-users="disabledUsers"
             :removable="state.participants.length > 3"
             @remove="removeParticipant"
             @toggle-winner="handleToggleWinner"

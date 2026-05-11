@@ -17,6 +17,7 @@ interface Props {
   };
   index: number;
   disabledCharacters: string[] | undefined;
+  disabledUsers: string[] | undefined;
   removable?: boolean;
 }
 
@@ -61,6 +62,7 @@ function handleRemove() {
       <UFormField name="playerName" label="Player Name">
         <UserSearchInput
           v-model="props.participant.playerName"
+          :disabled-users="props.disabledUsers"
           class="w-full"
         />
       </UFormField>
