@@ -9,7 +9,9 @@
     "preview": "nuxt preview",
     "postinstall": "nuxt prepare",
     "db:push": "drizzle-kit push",
-    "db:studio": "drizzle-kit studio"
+    "db:studio": "drizzle-kit studio",
+    "docker:up": "docker compose -f docker-compose.dev.yaml up --build -d",
+    "docker:down": "docker compose -f docker-compose.dev.yaml down"
   },
   "dependencies": {
     "@formkit/auto-animate": "0.9.0",
