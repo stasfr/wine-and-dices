@@ -1,13 +1,5 @@
 <script setup lang="ts">
-interface Props {
-  modelValue: string;
-}
-
-const props = defineProps<Props>();
-
-const emit = defineEmits<{
-  'update:modelValue': [value: string];
-}>();
+const value = defineModel<string>({ required: true });
 
 const requestFetch = useRequestFetch();
 
@@ -29,15 +21,6 @@ const characterItems = computed(() =>
     },
   })),
 );
-
-const value = computed({
-  get() {
-    return props.modelValue;
-  },
-  set(newValue: string) {
-    emit('update:modelValue', newValue);
-  },
-});
 
 const avatar = computed(() =>
   characterItems.value.find((item) => item.value === value.value)?.avatar,
