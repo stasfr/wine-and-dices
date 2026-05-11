@@ -45,22 +45,14 @@ const items = computed<InputMenuItem[]>(() => {
     return [];
   }
 
-  return usersData.value.data
-    .filter((user) => {
-      if (!props.disabledUsers) {
-        return true;
-      }
-
-      return (
-        !props.disabledUsers.includes(user.email) ||
-        user.email === modelValue.value
-      );
-    })
-    .map((user) => ({
-      label: formatUserName(user),
-      description: user.email,
-      value: user.email,
-    }));
+  return usersData.value.data.map((user) => ({
+    label: formatUserName(user),
+    description: user.email,
+    value: user.email,
+    disabled:
+      props.disabledUsers?.includes(user.email) &&
+      user.email !== modelValue.value,
+  }));
 });
 </script>
 
