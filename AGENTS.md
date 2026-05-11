@@ -63,18 +63,12 @@ const { email } = await readValidatedBody(event, (data) =>
 - Never split the code into multiple files (like vue composables or utility functions). Keep all related code in a single file. If the user asks to split into files, then split
 - Always extract types into separate files in the types directory
 - Always use tailwind v4 classes for styling. Always make their values multiples of 2 (`w-8`, `p-2` - this is good. `w-7`, `p-3` - this is bad)
-- When using `useTemplateRef`, do not add the "Ref" suffix to the variable name. For component refs, use the component name as the variable name. For element refs, add the "Element" suffix to the variable name.
+- if a component needs to use a ref on a tag or a custom component, it must strictly be done using `useTemplateRef`
+- the variable from `useTemplateRef` must follow a strict naming convention:
 
-```typescript
-// BAD
-const fooRef = useTemplateRef('fooRef');
-
-// GOOD - component ref
-const foo = useTemplateRef('foo');
-
-// GOOD - element ref
-const fooElement = useTemplateRef('foo');
-```
+1. the template must have a readable name, without prefixes like `ref`/`element`, etc. For example, `ref="someName"`
+2. if the reference is to a native HTML element, add `El` to the variable name. For example, `someNameEl = useTemplateRef('someName')`
+3. if the reference is to a custom component, add `Ref` to the variable name. For example, `someNameRef = useTemplateRef('someName')`
 
 - Always use props in components via a variable, and extract their types into a separate interface inside the component's script tag
 
