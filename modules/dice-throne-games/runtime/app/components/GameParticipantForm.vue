@@ -20,9 +20,11 @@ interface Props {
 
 const props = defineProps<Props>();
 
-const emit = defineEmits<{
+interface Emits {
   remove: [index: number];
-}>();
+}
+
+const emit = defineEmits<Emits>();
 
 function handleRemove() {
   emit('remove', props.index);
@@ -37,7 +39,9 @@ function handleRemove() {
     class="p-3 border rounded-lg space-y-2"
   >
     <div class="flex items-center justify-between">
-      <span class="text-sm font-medium"> Participant {{ props.index + 1 }} </span>
+      <span class="text-sm font-medium">
+        Participant {{ props.index + 1 }}
+      </span>
       <UButton
         type="button"
         size="xs"
