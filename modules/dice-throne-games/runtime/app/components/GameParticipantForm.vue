@@ -24,6 +24,7 @@ const props = defineProps<Props>();
 
 interface Emits {
   remove: [index: number];
+  toggleWinner: [index: number];
 }
 
 const emit = defineEmits<Emits>();
@@ -73,8 +74,9 @@ function handleRemove() {
 
       <UCheckbox
         name="winner"
-        v-model="props.participant.winner"
+        :model-value="props.participant.winner"
         label="Winner"
+        @update:model-value="emit('toggleWinner', props.index)"
       />
     </UForm>
   </UCard>

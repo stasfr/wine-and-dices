@@ -94,6 +94,67 @@ watch(
   },
 );
 
+function validateWinners(): FormError[] {
+  const errors: FormError[] = [];
+  const winnerCount = state.value.participants.filter((p) => p.winner).length;
+
+  if (winnerCount === 0) {
+    errors.push({
+      name: 'participants',
+      message: 'At least one participant must be a winner',
+    });
+    return errors;
+  }
+
+  if (state.value.mode === 'king_of_the_hill') {
+    if (winnerCount !== 1) {
+      errors.push({
+        name: 'participants',
+        message: 'King of the hill mode requires exactly 1 winner',
+      });
+    }
+  } else {
+    const participantsByTeam = new Map<
+      number,
+      Schema['participants']
+    >();
+
+    for (const participant of state.value.participants) {
+      const team = participantsByTeam.get(participant.teamIndex) || [];
+      team.push(participant);
+      participantsByTeam.set(participant.teamIndex, team);
+    }
+
+    let winningTeamCount = 0;
+    for (const [, teamParticipants] of participantsByTeam) {
+      const teamWinnerCount = teamParticipants.filter((p) => p.winner).length;
+      const allWinners = teamWinnerCount === teamParticipants.length;
+      const noWinners = teamWinnerCount === 0;
+
+      if (!allWinners && !noWinners) {
+        errors.push({
+          name: 'participants',
+          message: 'All members of a team must be winners or none',
+        });
+        break;
+      }
+
+      if (allWinners) {
+        winningTeamCount++;
+      }
+    }
+
+    if (winningTeamCount !== 1) {
+      errors.push({
+        name: 'participants',
+        message: 'Exactly one team must be the winner',
+      });
+    }
+  }
+
+  return errors;
+}
+
 const isFormValid = computed(() => {
   const schemaResult = v.safeParse(schema, state.value);
   if (!schemaResult.success) {
@@ -105,6 +166,11 @@ const isFormValid = computed(() => {
   }
 
   if (!time.value) {
+    return false;
+  }
+
+  const winnerErrors = validateWinners();
+  if (winnerErrors.length > 0) {
     return false;
   }
 
@@ -169,7 +235,33 @@ function validate() {
     errors.push({ name: 'time', message: 'Time is required' });
   }
 
+  errors.push(...validateWinners());
+
   return errors;
+}
+
+function handleToggleWinner(index: number) {
+  const participant = state.value.participants[index];
+  if (!participant) {
+    return;
+  }
+
+  const newWinnerState = !participant.winner;
+
+  if (state.value.mode === 'king_of_the_hill') {
+    for (let i = 0; i < state.value.participants.length; i++) {
+      const p = state.value.participants[i];
+      if (!p) {
+        continue;
+      }
+      p.winner = i === index ? newWinnerState : false;
+    }
+  } else {
+    const teamIndex = participant.teamIndex;
+    for (const p of state.value.participants) {
+      p.winner = p.teamIndex === teamIndex ? newWinnerState : false;
+    }
+  }
 }
 
 function addParticipant() {
@@ -301,6 +393,7 @@ async function onSubmit(event: FormSubmitEvent<Schema>) {
               :participant="item.participant"
               :index="item.index"
               :disabled-characters="disabledCharacters"
+              @toggle-winner="handleToggleWinner"
             />
           </div>
         </UCard>
@@ -332,6 +425,7 @@ async function onSubmit(event: FormSubmitEvent<Schema>) {
             :disabled-characters="disabledCharacters"
             :removable="state.participants.length > 2"
             @remove="removeParticipant"
+            @toggle-winner="handleToggleWinner"
           />
         </div>
       </UCard>
