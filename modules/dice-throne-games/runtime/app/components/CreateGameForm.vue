@@ -6,8 +6,9 @@ import {
   getLocalTimeZone,
 } from '@internationalized/date';
 import { useMutation, useQueryCache } from '@pinia/colada';
-import { shallowRef } from 'vue';
+import * as v from 'valibot';
 
+import type { FormError, FormSubmitEvent } from '@nuxt/ui';
 import type { ICreateGameBody } from '../types/create';
 
 const FORM_ID = 'create-game-form';
@@ -40,9 +41,24 @@ const inputDateRef = useTemplateRef('inputDate');
 const date = shallowRef(today(getLocalTimeZone()));
 const time = shallowRef(new Time());
 
-const formData = ref({
+const schema = v.object({
+  comment: v.string(),
+  mode: v.pipe(v.string(), v.minLength(1, 'Mode is required')),
+  participants: v.array(
+    v.object({
+      playerName: v.pipe(v.string(), v.minLength(1, 'Player name is required')),
+      characterId: v.pipe(v.string(), v.minLength(1, 'Character is required')),
+      winner: v.boolean(),
+      teamIndex: v.pipe(v.number(), v.integer(), v.minValue(0)),
+    }),
+  ),
+});
+
+type Schema = v.InferOutput<typeof schema>;
+
+const state = ref<Schema>({
   comment: '',
-  mode: 'king_of_the_hill' as const,
+  mode: 'king_of_the_hill',
   participants: [
     { playerName: '', characterId: '', winner: false, teamIndex: 0 },
     { playerName: '', characterId: '', winner: false, teamIndex: 1 },
@@ -50,42 +66,49 @@ const formData = ref({
   ],
 });
 
+function validate() {
+  const errors: FormError[] = [];
+
+  if (!date.value) {
+    errors.push({ name: 'date', message: 'Date is required' });
+  }
+
+  if (!time.value) {
+    errors.push({ name: 'time', message: 'Time is required' });
+  }
+
+  return errors;
+}
+
 function addParticipant() {
-  formData.value.participants.push({
+  state.value.participants.push({
     playerName: '',
     characterId: '',
     winner: false,
-    teamIndex: formData.value.participants.length,
+    teamIndex: state.value.participants.length,
   });
 }
 
 function removeParticipant(index: number) {
-  formData.value.participants.splice(index, 1);
-  formData.value.participants.forEach((p, i) => {
-    p.teamIndex = i;
+  state.value.participants.splice(index, 1);
+  state.value.participants.forEach((participant, i) => {
+    participant.teamIndex = i;
   });
 }
 
-async function onSubmit() {
-  const { comment, mode, participants } = formData.value;
+async function onSubmit(event: FormSubmitEvent<Schema>) {
   const currentDate = date.value;
   const currentTime = time.value;
 
   if (!currentDate) {
-    toast.add({
-      title: 'Date is required',
-      color: 'error',
-    });
     return;
   }
 
   if (!currentTime) {
-    toast.add({
-      title: 'Time is required',
-      color: 'error',
-    });
     return;
   }
+
+  const { comment, mode, participants } = event.data;
 
   const dateTime = new CalendarDateTime(
     currentDate.year,
@@ -109,15 +132,17 @@ async function onSubmit() {
       title: 'Game created',
       color: 'success',
     });
+
     date.value = today(getLocalTimeZone());
     time.value = new Time();
-    formData.value.comment = '';
-    formData.value.mode = 'king_of_the_hill';
-    formData.value.participants = [
+    state.value.comment = '';
+    state.value.mode = 'king_of_the_hill';
+    state.value.participants = [
       { playerName: '', characterId: '', winner: false, teamIndex: 0 },
       { playerName: '', characterId: '', winner: false, teamIndex: 1 },
       { playerName: '', characterId: '', winner: false, teamIndex: 2 },
     ];
+
     navigateTo('/games');
   } catch (err) {
     const error = err instanceof Error ? err : new Error(String(err));
@@ -131,10 +156,13 @@ async function onSubmit() {
 </script>
 
 <template>
-  <form
+  <UForm
     :id="FORM_ID"
+    :schema="schema"
+    :state="state"
+    :validate="validate"
     class="space-y-4 flex flex-col gap-2"
-    @submit.prevent="onSubmit"
+    @submit="onSubmit"
     @keydown.enter.prevent
   >
     <div class="flex gap-2 w-full">
@@ -165,11 +193,11 @@ async function onSubmit() {
     </div>
 
     <UFormField label="Comment" name="comment">
-      <UTextarea v-model="formData.comment" class="w-full" />
+      <UTextarea v-model="state.comment" class="w-full" />
     </UFormField>
 
     <UFormField label="Mode" name="mode">
-      <USelect v-model="formData.mode" :items="gameModeItems" class="w-full" />
+      <USelect v-model="state.mode" :items="gameModeItems" class="w-full" />
     </UFormField>
 
     <div class="space-y-2">
@@ -186,7 +214,7 @@ async function onSubmit() {
       </div>
 
       <div
-        v-for="(participant, index) in formData.participants"
+        v-for="(participant, index) in state.participants"
         :key="index"
         class="p-3 border rounded-lg space-y-2"
       >
@@ -245,5 +273,5 @@ async function onSubmit() {
         :loading="createAsyncStatus === 'loading'"
       />
     </div>
-  </form>
+  </UForm>
 </template>
