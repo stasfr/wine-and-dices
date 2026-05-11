@@ -147,12 +147,12 @@ async function onSubmit() {
 <template>
   <form
     :id="FORM_ID"
-    class="space-y-4"
+    class="space-y-4 flex flex-col gap-2"
     @submit.prevent="onSubmit"
     @keydown.enter.prevent
   >
-    <div class="flex gap-2">
-      <UFormField label="Date" name="date">
+    <div class="flex gap-2 w-full">
+      <UFormField label="Date" name="date" class="flex-1">
         <UInputDate ref="inputDate" v-model="date">
           <template #trailing>
             <UPopover :reference="inputDateRef?.inputsRef?.[3]?.$el">
@@ -173,17 +173,17 @@ async function onSubmit() {
         </UInputDate>
       </UFormField>
 
-      <UFormField label="Time" name="time">
+      <UFormField label="Time" name="time" class="flex-1">
         <UInputTime v-model="time" :hour-cycle="24" />
       </UFormField>
     </div>
 
-    <UFormField label="Mode" name="mode">
-      <USelect v-model="formData.mode" :items="gameModeItems" />
+    <UFormField label="Comment" name="comment">
+      <UTextarea v-model="formData.comment" class="w-full" />
     </UFormField>
 
-    <UFormField label="Comment" name="comment">
-      <UTextarea v-model="formData.comment" />
+    <UFormField label="Mode" name="mode">
+      <USelect v-model="formData.mode" :items="gameModeItems" class="w-full" />
     </UFormField>
 
     <div class="space-y-2">
