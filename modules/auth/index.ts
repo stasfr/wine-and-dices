@@ -1,4 +1,9 @@
-import { addServerScanDir, createResolver, defineNuxtModule } from 'nuxt/kit';
+import {
+  addServerScanDir,
+  addTypeTemplate,
+  createResolver,
+  defineNuxtModule,
+} from 'nuxt/kit';
 
 export default defineNuxtModule({
   meta: {
@@ -8,5 +13,13 @@ export default defineNuxtModule({
     const resolver = createResolver(import.meta.url);
 
     addServerScanDir(resolver.resolve('./runtime/server'));
+
+    addTypeTemplate(
+      {
+        src: resolver.resolve('./types/auth.d.ts'),
+        filename: 'types/auth.d.ts',
+      },
+      { nitro: true, nuxt: true },
+    );
   },
 });
