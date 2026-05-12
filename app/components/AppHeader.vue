@@ -7,7 +7,6 @@ const items = computed<NavigationMenuItem[]>(() => [
   {
     label: 'Dices',
     icon: 'i-lucide-dices',
-    to: '/games',
     children: [
       {
         label: 'Characters list',
@@ -83,6 +82,10 @@ const userMenuItems = computed<DropdownMenuItem[][]>(() => [
       </template>
 
       <UColorModeButton />
+    </template>
+
+    <template #body>
+      <UNavigationMenu :items="items" orientation="vertical" class="-mx-2.5" />
     </template>
   </UHeader>
 </template>
