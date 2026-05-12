@@ -113,4 +113,5 @@ defineEmits<{
 - Never use `?` in types. Explicitly indicate that a variable can be `undefined`
 - Do not write function return types
 - Prefer function declarations over arrow functions
+- In Vue components and composables, prefer using `ref` instead of `reactive`, even if `reactive` is used in the example
 - All interactions with the user must be in Russian, but all content in the application must be in English.
