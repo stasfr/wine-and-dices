@@ -24,8 +24,12 @@ logs
 !.env.example
 
 # For static files like characters images
-public/images/portraits/
-public/images/characters/
+public/images/portraits/*
+!public/images/portraits/.gitkeep
+public/images/characters/*
+!public/images/characters/.gitkeep
+public/avatars/*
+!public/avatars/.gitkeep
 
 # Linter
 .eslintcache
