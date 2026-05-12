@@ -45,6 +45,9 @@ export default defineEventHandler(async (event) => {
       id: user.id,
       email: user.email,
       isActive: user.isActive,
+      firstName: user.firstName,
+      lastName: user.lastName,
+      middleName: user.middleName,
     },
     loggedInAt: Date.now(),
   });

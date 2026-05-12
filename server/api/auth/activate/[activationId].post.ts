@@ -72,6 +72,9 @@ export default defineEventHandler(async (event) => {
       id: session.user.id,
       email: session.user.email,
       isActive: true,
+      firstName: session.user.firstName,
+      lastName: session.user.lastName,
+      middleName: session.user.middleName,
     },
     loggedInAt: session.loggedInAt,
   });

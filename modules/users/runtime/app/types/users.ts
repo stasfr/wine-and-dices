@@ -6,3 +6,12 @@ export interface IUserListItem {
   firstName: string | null;
   middleName: string | null;
 }
+
+export interface IUserProfile {
+  id: string;
+  email: string;
+  isActive: boolean;
+  firstName: string | null | undefined;
+  lastName: string | null | undefined;
+  middleName: string | null | undefined;
+}
