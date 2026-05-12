@@ -1,6 +1,7 @@
 import * as v from 'valibot';
 import { eq } from 'drizzle-orm';
 import { users as usersTable } from '#server/db/schema/schema.js';
+import type { ServerFile } from 'nuxt-file-storage';
 
 const bodySchema = v.object({
   files: v.array(
@@ -89,7 +90,15 @@ export default defineEventHandler(async (event) => {
     }
   }
 
-  const fileName = await storeFileLocally(file as any, 16, '');
+  const serverFile: ServerFile = {
+    name: file.name,
+    content: file.content,
+    size: String(file.size),
+    type: file.type,
+    lastModified: String(file.lastModified),
+  };
+
+  const fileName = await storeFileLocally(serverFile, 16, '');
 
   const updateResult = await db
     .update(usersTable)
