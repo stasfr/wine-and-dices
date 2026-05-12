@@ -6,6 +6,7 @@ declare module '#auth-utils' {
     firstName: string | null | undefined;
     lastName: string | null | undefined;
     middleName: string | null | undefined;
+    avatar: string | null | undefined;
   }
 }
 

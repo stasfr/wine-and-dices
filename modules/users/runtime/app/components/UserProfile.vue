@@ -11,6 +11,34 @@ const props = defineProps<Props>();
 const toast = useToast();
 const requestFetch = useRequestFetch();
 
+function getErrorMessage(err: unknown): string {
+  if (err && typeof err === 'object') {
+    const fetchError = err as {
+      data?: { message?: string; statusMessage?: string };
+      statusMessage?: string;
+      message?: string;
+    };
+
+    if (fetchError.data?.message) {
+      return fetchError.data.message;
+    }
+
+    if (fetchError.data?.statusMessage) {
+      return fetchError.data.statusMessage;
+    }
+
+    if (fetchError.statusMessage) {
+      return fetchError.statusMessage;
+    }
+
+    if (fetchError.message) {
+      return fetchError.message;
+    }
+  }
+
+  return 'An unexpected error occurred';
+}
+
 const isEditing = ref(false);
 
 const state = ref({
@@ -20,6 +48,15 @@ const state = ref({
   lastName: '',
   firstName: '',
   middleName: '',
+});
+
+const avatarUrl = computed(() => {
+  const user = props.user;
+  if (!user || !user.avatar) {
+    return undefined;
+  }
+
+  return `/avatars/${user.avatar}`;
 });
 
 watch(
@@ -58,14 +95,67 @@ const { mutate: updateProfile, asyncStatus: updateAsyncStatus } = useMutation({
     await useUserSession().fetch();
   },
   onError: (err) => {
-    const error = err instanceof Error ? err : new Error(String(err));
     toast.add({
       title: 'Failed to update profile',
-      description: error.message,
+      description: getErrorMessage(err),
       color: 'error',
     });
   },
 });
+
+const { handleFileInput, files: avatarFiles } = useFileStorage();
+const avatarFileInputEl = useTemplateRef('avatarFileInput');
+
+const { mutate: uploadAvatar, asyncStatus: uploadAvatarAsyncStatus } =
+  useMutation({
+    mutation: () =>
+      requestFetch('/api/users/avatar', {
+        method: 'POST',
+        body: {
+          files: avatarFiles.value,
+        },
+      }),
+    onSuccess: async () => {
+      toast.add({
+        title: 'Avatar updated',
+        color: 'success',
+      });
+      await useUserSession().fetch();
+
+      if (avatarFileInputEl.value) {
+        avatarFileInputEl.value.value = '';
+      }
+    },
+    onError: (err) => {
+      toast.add({
+        title: 'Failed to update avatar',
+        description: getErrorMessage(err),
+        color: 'error',
+      });
+    },
+  });
+
+const { mutate: deleteAvatar, asyncStatus: deleteAvatarAsyncStatus } =
+  useMutation({
+    mutation: () =>
+      requestFetch('/api/users/avatar', {
+        method: 'DELETE',
+      }),
+    onSuccess: async () => {
+      toast.add({
+        title: 'Avatar removed',
+        color: 'success',
+      });
+      await useUserSession().fetch();
+    },
+    onError: (err) => {
+      toast.add({
+        title: 'Failed to remove avatar',
+        description: getErrorMessage(err),
+        color: 'error',
+      });
+    },
+  });
 
 function handleEdit() {
   isEditing.value = true;
@@ -82,10 +172,32 @@ function handleCancel() {
   state.value.lastName = user.lastName || '';
   state.value.firstName = user.firstName || '';
   state.value.middleName = user.middleName || '';
+
+  if (avatarFileInputEl.value) {
+    avatarFileInputEl.value.value = '';
+  }
 }
 
 function handleSave() {
   updateProfile();
+}
+
+async function handleAvatarInput(event: Event) {
+  await handleFileInput(event);
+
+  if (avatarFiles.value.length > 0) {
+    uploadAvatar();
+  }
+}
+
+function handleAvatarDelete() {
+  deleteAvatar();
+}
+
+function triggerAvatarInput() {
+  if (avatarFileInputEl.value) {
+    avatarFileInputEl.value.click();
+  }
 }
 </script>
 
@@ -93,6 +205,47 @@ function handleSave() {
   <UForm v-if="props.user" :state="state" class="space-y-4">
     <UPageCard title="Account">
       <div class="space-y-4">
+        <div class="flex items-center gap-4">
+          <UAvatar
+            :src="avatarUrl"
+            alt="Avatar"
+            icon="i-lucide-user"
+            size="3xl"
+          />
+
+          <div class="flex flex-col gap-2">
+            <input
+              ref="avatarFileInput"
+              type="file"
+              accept="image/jpeg,image/png,image/gif,image/webp"
+              class="hidden"
+              @input="handleAvatarInput"
+            />
+
+            <div class="flex gap-2">
+              <UButton
+                type="button"
+                label="Upload avatar"
+                icon="i-lucide-upload"
+                size="sm"
+                :loading="uploadAvatarAsyncStatus === 'loading'"
+                @click="triggerAvatarInput"
+              />
+              <UButton
+                v-if="avatarUrl"
+                type="button"
+                label="Remove"
+                color="error"
+                variant="outline"
+                icon="i-lucide-trash"
+                size="sm"
+                :loading="deleteAvatarAsyncStatus === 'loading'"
+                @click="handleAvatarDelete"
+              />
+            </div>
+          </div>
+        </div>
+
         <UFormField label="ID" name="id">
           <UInput v-model="state.id" disabled class="w-full" />
         </UFormField>
@@ -165,7 +318,5 @@ function handleSave() {
     </UPageCard>
   </UForm>
 
-  <div v-else class="text-center py-8 text-muted">
-    No user data available
-  </div>
+  <div v-else class="text-center py-8 text-muted">No user data available</div>
 </template>

@@ -88,6 +88,7 @@ export default defineEventHandler(async (event) => {
       firstName: user.firstName,
       lastName: user.lastName,
       middleName: user.middleName,
+      avatar: user.avatar,
     },
     loggedInAt: Date.now(),
   });

@@ -114,6 +114,9 @@ importers:
       drizzle-kit:
         specifier: 1.0.0-beta.22
         version: 1.0.0-beta.22
+      nuxt-file-storage:
+        specifier: ^0.3.2
+        version: 0.3.2(magicast@0.5.2)
 
 packages:
 
@@ -4832,6 +4835,9 @@ packages:
         optional: true
       '@simplewebauthn/server':
         optional: true
+
+  nuxt-file-storage@0.3.2:
+    resolution: {integrity: sha512-ET2bg2dSiSqiuos017h/6e+zE7BNvdugsppOBCJMfwz6Jvqg+So0QUELmNGloJC2y+CEt2fe09tvtHeqfFwP/w==}
 
   nuxt-nodemailer@1.1.4:
     resolution: {integrity: sha512-nIH9dfQ/Z58QtwspetoHJI+XGNraVBW7setEu0f8EJDTLLh2WRMIZgamVRmrF9d10/POT+fLDmQ2N1QEmUwWuw==}
@@ -11219,6 +11225,13 @@ snapshots:
     transitivePeerDependencies:
       - argon2
       - bcrypt
+      - magicast
+
+  nuxt-file-storage@0.3.2(magicast@0.5.2):
+    dependencies:
+      '@nuxt/kit': 4.4.5(magicast@0.5.2)
+      defu: 6.1.7
+    transitivePeerDependencies:
       - magicast
 
   nuxt-nodemailer@1.1.4(magicast@0.5.2)(nodemailer@8.0.7):

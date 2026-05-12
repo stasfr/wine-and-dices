@@ -75,6 +75,7 @@ export default defineEventHandler(async (event) => {
       firstName: session.user.firstName,
       lastName: session.user.lastName,
       middleName: session.user.middleName,
+      avatar: session.user.avatar,
     },
     loggedInAt: session.loggedInAt,
   });

@@ -35,6 +35,7 @@ export const users = pgTable('users', {
   lastName: varchar('last_name'),
   firstName: varchar('first_name'),
   middleName: varchar('middle_name'),
+  avatar: varchar('avatar'),
   createdAt,
   updatedAt,
   deletedAt,

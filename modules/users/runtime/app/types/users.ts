@@ -5,6 +5,7 @@ export interface IUserListItem {
   lastName: string | null;
   firstName: string | null;
   middleName: string | null;
+  avatar: string | null;
 }
 
 export interface IUserProfile {
@@ -14,4 +15,5 @@ export interface IUserProfile {
   firstName: string | null | undefined;
   lastName: string | null | undefined;
   middleName: string | null | undefined;
+  avatar: string | null | undefined;
 }

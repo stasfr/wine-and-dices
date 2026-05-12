@@ -1,13 +1,6 @@
-import * as v from 'valibot';
 import { eq } from 'drizzle-orm';
-import { users as usersTable } from '#server/db/schema/schema.js';
 
-const bodySchema = v.object({
-  firstName: v.optional(v.string()),
-  lastName: v.optional(v.string()),
-  middleName: v.optional(v.string()),
-  avatar: v.optional(v.string()),
-});
+import { users as usersTable } from '#server/db/schema/schema.js';
 
 export default defineEventHandler(async (event) => {
   const db = useDb();
@@ -17,17 +10,37 @@ export default defineEventHandler(async (event) => {
     throw createError({ status: 401, statusMessage: 'Unauthorized' });
   }
 
-  const body = await readValidatedBody(event, (data) =>
-    v.parse(bodySchema, data),
-  );
+  const userSelectResult = await db
+    .select({
+      id: usersTable.id,
+      email: usersTable.email,
+      isActive: usersTable.isActive,
+      firstName: usersTable.firstName,
+      lastName: usersTable.lastName,
+      middleName: usersTable.middleName,
+      avatar: usersTable.avatar,
+    })
+    .from(usersTable)
+    .where(eq(usersTable.id, session.user.id));
+
+  const existingUser = userSelectResult[0];
+
+  if (!existingUser) {
+    throw createError({ status: 404, statusMessage: 'User not found' });
+  }
+
+  if (existingUser.avatar) {
+    try {
+      await deleteFile(existingUser.avatar, '');
+    } catch {
+      // ignore if file doesn't exist
+    }
+  }
 
   const updateResult = await db
     .update(usersTable)
     .set({
-      firstName: body.firstName || null,
-      lastName: body.lastName || null,
-      middleName: body.middleName || null,
-      avatar: body.avatar || null,
+      avatar: null,
       updatedAt: new Date().toISOString(),
     })
     .where(eq(usersTable.id, session.user.id))

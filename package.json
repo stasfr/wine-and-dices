@@ -52,6 +52,7 @@
     "@iconify-json/lucide": "^1.2.105",
     "@iconify-json/simple-icons": "^1.2.81",
     "dotenv": "^17.4.2",
-    "drizzle-kit": "1.0.0-beta.22"
+    "drizzle-kit": "1.0.0-beta.22",
+    "nuxt-file-storage": "^0.3.2"
   }
 }

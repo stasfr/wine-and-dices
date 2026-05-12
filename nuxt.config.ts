@@ -17,7 +17,11 @@ export default defineNuxtConfig({
     'nuxt-auth-utils',
     'nuxt-nodemailer',
     '@nuxt/eslint',
+    'nuxt-file-storage',
   ],
+  fileStorage: {
+    mount: process.cwd() + '/public/avatars',
+  },
   nodemailer: {
     from: '"Wine and Dices" <sfworking@yandex.ru>',
     host: 'smtp.yandex.ru',
