@@ -19,6 +19,8 @@ A Nuxt module must live in `modules/{module-name}/` and contain an `index.ts` en
 ```
 modules/{module-name}/
 ├── index.ts                          # module definition
+├── types/                            # TypeScript declarations (module augmentations, global types)
+│   └── auth.d.ts
 └── runtime/
     ├── app/
     │   ├── components/               # Vue components auto-registered by the module
@@ -73,6 +75,7 @@ export default defineNuxtModule({
 | `addServerHandler` | Adds a single server handler with explicit route |
 | `addServerImportsDir` | Auto-imports server utilities from a directory |
 | `addServerPlugin` | Adds a Nitro runtime plugin |
+| `addTypeTemplate` | Registers a `.d.ts` file in the generated `.nuxt/types/` directory |
 
 ### Server handlers inside a module
 
@@ -85,6 +88,42 @@ Place server files under `modules/{name}/runtime/server/`. Nitro treats this dir
 - `runtime/server/utils/helpers.ts` → auto-imported in server code
 
 Server files inside a module can use all the same aliases and imports as root server files (e.g. `#server/db/schema/schema.js`).
+
+### Type declarations inside a module
+
+Use `addTypeTemplate` from `@nuxt/kit` to register `.d.ts` files that augment third-party modules or declare global types. Keep the declaration file inside the module (e.g. `modules/{name}/types/`) and reference it via `src` so you do not hard-code the text in `index.ts`.
+
+```typescript
+import {
+  addServerScanDir,
+  addTypeTemplate,
+  createResolver,
+  defineNuxtModule,
+} from 'nuxt/kit';
+
+export default defineNuxtModule({
+  meta: {
+    name: 'auth',
+  },
+  setup() {
+    const resolver = createResolver(import.meta.url);
+
+    addServerScanDir(resolver.resolve('./runtime/server'));
+
+    addTypeTemplate(
+      {
+        src: resolver.resolve('./types/auth.d.ts'),
+        filename: 'types/auth.d.ts',
+      },
+      { nitro: true, nuxt: true },
+    );
+  },
+});
+```
+
+**Important:**
+- By default `addTypeTemplate` registers types only for the **app** context. If the declaration is also used in server files (e.g. augmenting `#auth-utils`), pass `{ nitro: true, nuxt: true }` as the second argument.
+- Nuxt 4 automatically includes `modules/*/shared/**/*` in `tsconfig.shared.json` and `tsconfig.app.json`, but **not** in `tsconfig.server.json`. Therefore, placing a `.d.ts` file in `modules/{name}/shared/` does **not** make it available to the server TypeScript context. Always use `addTypeTemplate` with `{ nitro: true }` for declarations that must be visible on the server.
 
 ### Moving existing code into a module
 
