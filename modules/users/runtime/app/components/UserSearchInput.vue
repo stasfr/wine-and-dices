@@ -52,7 +52,37 @@ const items = computed<InputMenuItem[]>(() => {
     disabled:
       props.disabledUsers?.includes(user.email) &&
       user.email !== modelValue.value,
+    avatar: user.avatar
+      ? {
+          src: `/avatars/${user.avatar}`,
+          alt: formatUserName(user),
+          loading: 'lazy' as const,
+        }
+      : {
+          icon: 'i-lucide-user',
+          alt: formatUserName(user),
+        },
   }));
+});
+
+const avatar = computed(() => {
+  const selectedUser = usersData.value?.data.find(
+    (user) => user.email === modelValue.value,
+  );
+  if (!selectedUser) {
+    return undefined;
+  }
+  if (selectedUser.avatar) {
+    return {
+      src: `/avatars/${selectedUser.avatar}`,
+      alt: formatUserName(selectedUser),
+      loading: 'lazy' as const,
+    };
+  }
+  return {
+    icon: 'i-lucide-user',
+    alt: formatUserName(selectedUser),
+  };
 });
 </script>
 
@@ -62,10 +92,10 @@ const items = computed<InputMenuItem[]>(() => {
     v-model:search-term="searchTerm"
     :items="items"
     :loading="asyncStatus === 'loading'"
+    :avatar="avatar"
     autocomplete
     ignore-filter
     clear
-    icon="i-lucide-user"
     placeholder="Search user..."
     value-key="value"
   />

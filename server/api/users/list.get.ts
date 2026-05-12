@@ -62,6 +62,7 @@ export default defineEventHandler(async (event) => {
       lastName: usersTable.lastName,
       firstName: usersTable.firstName,
       middleName: usersTable.middleName,
+      avatar: usersTable.avatar,
     })
     .from(usersTable)
     .limit(perPage)
