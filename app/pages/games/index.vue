@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { IGameListItem } from '#shared/types/games';
+import type { IGameListItem } from '~~/modules/dice-throne-games/runtime/app/types/games';
 
 const { data: gamesData, asyncStatus: gamesAsyncStatus } = useGamesList();
 const gamesList = computed(() => gamesData.value?.data || []);

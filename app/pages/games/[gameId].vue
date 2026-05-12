@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { IGameDetail, IGameParticipantDetail, GameMode } from '#shared/types/games';
+import type { IGameDetail, IGameParticipantDetail, GameMode } from '~~/modules/dice-throne-games/runtime/app/types/games';
 
 const route = useRoute();
 const gameId = computed(() => route.params.gameId as string);
