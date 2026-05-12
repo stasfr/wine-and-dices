@@ -7,58 +7,67 @@ interface Props {
 
 const props = defineProps<Props>();
 
-function formatValue(value: string | null | undefined) {
-  if (!value) {
-    return '-';
-  }
+const state = ref({
+  id: '',
+  email: '',
+  status: '',
+  lastName: '',
+  firstName: '',
+  middleName: '',
+});
 
-  return value;
-}
+watch(
+  () => props.user,
+  (user) => {
+    if (!user) {
+      return;
+    }
+
+    state.value.id = user.id;
+    state.value.email = user.email;
+    state.value.status = user.isActive ? 'Active' : 'Inactive';
+    state.value.lastName = user.lastName || '';
+    state.value.firstName = user.firstName || '';
+    state.value.middleName = user.middleName || '';
+  },
+  { immediate: true },
+);
 </script>
 
 <template>
-  <div v-if="props.user" class="space-y-4">
+  <UForm v-if="props.user" :state="state" class="space-y-4">
     <UPageCard title="Account">
-      <div class="space-y-2">
-        <div class="flex items-center justify-between">
-          <span class="text-sm text-muted">ID</span>
-          <span class="text-sm">{{ props.user.id }}</span>
-        </div>
+      <div class="space-y-4">
+        <UFormField label="ID" name="id">
+          <UInput v-model="state.id" disabled class="w-full" />
+        </UFormField>
 
-        <div class="flex items-center justify-between">
-          <span class="text-sm text-muted">Email</span>
-          <span class="text-sm">{{ props.user.email }}</span>
-        </div>
+        <UFormField label="Email" name="email">
+          <UInput v-model="state.email" disabled class="w-full" />
+        </UFormField>
 
-        <div class="flex items-center justify-between">
-          <span class="text-sm text-muted">Status</span>
-          <UBadge
-            :color="props.user.isActive ? 'success' : 'error'"
-            :label="props.user.isActive ? 'Active' : 'Inactive'"
-          />
-        </div>
+        <UFormField label="Status" name="status">
+          <UInput v-model="state.status" disabled class="w-full" />
+        </UFormField>
       </div>
     </UPageCard>
 
     <UPageCard title="Full Name">
-      <div class="space-y-2">
-        <div class="flex items-center justify-between">
-          <span class="text-sm text-muted">Last Name</span>
-          <span class="text-sm">{{ formatValue(props.user.lastName) }}</span>
-        </div>
+      <div class="space-y-4">
+        <UFormField label="Last Name" name="lastName">
+          <UInput v-model="state.lastName" disabled class="w-full" />
+        </UFormField>
 
-        <div class="flex items-center justify-between">
-          <span class="text-sm text-muted">First Name</span>
-          <span class="text-sm">{{ formatValue(props.user.firstName) }}</span>
-        </div>
+        <UFormField label="First Name" name="firstName">
+          <UInput v-model="state.firstName" disabled class="w-full" />
+        </UFormField>
 
-        <div class="flex items-center justify-between">
-          <span class="text-sm text-muted">Middle Name</span>
-          <span class="text-sm">{{ formatValue(props.user.middleName) }}</span>
-        </div>
+        <UFormField label="Middle Name" name="middleName">
+          <UInput v-model="state.middleName" disabled class="w-full" />
+        </UFormField>
       </div>
     </UPageCard>
-  </div>
+  </UForm>
 
   <div v-else class="text-center py-8 text-muted">
     No user data available
