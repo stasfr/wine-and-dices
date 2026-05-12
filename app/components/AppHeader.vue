@@ -5,12 +5,26 @@ const { loggedIn, user, clear } = useUserSession();
 
 const items = computed<NavigationMenuItem[]>(() => [
   {
-    label: 'Characters',
-    to: '/characters',
-  },
-  {
-    label: 'Games',
+    label: 'Dices',
+    icon: 'i-lucide-dices',
     to: '/games',
+    children: [
+      {
+        label: 'Characters list',
+        icon: 'i-lucide-users',
+        to: '/characters',
+      },
+      {
+        label: 'Games list',
+        icon: 'i-lucide-gamepad-2',
+        to: '/games',
+      },
+      {
+        label: 'Create Game',
+        icon: 'i-lucide-square-plus',
+        to: '/games/create',
+      },
+    ],
   },
 ]);
 
@@ -37,8 +51,14 @@ const userMenuItems = computed<DropdownMenuItem[][]>(() => [
 </script>
 
 <template>
-  <UHeader title="W&D" to="/">
-    <UNavigationMenu :items="items" color="neutral" />
+  <UHeader
+    title="W&D"
+    to="/"
+    :ui="{
+      center: 'basis-1/2 flex-1',
+    }"
+  >
+    <UNavigationMenu :items="items" class="w-full justify-center" />
 
     <template #right>
       <template v-if="loggedIn">
