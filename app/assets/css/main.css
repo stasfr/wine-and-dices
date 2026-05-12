@@ -1,6 +1,10 @@
 @import 'tailwindcss';
 @import '@nuxt/ui';
 
+/* Tailwind v4 does not automatically scan files outside the app directory,
+   so we explicitly include Vue components and other source files in Nuxt modules. */
+@source '../../../modules/**/*';
+
 @theme {
   --font-sans: 'Poppins', sans-serif;
 }

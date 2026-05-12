@@ -10,7 +10,7 @@ const charactersList = computed(() => data.value?.data || []);
 </script>
 
 <template>
-  <div class="flex gap-8 flex-wrap">
+  <div class="grid grid-cols-2 md:flex md:flex-wrap gap-4 md:gap-8">
     <UPageCard
       v-for="character in charactersList"
       :key="character.id"
@@ -19,7 +19,8 @@ const charactersList = computed(() => data.value?.data || []);
       <NuxtImg
         :src="`images/portraits/${character.key}.png`"
         :alt="character.name"
-        class="w-30 rounded-lg"
+        class="rounded-lg"
+        sizes="128px xl:160px"
       />
     </UPageCard>
   </div>
