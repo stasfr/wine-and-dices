@@ -11,6 +11,7 @@ const props = defineProps<Props>();
 const toast = useToast();
 const requestFetch = useRequestFetch();
 const { handleError } = useErrorHandler();
+const { fetch } = useUserSession();
 
 const isEditing = ref(false);
 
@@ -65,7 +66,7 @@ const { mutate: updateProfile, isLoading: isUpdatingProfile } = useMutation({
       color: 'success',
     });
     isEditing.value = false;
-    await useUserSession().fetch();
+    await fetch();
   },
   onError: (err) => {
     handleError(err, { title: 'Failed to update profile' });
@@ -88,7 +89,7 @@ const { mutate: uploadAvatar, isLoading: isUploadingAvatar } = useMutation({
       title: 'Avatar updated',
       color: 'success',
     });
-    await useUserSession().fetch();
+    await fetch();
 
     if (avatarFileInputEl.value) {
       avatarFileInputEl.value.value = '';
@@ -109,7 +110,7 @@ const { mutate: deleteAvatar, isLoading: isDeletingAvatar } = useMutation({
       title: 'Avatar removed',
       color: 'success',
     });
-    await useUserSession().fetch();
+    await fetch();
   },
   onError: (err) => {
     handleError(err, { title: 'Failed to remove avatar' });

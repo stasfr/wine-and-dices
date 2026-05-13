@@ -36,7 +36,6 @@
 | 24 | **Tailwind классы не кратные 2**: `-mx-2.5`, `gap-3`, `p-3`. | `AppHeader.vue`, `[gameId].vue` |
 | 25 | **Type assertion `route.params.gameId as string`** — `params.gameId` может быть `string[]`. | `[gameId].vue:5` |
 | 26 | **Type assertion для ошибки вместо type guard** | `auth/login.vue:87` |
-| 27 | **`useUserSession().fetch()` внутри обработчика** — повторный вызов composable вместо деструктуризации на верхнем уровне. | `auth/login.vue:56,76` |
 | 28 | **Конфликт Tailwind v3/v4** — `@nuxtjs/tailwindcss@6` (peer: Tailwind ~3.4) + `tailwindcss@4` + `@nuxt/ui@4` (сам управляет Tailwind). `@nuxtjs/tailwindcss` лишний. | `package.json` |
 | 29 | **@nuxt/eslint, eslint, typescript в `dependencies`** — должны быть в `devDependencies`. | `package.json` |
 | 30 | **Отсутствует `future: { compatibilityVersion: 4 }`** — Nuxt 4.4 работает в режиме обратной совместимости. | `nuxt.config.ts` |

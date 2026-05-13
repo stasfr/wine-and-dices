@@ -19,6 +19,7 @@ const FORM_ID = 'login-form';
 
 const mode = ref<'login' | 'register'>('login');
 const loading = ref(false);
+const { fetch } = useUserSession();
 
 const passwordSchema = v.pipe(
   v.string(),
@@ -82,7 +83,7 @@ async function onSubmit(_event: FormSubmitEvent<AuthFormBody>) {
         },
       });
 
-      await useUserSession().fetch();
+      await fetch();
       await navigateTo('/profile');
     } else {
       await $fetch('/api/auth/register', {
@@ -93,7 +94,7 @@ async function onSubmit(_event: FormSubmitEvent<AuthFormBody>) {
         },
       });
 
-      await useUserSession().fetch();
+      await fetch();
 
       toast.add({
         title: 'Success',
