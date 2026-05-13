@@ -83,7 +83,7 @@ export default defineEventHandler(async (event) => {
       if ('email' in participant && !emailToUserId.has(participant.email)) {
         throw createError({
           status: 400,
-          statusText: `User with email "${participant.email}" does not exist`,
+          statusMessage: `User with email "${participant.email}" does not exist`,
         });
       }
     }
@@ -95,7 +95,7 @@ export default defineEventHandler(async (event) => {
       if (!userId) {
         throw createError({
           status: 400,
-          statusText: `User with email "${participant.email}" does not exist`,
+          statusMessage: `User with email "${participant.email}" does not exist`,
         });
       }
       return {
@@ -113,7 +113,7 @@ export default defineEventHandler(async (event) => {
   if (new Date(date) > new Date()) {
     throw createError({
       status: 422,
-      statusText: 'Game date cannot be in the future',
+      statusMessage: 'Game date cannot be in the future',
     });
   }
 
@@ -121,7 +121,7 @@ export default defineEventHandler(async (event) => {
   if (participants.length < min || participants.length > max) {
     throw createError({
       status: 422,
-      statusText: `Game mode "${mode}" requires ${min === max ? min : `${min}-${max}`} participants`,
+      statusMessage: `Game mode "${mode}" requires ${min === max ? min : `${min}-${max}`} participants`,
     });
   }
 
@@ -135,7 +135,7 @@ export default defineEventHandler(async (event) => {
     ) {
       throw createError({
         status: 400,
-        statusText: `Invalid team index ${participant.teamIndex} for mode "${mode}". Valid range: 0-${expectedTeamCount - 1}`,
+        statusMessage: `Invalid team index ${participant.teamIndex} for mode "${mode}". Valid range: 0-${expectedTeamCount - 1}`,
       });
     }
     teamIndexCounts.set(
@@ -149,7 +149,7 @@ export default defineEventHandler(async (event) => {
       if (teamIndexCounts.get(i) !== 1) {
         throw createError({
           status: 400,
-          statusText: 'Mode "one_vs_one" requires exactly 1 participant per team',
+          statusMessage: 'Mode "one_vs_one" requires exactly 1 participant per team',
         });
       }
     }
@@ -158,7 +158,7 @@ export default defineEventHandler(async (event) => {
       if (teamIndexCounts.get(i) !== 2) {
         throw createError({
           status: 400,
-          statusText: 'Mode "two_vs_two" requires exactly 2 participants per team',
+          statusMessage: 'Mode "two_vs_two" requires exactly 2 participants per team',
         });
       }
     }
@@ -167,7 +167,7 @@ export default defineEventHandler(async (event) => {
       if (teamIndexCounts.get(i) !== 3) {
         throw createError({
           status: 400,
-          statusText: 'Mode "three_vs_three" requires exactly 3 participants per team',
+          statusMessage: 'Mode "three_vs_three" requires exactly 3 participants per team',
         });
       }
     }
@@ -176,7 +176,7 @@ export default defineEventHandler(async (event) => {
       if (teamIndexCounts.get(i) !== 2) {
         throw createError({
           status: 400,
-          statusText: 'Mode "two_vs_two_vs_two" requires exactly 2 participants per team',
+          statusMessage: 'Mode "two_vs_two_vs_two" requires exactly 2 participants per team',
         });
       }
     }
@@ -185,7 +185,7 @@ export default defineEventHandler(async (event) => {
       if (teamIndexCounts.get(i) !== 1) {
         throw createError({
           status: 400,
-          statusText: `Mode "king_of_the_hill" requires unique team index for each participant (0-${participants.length - 1})`,
+          statusMessage: `Mode "king_of_the_hill" requires unique team index for each participant (0-${participants.length - 1})`,
         });
       }
     }
@@ -195,7 +195,7 @@ export default defineEventHandler(async (event) => {
   if (winnerCount === 0) {
     throw createError({
       status: 400,
-      statusText: 'At least one participant must be a winner',
+      statusMessage: 'At least one participant must be a winner',
     });
   }
 
@@ -215,7 +215,7 @@ export default defineEventHandler(async (event) => {
       if (!allWinners && !noWinners) {
         throw createError({
           status: 400,
-          statusText:
+          statusMessage:
             `In team mode, all members of team ${teamIndex} must be winners or none. ` +
             `Found ${teamWinnerCount} winners out of ${teamParticipants.length} team members.`,
         });
@@ -229,7 +229,7 @@ export default defineEventHandler(async (event) => {
       if (userIdsSet.has(participant.userId)) {
         throw createError({
           status: 400,
-          statusText: `Duplicate userId "${participant.userId}" in participants. Each user can participate only once per game.`,
+          statusMessage: `Duplicate userId "${participant.userId}" in participants. Each user can participate only once per game.`,
         });
       }
       userIdsSet.add(participant.userId);
@@ -241,7 +241,7 @@ export default defineEventHandler(async (event) => {
     if (characterIdsSet.has(participant.characterId)) {
       throw createError({
         status: 400,
-        statusText: `Duplicate characterId "${participant.characterId}" in participants. Each character can be used only once per game.`,
+        statusMessage: `Duplicate characterId "${participant.characterId}" in participants. Each character can be used only once per game.`,
       });
     }
     characterIdsSet.add(participant.characterId);
@@ -265,7 +265,7 @@ export default defineEventHandler(async (event) => {
     if (!existingCharacterIds.has(participant.characterId)) {
       throw createError({
         status: 400,
-        statusText: `Character with id "${participant.characterId}" does not exist`,
+        statusMessage: `Character with id "${participant.characterId}" does not exist`,
       });
     }
   }
@@ -281,7 +281,7 @@ export default defineEventHandler(async (event) => {
       if ('userId' in participant && !existingUserIds.has(participant.userId)) {
         throw createError({
           status: 400,
-          statusText: `User with id "${participant.userId}" does not exist`,
+          statusMessage: `User with id "${participant.userId}" does not exist`,
         });
       }
     }
@@ -323,7 +323,7 @@ export default defineEventHandler(async (event) => {
   if (!game) {
     throw createError({
       status: 500,
-      statusText: 'Failed to create game',
+      statusMessage: 'Failed to create game',
     });
   }
 

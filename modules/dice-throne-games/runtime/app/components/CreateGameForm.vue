@@ -38,10 +38,20 @@ const { mutate: createGame, asyncStatus: createAsyncStatus } = useMutation({
     navigateTo('/games');
   },
   onError: (err) => {
-    const error = err instanceof Error ? err : new Error(String(err));
+    let description = 'An error occurred';
+    if (
+      typeof err === 'object' &&
+      err !== null &&
+      'statusMessage' in err &&
+      typeof err.statusMessage === 'string'
+    ) {
+      description = err.statusMessage;
+    } else if (err instanceof Error) {
+      description = err.message;
+    }
     toast.add({
       title: 'Failed to create game',
-      description: error.message,
+      description,
       color: 'error',
     });
   },

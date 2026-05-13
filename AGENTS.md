@@ -18,7 +18,7 @@ if (!user.name) {
   // or
   return;
   // or
-  createError({ status: 400, statusText: 'some error' });
+  createError({ status: 400, statusMessage: 'some error' });
 }
 
 const username = user.name;

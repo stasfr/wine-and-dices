@@ -32,7 +32,7 @@ export default defineEventHandler(async (event) => {
   const user = userSelectResult[0];
 
   if (!user) {
-    throw createError({ status: 404, statusText: 'User not found' });
+    throw createError({ status: 404, statusMessage: 'User not found' });
   }
 
   return { data: user };

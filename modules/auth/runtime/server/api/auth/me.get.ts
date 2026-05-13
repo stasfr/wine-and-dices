@@ -6,7 +6,7 @@ export default defineEventHandler(async (event) => {
   const session = await requireUserSession(event);
 
   if (!session.user) {
-    throw createError({ status: 401, statusText: 'Unauthorized' });
+    throw createError({ status: 401, statusMessage: 'Unauthorized' });
   }
 
   const userResult = await db
@@ -25,7 +25,7 @@ export default defineEventHandler(async (event) => {
     .where(eq(usersTable.id, session.user.id));
 
   if (!userResult.length) {
-    throw createError({ status: 404, statusText: 'User not found' });
+    throw createError({ status: 404, statusMessage: 'User not found' });
   }
 
   return {

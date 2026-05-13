@@ -17,7 +17,6 @@
 
 | # | Проблема | Где |
 |---|----------|-----|
-| 8 | **Смешение `statusText` и `statusMessage`** в `createError()` — клиент не может единообразно обрабатывать ошибки. | Все `runtime/server/api/**/*.ts` |
 | 9 | **Валидация пароля — `v.minLength(1)`** — допускается 1 символ, нет максимума. | `auth/register.post.ts`, `auth/login.post.ts` |
 | 10 | **Email-контент на русском** — UI полностью на английском, email-письма тоже должны быть на английском (по AGENTS.md). | `auth/register.post.ts` |
 | 11 | **Avatar: `file.content` не валидируется как base64/изображение** — возможна загрузка произвольного контента с поддельным MIME. | `users/avatar.post.ts` |

@@ -24,7 +24,7 @@ export default defineEventHandler(async (event) => {
   const character = characterSelectResult[0];
 
   if (!character) {
-    throw createError({ status: 404, statusText: 'Character not found' });
+    throw createError({ status: 404, statusMessage: 'Character not found' });
   }
 
   return { data: character };

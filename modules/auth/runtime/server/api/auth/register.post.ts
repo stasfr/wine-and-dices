@@ -59,7 +59,7 @@ export default defineEventHandler(async (event) => {
   if (!user || !user.activation) {
     throw createError({
       status: 500,
-      statusText: 'Failed to create user',
+      statusMessage: 'Failed to create user',
     });
   }
 

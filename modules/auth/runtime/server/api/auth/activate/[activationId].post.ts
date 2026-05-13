@@ -14,11 +14,11 @@ export default defineEventHandler(async (event) => {
   const session = await requireUserSession(event);
 
   if (!session.user) {
-    throw createError({ status: 401, statusText: 'Unauthorized' });
+    throw createError({ status: 401, statusMessage: 'Unauthorized' });
   }
 
   if (session.user.isActive) {
-    throw createError({ status: 400, statusText: 'User is already activated' });
+    throw createError({ status: 400, statusMessage: 'User is already activated' });
   }
 
   const params = await getValidatedRouterParams(event, (data) =>
@@ -35,7 +35,7 @@ export default defineEventHandler(async (event) => {
   if (!userActivationResult.length) {
     throw createError({
       status: 404,
-      statusText: 'Activation link is invalid: Activation not found',
+      statusMessage: 'Activation link is invalid: Activation not found',
     });
   }
 
@@ -44,14 +44,14 @@ export default defineEventHandler(async (event) => {
   if (!userActivation) {
     throw createError({
       status: 404,
-      statusText: 'Activation link is invalid: Activation not found',
+      statusMessage: 'Activation link is invalid: Activation not found',
     });
   }
 
   if (userActivation.userId !== session.user.id) {
     throw createError({
       status: 404,
-      statusText: 'Activation link is invalid: User not found',
+      statusMessage: 'Activation link is invalid: User not found',
     });
   }
 
@@ -59,7 +59,7 @@ export default defineEventHandler(async (event) => {
     new Date(userActivation.createdAt) <
     new Date(Date.now() - 1000 * 60 * 60 * 24)
   ) {
-    throw createError({ status: 404, statusText: 'Activation expired' });
+    throw createError({ status: 404, statusMessage: 'Activation expired' });
   }
 
   await db

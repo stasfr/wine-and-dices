@@ -14,24 +14,15 @@ const requestFetch = useRequestFetch();
 function getErrorMessage(err: unknown): string {
   if (err && typeof err === 'object') {
     const fetchError = err as {
-      data?: { message?: string; statusMessage?: string };
       statusMessage?: string;
       message?: string;
     };
 
-    if (fetchError.data?.message) {
-      return fetchError.data.message;
-    }
-
-    if (fetchError.data?.statusMessage) {
-      return fetchError.data.statusMessage;
-    }
-
-    if (fetchError.statusMessage) {
+    if (typeof fetchError.statusMessage === 'string') {
       return fetchError.statusMessage;
     }
 
-    if (fetchError.message) {
+    if (typeof fetchError.message === 'string') {
       return fetchError.message;
     }
   }
