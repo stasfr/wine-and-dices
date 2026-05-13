@@ -85,8 +85,8 @@ export default defineEventHandler(async (event) => {
   if (existingUser.avatar) {
     try {
       await deleteFile(existingUser.avatar, '');
-    } catch {
-      // ignore if file doesn't exist
+    } catch (error) {
+      console.error('Failed to delete old avatar:', error);
     }
   }
 
