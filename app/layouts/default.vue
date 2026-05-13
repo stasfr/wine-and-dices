@@ -1,11 +1,9 @@
 <template>
-  <UApp>
-    <AppHeader />
+  <AppHeader />
 
-    <UContainer>
-      <UMain class="flex flex-col">
-        <NuxtPage />
-      </UMain>
-    </UContainer>
-  </UApp>
+  <UContainer>
+    <UMain class="flex flex-col">
+      <NuxtPage />
+    </UMain>
+  </UContainer>
 </template>

@@ -9,8 +9,6 @@
 
 | # | Проблема | Где |
 |---|----------|-----|
-| 1 | **Кастомные модули (`auth`, `dice-throne-games`, `users`) не подключены в `nuxt.config.ts`** — Nuxt не загружает их компоненты, серверные хендлеры и типы. | `nuxt.config.ts` |
-| 2 | **`<UApp>` продублирован** — Nuxt UI v4 требует ровно один инстанс. Дублирование ломает порталы, тосты, модалки и тултипы. | `app/app.vue`, `app/layouts/default.vue` |
 | 3 | **`useDb()` создаёт новый пул соединений PostgreSQL при каждом вызове** — при нагрузке исчерпаются соединения с БД. | `server/utils/drizzleClient.ts` |
 | 4 | **`postgres:18.3` не существует** — контейнер не запустится. Последняя стабильная версия PostgreSQL — 17.x. | `docker-compose.dev.yaml` |
 | 5 | **Пустые `catch` блоки** — ошибки удаления аватаров игнорируются без логирования. | `modules/users/runtime/server/api/users/avatar.delete.ts`, `avatar.post.ts` |
