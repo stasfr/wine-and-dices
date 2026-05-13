@@ -15,7 +15,6 @@
 | 13 | **Async `onMounted` без cleanup** — если компонент размонтируется во время `$fetch`, `toast.add`/`navigateTo` вызовутся на мёртвом компоненте. | `auth/activate/[activationId].vue` |
 | 14 | **Неявная проверка `session.user` после `requireUserSession`** — `requireUserSession` уже бросает 401, проверка избыточна. | Множество файлов в `auth` и `users` |
 | 15 | **`navigateTo('/games')` без `await`/`return`** в `onSuccess` коллбэке — в Nuxt 3 навигация должна возвращаться. | `CreateGameForm.vue:38` |
-| 17 | **Отсутствуют auth middleware** — страницы `/profile`, `/games/create` не защищены от неавторизованных пользователей на клиенте. | `app/middleware/` — директория отсутствует |
 | 18 | **`runtimeConfig` не разделён на `public`/`private`** — `clientUrl`, `clientProtocol` и т.д. должны быть доступны на клиенте через `.public`. | `nuxt.config.ts` |
 | 19 | **`nodemailer.auth.user`/`pass` захардкожены пустыми строками** — env-переменные могут не перезаписать их. | `nuxt.config.ts` |
 
