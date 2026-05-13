@@ -21,15 +21,20 @@ export default defineEventHandler(async (event) => {
     v.parse(bodySchema, data),
   );
 
+  const updateData: Record<string, unknown> = {
+    firstName: body.firstName || null,
+    lastName: body.lastName || null,
+    middleName: body.middleName || null,
+    updatedAt: new Date().toISOString(),
+  };
+
+  if (body.avatar !== undefined) {
+    updateData.avatar = body.avatar || null;
+  }
+
   const updateResult = await db
     .update(usersTable)
-    .set({
-      firstName: body.firstName || null,
-      lastName: body.lastName || null,
-      middleName: body.middleName || null,
-      avatar: body.avatar || null,
-      updatedAt: new Date().toISOString(),
-    })
+    .set(updateData)
     .where(eq(usersTable.id, session.user.id))
     .returning({
       id: usersTable.id,
