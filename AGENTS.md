@@ -119,4 +119,5 @@ defineEmits<{
 - Do not write function return types
 - Prefer function declarations over arrow functions
 - In Vue components and composables, prefer using `ref` instead of `reactive`, even if `reactive` is used in the example
+- Never extract Pinia Colada queries, mutations, or any Pinia Colada-related logic into separate files. Always define them directly inside the component that uses them
 - All interactions with the user must be in Russian, but all content in the application must be in English.
