@@ -2,30 +2,58 @@
 import * as v from 'valibot';
 import type { FormSubmitEvent } from '@nuxt/ui';
 
+export interface LoginBody {
+  email: string;
+  password: string;
+}
+
+export interface RegisterBodyм {
+  email: string;
+  password: string;
+  confirmPassword: string;
+}
+
+export type AuthFormBody = LoginBody | RegisterBody;
+
 const FORM_ID = 'login-form';
 
 const mode = ref<'login' | 'register'>('login');
 const loading = ref(false);
 
+const passwordSchema = v.pipe(
+  v.string(),
+  v.minLength(8, 'Must be at least 8 characters'),
+  v.maxLength(64, 'Must be at most 64 characters'),
+  v.regex(/^\S*$/, 'Must not contain spaces'),
+  v.regex(/[a-z]/, 'Must contain at least one lowercase letter'),
+  v.regex(/[A-Z]/, 'Must contain at least one uppercase letter'),
+  v.regex(/[0-9]/, 'Must contain at least one digit'),
+  v.regex(/[\p{P}\p{S}]/u, 'Must contain at least one special character'),
+);
+
 const loginSchema = v.object({
   email: v.pipe(v.string(), v.email('Invalid email')),
-  password: v.pipe(v.string(), v.minLength(8, 'Must be at least 8 characters')),
+  password: passwordSchema,
 });
 
-const registerSchema = v.object({
-  email: v.pipe(v.string(), v.email('Invalid email')),
-  password: v.pipe(v.string(), v.minLength(8, 'Must be at least 8 characters')),
-  confirmPassword: v.pipe(
-    v.string(),
-    v.minLength(8, 'Must be at least 8 characters'),
+const registerSchema = v.pipe(
+  v.object({
+    email: v.pipe(v.string(), v.email('Invalid email')),
+    password: passwordSchema,
+    confirmPassword: passwordSchema,
+  }),
+  v.forward(
+    v.check(
+      (input) => input.password === input.confirmPassword,
+      'Passwords do not match',
+    ),
+    ['confirmPassword'],
   ),
-});
+);
 
 const schema = computed(() =>
   mode.value === 'login' ? loginSchema : registerSchema,
 );
-
-type Schema = v.InferOutput<typeof loginSchema> | v.InferOutput<typeof registerSchema>;
 
 const formData = ref({
   email: '',
@@ -41,7 +69,7 @@ const isFormValid = computed(() => {
 const toast = useToast();
 const { handleError, getErrorStatusCode } = useErrorHandler();
 
-async function onSubmit(_event: FormSubmitEvent<Schema>) {
+async function onSubmit(_event: FormSubmitEvent<AuthFormBody>) {
   loading.value = true;
 
   try {
@@ -57,15 +85,6 @@ async function onSubmit(_event: FormSubmitEvent<Schema>) {
       await useUserSession().fetch();
       await navigateTo('/profile');
     } else {
-      if (formData.value.password !== formData.value.confirmPassword) {
-        toast.add({
-          title: 'Error',
-          description: 'Passwords do not match',
-          color: 'error',
-        });
-        return;
-      }
-
       await $fetch('/api/auth/register', {
         method: 'POST',
         body: {
@@ -90,8 +109,7 @@ async function onSubmit(_event: FormSubmitEvent<Schema>) {
       mode.value = 'register';
       toast.add({
         title: 'Info',
-        description:
-          'User does not exist. Confirm password to register.',
+        description: 'User does not exist. Confirm password to register.',
         color: 'info',
       });
     } else {
@@ -105,7 +123,10 @@ async function onSubmit(_event: FormSubmitEvent<Schema>) {
 
 <template>
   <div class="flex flex-col items-center justify-center gap-4 p-4 flex-1">
-    <UPageCard :title="mode === 'login' ? 'Login' : 'Register'" class="w-full max-w-md">
+    <UPageCard
+      :title="mode === 'login' ? 'Login' : 'Register'"
+      class="w-full max-w-md"
+    >
       <UForm
         :id="FORM_ID"
         :schema="schema"
@@ -133,9 +154,14 @@ async function onSubmit(_event: FormSubmitEvent<Schema>) {
           />
         </UFormField>
 
-        <UButton :loading="loading" :disabled="!isFormValid" type="submit" class="w-full">
+        <UButton
+          :loading="loading"
+          :disabled="!isFormValid"
+          type="submit"
+          class="w-full"
+        >
           <span class="text-center w-full">
-            {{ mode === 'login' ? 'Login' : 'Register' }}
+            {{ mode === 'login' ? 'Login or create an account' : 'Register' }}
           </span>
         </UButton>
       </UForm>

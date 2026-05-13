@@ -5,9 +5,20 @@ import {
   users as usersTable,
 } from '#server/db/schema/schema.js';
 
+const passwordSchema = v.pipe(
+  v.string(),
+  v.minLength(8, 'Must be at least 8 characters'),
+  v.maxLength(64, 'Must be at most 64 characters'),
+  v.regex(/^\S*$/, 'Must not contain spaces'),
+  v.regex(/[a-z]/, 'Must contain at least one lowercase letter'),
+  v.regex(/[A-Z]/, 'Must contain at least one uppercase letter'),
+  v.regex(/[0-9]/, 'Must contain at least one digit'),
+  v.regex(/[\p{P}\p{S}]/u, 'Must contain at least one special character'),
+);
+
 const bodySchema = v.object({
   email: v.pipe(v.string(), v.minLength(1), v.email()),
-  password: v.pipe(v.string(), v.minLength(1)),
+  password: passwordSchema,
 });
 
 export default defineEventHandler(async (event) => {

@@ -17,7 +17,6 @@
 
 | # | Проблема | Где |
 |---|----------|-----|
-| 9 | **Валидация пароля — `v.minLength(1)`** — допускается 1 символ, нет максимума. | `auth/register.post.ts`, `auth/login.post.ts` |
 | 10 | **Email-контент на русском** — UI полностью на английском, email-письма тоже должны быть на английском (по AGENTS.md). | `auth/register.post.ts` |
 | 11 | **Avatar: `file.content` не валидируется как base64/изображение** — возможна загрузка произвольного контента с поддельным MIME. | `users/avatar.post.ts` |
 | 12 | **`tx.rollback()` + `return`** — `rollback()` никогда не возвращает управление (тип `never`), код после него мёртвый и вводит в заблуждение. | `auth/register.post.ts`, `dices/games/create.post.ts` |

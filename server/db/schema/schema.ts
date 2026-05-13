@@ -30,7 +30,7 @@ const deletedAt = timestamp('deleted_at', {
 export const users = pgTable('users', {
   id: uuid('id').primaryKey().defaultRandom(),
   email: varchar('email').notNull().unique(),
-  password: varchar('password').notNull(),
+  password: varchar('password', { length: 255 }).notNull(),
   isActive: boolean('is_active').default(false).notNull(),
   lastName: varchar('last_name'),
   firstName: varchar('first_name'),
