@@ -11,6 +11,41 @@ const paramsSchema = v.object({
   gameId: v.pipe(v.string(), v.minLength(1)),
 });
 
+interface Participant {
+  id: string;
+  playerName: string | null;
+  winner: boolean;
+  teamIndex: number;
+  characterId: string;
+  characterName: string | null;
+  characterKey: string | null;
+  userId: string | null;
+  userEmail: string | null;
+  userFirstName: string | null;
+  userLastName: string | null;
+  userMiddleName: string | null;
+}
+
+function groupParticipantsByTeam(participants: Participant[]) {
+  const byTeam = new Map<number, Participant[]>();
+
+  for (const participant of participants) {
+    const list = byTeam.get(participant.teamIndex);
+    if (list) {
+      list.push(participant);
+    } else {
+      byTeam.set(participant.teamIndex, [participant]);
+    }
+  }
+
+  return Array.from(byTeam.entries())
+    .sort((a, b) => a[0] - b[0])
+    .map(([teamIndex, teamParticipants]) => ({
+      teamIndex,
+      participants: teamParticipants,
+    }));
+}
+
 export default defineEventHandler(async (event) => {
   const db = useDb();
   await requireUserSession(event);
@@ -58,13 +93,15 @@ export default defineEventHandler(async (event) => {
     )
     .where(eq(gameParticipantsTable.gameId, gameId));
 
+  const teams = groupParticipantsByTeam(participants);
+
   return {
     data: {
       game: {
         ...game,
-        participants,
+        teams,
       },
-      participants,
+      teams,
     },
   };
 });

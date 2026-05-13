@@ -4,6 +4,7 @@ import type {
   IGameParticipantDetail,
   GameMode,
 } from '~~/modules/dice-throne-games/runtime/app/types/games';
+import { parseAbsoluteToLocal } from '@internationalized/date';
 
 const gameId = useRouteParams<string>('gameId', '');
 
@@ -20,7 +21,15 @@ const {
 });
 
 const game = computed(() => gameData.value?.data.game);
-const participants = computed(() => gameData.value?.data.participants || []);
+const teams = computed(() => gameData.value?.data.teams || []);
+
+const allParticipants = computed(() => {
+  const result: IGameParticipantDetail[] = [];
+  for (const team of teams.value) {
+    result.push(...team.participants);
+  }
+  return result;
+});
 
 const modeLabelMap: Record<GameMode, string> = {
   one_vs_one: '1v1',
@@ -59,25 +68,6 @@ const teamCount = computed(() => {
   }
 });
 
-const groupedParticipants = computed(() => {
-  const groups: Record<number, IGameParticipantDetail[]> = {};
-
-  for (const participant of participants.value) {
-    if (!groups[participant.teamIndex]) {
-      groups[participant.teamIndex] = [];
-    }
-
-    const group = groups[participant.teamIndex];
-    if (!group) {
-      continue;
-    }
-
-    group.push(participant);
-  }
-
-  return groups;
-});
-
 function formatUserName(participant: IGameParticipantDetail) {
   if (participant.playerName) {
     return participant.playerName;
@@ -101,7 +91,8 @@ function formatUserName(participant: IGameParticipantDetail) {
 }
 
 function formatDate(dateString: string) {
-  return new Date(dateString).toLocaleString('en-US', {
+  const zoned = parseAbsoluteToLocal(dateString.replace(' ', 'T'));
+  return zoned.toDate().toLocaleString('en-US', {
     day: 'numeric',
     month: 'short',
     year: 'numeric',
@@ -170,16 +161,16 @@ function formatDate(dateString: string) {
             class="grid gap-4"
             :class="teamCount === 3 ? 'grid-cols-3' : 'grid-cols-2'"
           >
-            <UCard v-for="teamIdx in teamCount" :key="teamIdx" class="w-full">
+            <UCard v-for="team in teams" :key="team.teamIndex" class="w-full">
               <template #header>
                 <div class="flex items-center justify-between">
-                  <span class="font-medium text-sm">Team {{ teamIdx }}</span>
+                  <span class="font-medium text-sm">Team {{ team.teamIndex + 1 }}</span>
                 </div>
               </template>
 
               <div class="space-y-4">
                 <div
-                  v-for="participant in groupedParticipants[teamIdx - 1] || []"
+                  v-for="participant in team.participants"
                   :key="participant.id"
                   class="flex items-center gap-2 p-2 rounded-lg border border-default"
                   :class="
@@ -228,7 +219,7 @@ function formatDate(dateString: string) {
 
             <div class="space-y-2">
               <div
-                v-for="participant in participants"
+                v-for="participant in allParticipants"
                 :key="participant.id"
                 class="flex items-center gap-2 p-2 rounded-lg border border-default"
                 :class="

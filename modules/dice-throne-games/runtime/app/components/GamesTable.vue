@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import type { TableColumn } from '@nuxt/ui';
 import type { IGameListItem, GameMode, IGameParticipantDetail } from '../types/games';
+import { parseAbsoluteToLocal } from '@internationalized/date';
 
 interface Props {
   data: IGameListItem[];
@@ -35,7 +36,7 @@ const modeColorMap: Record<
 
 const columns: TableColumn<IGameListItem>[] = [
   {
-    accessorKey: 'participants',
+    accessorKey: 'teams',
     header: 'Players',
     meta: {
       class: {
@@ -99,7 +100,8 @@ function formatParticipant(participant: IGameParticipantDetail) {
 }
 
 function formatDate(dateValue: string) {
-  return new Date(dateValue).toLocaleString('en-US', {
+  const zoned = parseAbsoluteToLocal(dateValue.replace(' ', 'T'));
+  return zoned.toDate().toLocaleString('en-US', {
     day: 'numeric',
     month: 'short',
     year: 'numeric',
@@ -129,14 +131,26 @@ function getModeColor(mode: GameMode) {
     :loading="props.loading"
     class="flex-1"
   >
-    <template #participants-cell="{ row }">
-      <div class="flex flex-col gap-1">
-        <span
-          v-for="participant in row.original.participants"
-          :key="participant.id"
+    <template #teams-cell="{ row }">
+      <div class="flex flex-col gap-2">
+        <template
+          v-for="(team, teamIdx) in row.original.teams"
+          :key="team.teamIndex"
         >
-          {{ formatParticipant(participant) }}
-        </span>
+          <div class="flex flex-col gap-1">
+            <span
+              v-for="participant in team.participants"
+              :key="participant.id"
+            >
+              {{ formatParticipant(participant) }}
+            </span>
+          </div>
+          <USeparator
+            v-if="teamIdx < row.original.teams.length - 1"
+            type="dashed"
+            class="my-1"
+          />
+        </template>
       </div>
     </template>
 

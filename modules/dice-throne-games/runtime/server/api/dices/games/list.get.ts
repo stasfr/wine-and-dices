@@ -31,6 +31,42 @@ const querySchema = v.object({
   characterIds: v.optional(v.pipe(v.string(), v.minLength(1))),
 });
 
+interface Participant {
+  id: string;
+  playerName: string | null;
+  winner: boolean;
+  teamIndex: number;
+  characterId: string;
+  characterName: string | null;
+  characterKey: string | null;
+  userId: string | null;
+  userEmail: string | null;
+  userFirstName: string | null;
+  userLastName: string | null;
+  userMiddleName: string | null;
+  gameId: string;
+}
+
+function groupParticipantsByTeam(participants: Participant[]) {
+  const byTeam = new Map<number, Participant[]>();
+
+  for (const participant of participants) {
+    const list = byTeam.get(participant.teamIndex);
+    if (list) {
+      list.push(participant);
+    } else {
+      byTeam.set(participant.teamIndex, [participant]);
+    }
+  }
+
+  return Array.from(byTeam.entries())
+    .sort((a, b) => a[0] - b[0])
+    .map(([teamIndex, teamParticipants]) => ({
+      teamIndex,
+      participants: teamParticipants,
+    }));
+}
+
 export default defineEventHandler(async (event) => {
   const db = useDb();
   await requireUserSession(event);
@@ -113,7 +149,7 @@ export default defineEventHandler(async (event) => {
     )
     .where(inArray(gameParticipantsTable.gameId, gameIds));
 
-  const participantsByGameId = new Map<string, typeof participants>();
+  const participantsByGameId = new Map<string, Participant[]>();
   for (const participant of participants) {
     const list = participantsByGameId.get(participant.gameId);
     if (list) {
@@ -124,10 +160,10 @@ export default defineEventHandler(async (event) => {
   }
 
   const data = games.map((game) => {
-    const gameParticipants = participantsByGameId.get(game.id);
+    const gameParticipants = participantsByGameId.get(game.id) ?? [];
     return {
       ...game,
-      participants: gameParticipants ?? [],
+      teams: groupParticipantsByTeam(gameParticipants),
     };
   });
 
