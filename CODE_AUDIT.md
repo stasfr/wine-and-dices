@@ -10,7 +10,6 @@
 | # | Проблема | Где |
 |---|----------|-----|
 | 6 | **Прямые импорты из внутренних путей модулей** — страницы импортируют `~~/modules/dice-throne-games/...`, нарушая границы модулей. | `app/pages/games/index.vue`, `[gameId].vue` |
-| 7 | **В `modules/users/runtime/app/types/search.ts` — копипаста** — вместо типов поиска пользователей лежит `ICreateGameBody` из dice-throne-games. | `modules/users/runtime/app/types/search.ts` |
 
 ---
 
