@@ -120,4 +120,16 @@ defineEmits<{
 - Prefer function declarations over arrow functions
 - In Vue components and composables, prefer using `ref` instead of `reactive`, even if `reactive` is used in the example
 - Never extract Pinia Colada queries, mutations, or any Pinia Colada-related logic into separate files. Always define them directly inside the component that uses them
+- For route params and queries on the client side, always use `@vueuse/router` composables (`useRouteParams`, `useRouteQuery`) instead of manual `route.params` / `route.query` access with type assertions
+
+```typescript
+// BAD
+const route = useRoute();
+const gameId = computed(() => route.params.gameId as string);
+
+// GOOD
+const gameId = useRouteParams<string>('gameId', '');
+const page = useRouteQuery<string>('page', '1');
+```
+
 - All interactions with the user must be in Russian, but all content in the application must be in English.
