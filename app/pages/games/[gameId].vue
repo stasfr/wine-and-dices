@@ -181,7 +181,7 @@ function formatDate(dateString: string) {
                 <div
                   v-for="participant in groupedParticipants[teamIdx - 1] || []"
                   :key="participant.id"
-                  class="flex items-center gap-3 p-3 rounded-lg border border-default"
+                  class="flex items-center gap-2 p-2 rounded-lg border border-default"
                   :class="
                     participant.winner
                       ? 'bg-success/10 border-success/30'
@@ -230,7 +230,7 @@ function formatDate(dateString: string) {
               <div
                 v-for="participant in participants"
                 :key="participant.id"
-                class="flex items-center gap-3 p-3 rounded-lg border border-default"
+                class="flex items-center gap-2 p-2 rounded-lg border border-default"
                 :class="
                   participant.winner
                     ? 'bg-success/10 border-success/30'

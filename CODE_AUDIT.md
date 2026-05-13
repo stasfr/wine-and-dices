@@ -33,7 +33,6 @@
 
 | # | Проблема | Где |
 |---|----------|-----|
-| 24 | **Tailwind классы не кратные 2**: `-mx-2.5`, `gap-3`, `p-3`. | `AppHeader.vue`, `[gameId].vue` |
 | 26 | **Type assertion для ошибки вместо type guard** | `auth/login.vue:87` |
 | 28 | **Конфликт Tailwind v3/v4** — `@nuxtjs/tailwindcss@6` (peer: Tailwind ~3.4) + `tailwindcss@4` + `@nuxt/ui@4` (сам управляет Tailwind). `@nuxtjs/tailwindcss` лишний. | `package.json` |
 | 29 | **@nuxt/eslint, eslint, typescript в `dependencies`** — должны быть в `devDependencies`. | `package.json` |

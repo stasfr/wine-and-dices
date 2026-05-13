@@ -85,7 +85,7 @@ const userMenuItems = computed<DropdownMenuItem[][]>(() => [
     </template>
 
     <template #body>
-      <UNavigationMenu :items="items" orientation="vertical" class="-mx-2.5" />
+      <UNavigationMenu :items="items" orientation="vertical" class="-mx-2" />
     </template>
   </UHeader>
 </template>
