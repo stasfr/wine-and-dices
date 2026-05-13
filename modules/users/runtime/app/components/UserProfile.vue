@@ -10,25 +10,7 @@ const props = defineProps<Props>();
 
 const toast = useToast();
 const requestFetch = useRequestFetch();
-
-function getErrorMessage(err: unknown): string {
-  if (err && typeof err === 'object') {
-    const fetchError = err as {
-      statusMessage?: string;
-      message?: string;
-    };
-
-    if (typeof fetchError.statusMessage === 'string') {
-      return fetchError.statusMessage;
-    }
-
-    if (typeof fetchError.message === 'string') {
-      return fetchError.message;
-    }
-  }
-
-  return 'An unexpected error occurred';
-}
+const { handleError } = useErrorHandler();
 
 const isEditing = ref(false);
 
@@ -67,7 +49,7 @@ watch(
   { immediate: true },
 );
 
-const { mutate: updateProfile, asyncStatus: updateAsyncStatus } = useMutation({
+const { mutate: updateProfile, isLoading: isUpdatingProfile } = useMutation({
   mutation: () =>
     requestFetch('/api/users/profile', {
       method: 'PATCH',
@@ -86,67 +68,53 @@ const { mutate: updateProfile, asyncStatus: updateAsyncStatus } = useMutation({
     await useUserSession().fetch();
   },
   onError: (err) => {
-    toast.add({
-      title: 'Failed to update profile',
-      description: getErrorMessage(err),
-      color: 'error',
-    });
+    handleError(err, { title: 'Failed to update profile' });
   },
 });
 
 const { handleFileInput, files: avatarFiles } = useFileStorage();
 const avatarFileInputEl = useTemplateRef('avatarFileInput');
 
-const { mutate: uploadAvatar, asyncStatus: uploadAvatarAsyncStatus } =
-  useMutation({
-    mutation: () =>
-      requestFetch('/api/users/avatar', {
-        method: 'POST',
-        body: {
-          files: avatarFiles.value,
-        },
-      }),
-    onSuccess: async () => {
-      toast.add({
-        title: 'Avatar updated',
-        color: 'success',
-      });
-      await useUserSession().fetch();
+const { mutate: uploadAvatar, isLoading: isUploadingAvatar } = useMutation({
+  mutation: () =>
+    requestFetch('/api/users/avatar', {
+      method: 'POST',
+      body: {
+        files: avatarFiles.value,
+      },
+    }),
+  onSuccess: async () => {
+    toast.add({
+      title: 'Avatar updated',
+      color: 'success',
+    });
+    await useUserSession().fetch();
 
-      if (avatarFileInputEl.value) {
-        avatarFileInputEl.value.value = '';
-      }
-    },
-    onError: (err) => {
-      toast.add({
-        title: 'Failed to update avatar',
-        description: getErrorMessage(err),
-        color: 'error',
-      });
-    },
-  });
+    if (avatarFileInputEl.value) {
+      avatarFileInputEl.value.value = '';
+    }
+  },
+  onError: (err) => {
+    handleError(err, { title: 'Failed to update avatar' });
+  },
+});
 
-const { mutate: deleteAvatar, asyncStatus: deleteAvatarAsyncStatus } =
-  useMutation({
-    mutation: () =>
-      requestFetch('/api/users/avatar', {
-        method: 'DELETE',
-      }),
-    onSuccess: async () => {
-      toast.add({
-        title: 'Avatar removed',
-        color: 'success',
-      });
-      await useUserSession().fetch();
-    },
-    onError: (err) => {
-      toast.add({
-        title: 'Failed to remove avatar',
-        description: getErrorMessage(err),
-        color: 'error',
-      });
-    },
-  });
+const { mutate: deleteAvatar, isLoading: isDeletingAvatar } = useMutation({
+  mutation: () =>
+    requestFetch('/api/users/avatar', {
+      method: 'DELETE',
+    }),
+  onSuccess: async () => {
+    toast.add({
+      title: 'Avatar removed',
+      color: 'success',
+    });
+    await useUserSession().fetch();
+  },
+  onError: (err) => {
+    handleError(err, { title: 'Failed to remove avatar' });
+  },
+});
 
 function handleEdit() {
   isEditing.value = true;
@@ -219,7 +187,7 @@ function triggerAvatarInput() {
                 label="Upload avatar"
                 icon="i-lucide-upload"
                 size="sm"
-                :loading="uploadAvatarAsyncStatus === 'loading'"
+                :loading="isUploadingAvatar"
                 @click="triggerAvatarInput"
               />
               <UButton
@@ -230,7 +198,7 @@ function triggerAvatarInput() {
                 variant="outline"
                 icon="i-lucide-trash"
                 size="sm"
-                :loading="deleteAvatarAsyncStatus === 'loading'"
+                :loading="isDeletingAvatar"
                 @click="handleAvatarDelete"
               />
             </div>
@@ -300,7 +268,7 @@ function triggerAvatarInput() {
               type="button"
               label="Save"
               icon="i-lucide-check"
-              :loading="updateAsyncStatus === 'loading'"
+              :loading="isUpdatingProfile"
               @click="handleSave"
             />
           </template>

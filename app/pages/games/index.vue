@@ -1,9 +1,8 @@
 <script setup lang="ts">
 import type { IGameListItem } from '~~/modules/dice-throne-games/runtime/app/types/games';
 
-const { data: gamesData, asyncStatus: gamesAsyncStatus } = useGamesList();
+const { data: gamesData, isLoading, error: gamesError } = useGamesList();
 const gamesList = computed(() => gamesData.value?.data || []);
-const isLoading = computed(() => gamesAsyncStatus.value === 'loading');
 
 function handleViewGame(game: IGameListItem) {
   navigateTo(`/games/${game.id}`);
@@ -24,7 +23,10 @@ function handleViewGame(game: IGameListItem) {
     </UPageHeader>
 
     <UPageBody>
-      <div v-if="!isLoading && gamesList.length === 0" class="text-center py-8 text-muted">
+      <div v-if="gamesError" class="text-center py-8 text-error">
+        {{ getErrorMessage(gamesError) }}
+      </div>
+      <div v-else-if="!isLoading && gamesList.length === 0" class="text-center py-8 text-muted">
         No games found
       </div>
       <GamesTable

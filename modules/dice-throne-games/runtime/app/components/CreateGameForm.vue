@@ -16,8 +16,9 @@ const FORM_ID = 'create-game-form';
 const requestFetch = useRequestFetch();
 const toast = useToast();
 const queryCache = useQueryCache();
+const { handleError } = useErrorHandler();
 
-const { mutate: createGame, asyncStatus: createAsyncStatus } = useMutation({
+const { mutate: createGame, isLoading: isCreatingGame } = useMutation({
   mutation: (data: ICreateGameBody) =>
     requestFetch('/api/dices/games/create', {
       method: 'POST',
@@ -38,22 +39,7 @@ const { mutate: createGame, asyncStatus: createAsyncStatus } = useMutation({
     navigateTo('/games');
   },
   onError: (err) => {
-    let description = 'An error occurred';
-    if (
-      typeof err === 'object' &&
-      err !== null &&
-      'statusMessage' in err &&
-      typeof err.statusMessage === 'string'
-    ) {
-      description = err.statusMessage;
-    } else if (err instanceof Error) {
-      description = err.message;
-    }
-    toast.add({
-      title: 'Failed to create game',
-      description,
-      color: 'error',
-    });
+    handleError(err, { title: 'Failed to create game', fallback: 'An error occurred' });
   },
   onSettled: () => {
     queryCache.invalidateQueries({ key: ['games'] });
@@ -489,7 +475,7 @@ function onSubmit(event: FormSubmitEvent<Schema>) {
         type="submit"
         label="Create"
         icon="i-lucide-check"
-        :loading="createAsyncStatus === 'loading'"
+        :loading="isCreatingGame"
         :disabled="!isFormValid"
       />
     </div>

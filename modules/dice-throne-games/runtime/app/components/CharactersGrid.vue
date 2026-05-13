@@ -1,7 +1,7 @@
 <script setup lang="ts">
 const requestFetch = useRequestFetch();
 
-const { data } = useQuery({
+const { data, error: charactersError } = useQuery({
   key: ['characters'],
   query: () => requestFetch('/api/dices/characters/list'),
 });
@@ -10,7 +10,10 @@ const charactersList = computed(() => data.value?.data || []);
 </script>
 
 <template>
-  <div class="grid grid-cols-2 md:flex md:flex-wrap gap-4 md:gap-8">
+  <div v-if="charactersError" class="text-center py-8 text-error">
+    {{ getErrorMessage(charactersError) }}
+  </div>
+  <div v-else class="grid grid-cols-2 md:flex md:flex-wrap gap-4 md:gap-8">
     <UPageCard
       v-for="character in charactersList"
       :key="character.id"

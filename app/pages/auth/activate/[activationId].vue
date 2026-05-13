@@ -2,6 +2,7 @@
 const route = useRoute();
 const toast = useToast();
 const { fetch: fetchSession } = useUserSession();
+const { handleError } = useErrorHandler();
 
 const loading = ref(true);
 const error = ref(false);
@@ -36,22 +37,7 @@ onMounted(async () => {
     await navigateTo('/profile');
   } catch (err: unknown) {
     error.value = true;
-    let description = 'Activation failed';
-    if (
-      typeof err === 'object' &&
-      err !== null &&
-      'statusMessage' in err &&
-      typeof err.statusMessage === 'string'
-    ) {
-      description = err.statusMessage;
-    } else if (err instanceof Error) {
-      description = err.message;
-    }
-    toast.add({
-      title: 'Error',
-      description,
-      color: 'error',
-    });
+    handleError(err, { title: 'Error', fallback: 'Activation failed' });
   } finally {
     loading.value = false;
   }

@@ -1,18 +1,24 @@
 <script setup lang="ts">
-import type { IGameDetail, IGameParticipantDetail, GameMode } from '~~/modules/dice-throne-games/runtime/app/types/games';
+import type {
+  IGameDetail,
+  IGameParticipantDetail,
+  GameMode,
+} from '~~/modules/dice-throne-games/runtime/app/types/games';
 
 const route = useRoute();
 const gameId = computed(() => route.params.gameId as string);
 
 const requestFetch = useRequestFetch();
 
-const { data: gameData, asyncStatus } = useQuery({
+const {
+  data: gameData,
+  isLoading,
+  error: gameError,
+} = useQuery({
   key: () => ['games', gameId.value],
   query: () =>
     requestFetch<{ data: IGameDetail }>(`/api/dices/games/${gameId.value}`),
 });
-
-const isLoading = computed(() => asyncStatus.value === 'loading');
 
 const game = computed(() => gameData.value?.data.game);
 const participants = computed(() => gameData.value?.data.participants || []);
@@ -55,10 +61,7 @@ const teamCount = computed(() => {
 });
 
 const groupedParticipants = computed(() => {
-  const groups: Record<
-    number,
-    IGameParticipantDetail[]
-  > = {};
+  const groups: Record<number, IGameParticipantDetail[]> = {};
 
   for (const participant of participants.value) {
     if (!groups[participant.teamIndex]) {
@@ -129,6 +132,10 @@ function formatDate(dateString: string) {
         Loading game details...
       </div>
 
+      <div v-else-if="gameError" class="text-center py-8 text-error">
+        {{ getErrorMessage(gameError) }}
+      </div>
+
       <div v-else-if="!game" class="text-center py-8 text-muted">
         Game not found
       </div>
@@ -159,19 +166,12 @@ function formatDate(dateString: string) {
           <p class="text-base whitespace-pre-wrap">{{ game.comment }}</p>
         </UCard>
 
-        <div
-          v-if="game.mode !== 'king_of_the_hill'"
-          class="space-y-4"
-        >
+        <div v-if="game.mode !== 'king_of_the_hill'" class="space-y-4">
           <div
             class="grid gap-4"
             :class="teamCount === 3 ? 'grid-cols-3' : 'grid-cols-2'"
           >
-            <UCard
-              v-for="teamIdx in teamCount"
-              :key="teamIdx"
-              class="w-full"
-            >
+            <UCard v-for="teamIdx in teamCount" :key="teamIdx" class="w-full">
               <template #header>
                 <div class="flex items-center justify-between">
                   <span class="font-medium text-sm">Team {{ teamIdx }}</span>
@@ -183,7 +183,11 @@ function formatDate(dateString: string) {
                   v-for="participant in groupedParticipants[teamIdx - 1] || []"
                   :key="participant.id"
                   class="flex items-center gap-3 p-3 rounded-lg border border-default"
-                  :class="participant.winner ? 'bg-success/10 border-success/30' : 'bg-default'"
+                  :class="
+                    participant.winner
+                      ? 'bg-success/10 border-success/30'
+                      : 'bg-default'
+                  "
                 >
                   <UAvatar
                     v-if="participant.characterKey"
@@ -228,7 +232,11 @@ function formatDate(dateString: string) {
                 v-for="participant in participants"
                 :key="participant.id"
                 class="flex items-center gap-3 p-3 rounded-lg border border-default"
-                :class="participant.winner ? 'bg-success/10 border-success/30' : 'bg-default'"
+                :class="
+                  participant.winner
+                    ? 'bg-success/10 border-success/30'
+                    : 'bg-default'
+                "
               >
                 <UAvatar
                   v-if="participant.characterKey"
