@@ -12,7 +12,7 @@ interface Props {
   index: number;
   disabledCharacters: string[] | undefined;
   disabledUsers: string[] | undefined;
-  removable?: boolean;
+  removable: boolean;
 }
 
 const props = defineProps<Props>();
@@ -28,17 +28,19 @@ function handleRemove() {
   emit('remove', props.index);
 }
 
-const participant = defineModel<{
+interface Model {
   playerName: string;
   characterId: string;
   winner: boolean;
   teamIndex: number;
-}>('participant', { required: true });
+}
+
+const participant = defineModel<Model>('participant', { required: true });
 </script>
 
 <template>
   <UCard class="w-full">
-    <template #header v-if="props.removable">
+    <template v-if="props.removable" #header>
       <div class="flex items-center justify-end">
         <UButton
           type="button"

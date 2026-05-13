@@ -1,6 +1,6 @@
 export interface ICreateGameBody {
   date: string;
-  comment?: string;
+  comment: string | undefined;
   mode: string;
   participants: {
     playerName: string;

@@ -33,10 +33,6 @@
 
 | # | Проблема | Где |
 |---|----------|-----|
-| 20 | **`?` в типах вместо явного `undefined`** — запрещено правилами проекта. | `create.ts`, `search.ts`, `GameParticipantForm.vue` |
-| 21 | **Явно указаны return types у функций** — `getErrorMessage`, `validateWinners`, `validate`. | `UserProfile.vue`, `CreateGameForm.vue` |
-| 22 | **Arrow function вместо function declaration** для `useGamesList`. | `app/queries/games.ts` |
-| 23 | **`defineModel` с инлайн-типом вместо `interface Model`** | `GameParticipantForm.vue` |
 | 24 | **Tailwind классы не кратные 2**: `-mx-2.5`, `gap-3`, `p-3`. | `AppHeader.vue`, `[gameId].vue` |
 | 25 | **Type assertion `route.params.gameId as string`** — `params.gameId` может быть `string[]`. | `[gameId].vue:5` |
 | 26 | **Type assertion для ошибки вместо type guard** | `auth/login.vue:87` |

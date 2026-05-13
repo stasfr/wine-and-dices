@@ -115,7 +115,7 @@ watch(
   },
 );
 
-function validateWinners(): FormError[] {
+function validateWinners() {
   const errors: FormError[] = [];
   const winnerCount = state.value.participants.filter((p) => p.winner).length;
 
@@ -419,6 +419,7 @@ function onSubmit(event: FormSubmitEvent<Schema>) {
               :index="item.index"
               :disabled-characters="disabledCharacters"
               :disabled-users="disabledUsers"
+              :removable="false"
               @toggle-winner="handleToggleWinner"
               @update:participant="state.participants[item.index] = $event"
             />
