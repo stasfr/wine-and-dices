@@ -81,13 +81,20 @@ export default defineEventHandler(async (event) => {
 
   await sendMail({
     html: `
-          <div>
-            <span>Ссылка для активации аккаунта </span><a href="${hrefLink}/auth/activate/${activationId}">тык</a>
-            <p>P.S. Потом письмо покрасивше будет, честно-честно</p>
-          </div>
+      <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto;">
+        <h2>Welcome to Wine and Dices!</h2>
+        <p>Thank you for registering. To complete your account setup, please click the button below:</p>
+        <p>
+          <a href="${hrefLink}/auth/activate/${activationId}" style="display: inline-block; padding: 12px 24px; background-color: #7c3aed; color: #ffffff; text-decoration: none; border-radius: 6px;">Activate Account</a>
+        </p>
+        <p>Or copy and paste this link into your browser:</p>
+        <p><a href="${hrefLink}/auth/activate/${activationId}">${hrefLink}/auth/activate/${activationId}</a></p>
+        <p>If you did not register on our website, you can safely ignore this email.</p>
+        <p>Best regards,<br>Wine and Dices Team</p>
+      </div>
     `,
-    subject: 'Активация аккаунта на Wine and Dices',
-    text: 'Привет! Это тестовое сообщение, отправленное с помощью Nodemailer через Яндекс.Почту.',
+    subject: 'Wine and Dices - Account Activation',
+    text: `Hello!\n\nThank you for registering on Wine and Dices. Please activate your account by clicking the following link:\n\n${hrefLink}/auth/activate/${activationId}\n\nIf you did not register on our website, you can safely ignore this email.\n\nBest regards,\nWine and Dices Team`,
     to: user.email,
   });
 
