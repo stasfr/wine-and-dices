@@ -1,5 +1,4 @@
 <script setup lang="ts">
-const route = useRoute();
 const toast = useToast();
 const { fetch: fetchSession } = useUserSession();
 const { handleError } = useErrorHandler();
@@ -7,10 +6,10 @@ const { handleError } = useErrorHandler();
 const loading = ref(true);
 const error = ref(false);
 
-onMounted(async () => {
-  const activationId = route.params.activationId;
+const activationId = useRouteParams<string>('activationId', '');
 
-  if (typeof activationId !== 'string' || !activationId) {
+onMounted(async () => {
+  if (!activationId.value) {
     error.value = true;
     loading.value = false;
     toast.add({
@@ -22,7 +21,7 @@ onMounted(async () => {
   }
 
   try {
-    await $fetch(`/api/auth/activate/${activationId}`, {
+    await $fetch(`/api/auth/activate/${activationId.value}`, {
       method: 'POST',
     });
 

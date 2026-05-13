@@ -5,8 +5,7 @@ import type {
   GameMode,
 } from '~~/modules/dice-throne-games/runtime/app/types/games';
 
-const route = useRoute();
-const gameId = computed(() => route.params.gameId as string);
+const gameId = useRouteParams<string>('gameId', '');
 
 const requestFetch = useRequestFetch();
 
