@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { h, resolveComponent } from 'vue';
 import type { TableColumn } from '@nuxt/ui';
 import type { IGameListItem, GameMode } from '../types/games';
 
@@ -15,10 +14,6 @@ interface Emits {
 const props = defineProps<Props>();
 const emit = defineEmits<Emits>();
 
-const UBadge = resolveComponent('UBadge');
-const UButton = resolveComponent('UButton');
-const UDropdownMenu = resolveComponent('UDropdownMenu');
-
 const modeLabelMap: Record<GameMode, string> = {
   one_vs_one: '1v1',
   two_vs_two: '2v2',
@@ -27,7 +22,10 @@ const modeLabelMap: Record<GameMode, string> = {
   king_of_the_hill: 'King of the Hill',
 };
 
-const modeColorMap: Record<GameMode, string> = {
+const modeColorMap: Record<
+  GameMode,
+  'primary' | 'success' | 'warning' | 'info' | 'error'
+> = {
   one_vs_one: 'primary',
   two_vs_two: 'success',
   three_vs_three: 'warning',
@@ -39,7 +37,6 @@ const columns: TableColumn<IGameListItem>[] = [
   {
     accessorKey: 'id',
     header: 'ID',
-    cell: ({ row }) => `#${row.getValue('id')}`,
     meta: {
       class: {
         th: 'w-24',
@@ -50,13 +47,6 @@ const columns: TableColumn<IGameListItem>[] = [
   {
     accessorKey: 'mode',
     header: 'Mode',
-    cell: ({ row }) => {
-      const mode = row.getValue('mode') as GameMode;
-      const label = modeLabelMap[mode] || mode;
-      const color = modeColorMap[mode] || 'neutral';
-
-      return h(UBadge, { variant: 'subtle', color }, () => label);
-    },
     meta: {
       class: {
         th: 'w-32',
@@ -66,17 +56,6 @@ const columns: TableColumn<IGameListItem>[] = [
   {
     accessorKey: 'date',
     header: 'Date',
-    cell: ({ row }) => {
-      const dateValue = row.getValue('date') as string;
-      return new Date(dateValue).toLocaleString('en-US', {
-        day: 'numeric',
-        month: 'short',
-        year: 'numeric',
-        hour: '2-digit',
-        minute: '2-digit',
-        hour12: false,
-      });
-    },
     meta: {
       class: {
         th: 'w-48',
@@ -86,10 +65,6 @@ const columns: TableColumn<IGameListItem>[] = [
   {
     accessorKey: 'comment',
     header: 'Comment',
-    cell: ({ row }) => {
-      const comment = row.getValue('comment') as string | null;
-      return comment || '-';
-    },
     meta: {
       class: {
         td: 'max-w-64 truncate',
@@ -106,43 +81,31 @@ const columns: TableColumn<IGameListItem>[] = [
         td: 'text-right',
       },
     },
-    cell: ({ row }) => {
-      const game = row.original;
-
-      const items = [
-        {
-          type: 'label' as const,
-          label: 'Actions',
-        },
-        {
-          label: 'View details',
-          icon: 'i-lucide-eye',
-          onSelect() {
-            emit('view', game);
-          },
-        },
-      ];
-
-      return h(
-        UDropdownMenu,
-        {
-          content: {
-            align: 'end',
-          },
-          items,
-          'aria-label': 'Actions dropdown',
-        },
-        () =>
-          h(UButton, {
-            icon: 'i-lucide-ellipsis-vertical',
-            color: 'neutral',
-            variant: 'ghost',
-            'aria-label': 'Actions dropdown',
-          }),
-      );
-    },
   },
 ];
+
+function formatDate(dateValue: string) {
+  return new Date(dateValue).toLocaleString('en-US', {
+    day: 'numeric',
+    month: 'short',
+    year: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+    hour12: false,
+  });
+}
+
+function getModeLabel(mode: GameMode) {
+  return modeLabelMap[mode] || mode;
+}
+
+function getModeColor(mode: GameMode) {
+  const color = modeColorMap[mode];
+  if (!color) {
+    return 'neutral';
+  }
+  return color;
+}
 </script>
 
 <template>
@@ -151,5 +114,45 @@ const columns: TableColumn<IGameListItem>[] = [
     :columns="columns"
     :loading="props.loading"
     class="flex-1"
-  />
+  >
+    <template #id-cell="{ row }"> #{{ row.original.id }} </template>
+
+    <template #mode-cell="{ row }">
+      <UBadge
+        :label="getModeLabel(row.original.mode)"
+        variant="subtle"
+        :color="getModeColor(row.original.mode)"
+      />
+    </template>
+
+    <template #date-cell="{ row }">
+      {{ formatDate(row.original.date) }}
+    </template>
+
+    <template #comment-cell="{ row }">
+      {{ row.original.comment || '-' }}
+    </template>
+
+    <template #actions-cell="{ row }">
+      <UDropdownMenu
+        :items="[
+          { type: 'label', label: 'Actions' },
+          {
+            label: 'View details',
+            icon: 'i-lucide-eye',
+            onSelect: () => emit('view', row.original),
+          },
+        ]"
+        :content="{ align: 'end' }"
+        aria-label="Actions dropdown"
+      >
+        <UButton
+          icon="i-lucide-ellipsis-vertical"
+          color="neutral"
+          variant="ghost"
+          aria-label="Actions dropdown"
+        />
+      </UDropdownMenu>
+    </template>
+  </UTable>
 </template>
