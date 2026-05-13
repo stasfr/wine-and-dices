@@ -148,6 +148,13 @@ function clearFilters() {
           @click="filtersOpen = true"
         />
         <UButton
+          v-if="activeFiltersCount > 0"
+          color="error"
+          variant="ghost"
+          label="Reset filters"
+          @click="clearFilters"
+        />
+        <UButton
           to="/games/create"
           label="Create Game"
           color="success"
