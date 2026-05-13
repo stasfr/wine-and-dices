@@ -22,6 +22,7 @@ export interface IGameParticipantDetail {
 
 export interface IGameTeam {
   teamIndex: number;
+  winner: boolean;
   participants: IGameParticipantDetail[];
 }
 

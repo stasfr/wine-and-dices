@@ -161,10 +161,24 @@ function formatDate(dateString: string) {
             class="grid gap-4"
             :class="teamCount === 3 ? 'grid-cols-3' : 'grid-cols-2'"
           >
-            <UCard v-for="team in teams" :key="team.teamIndex" class="w-full">
+            <UCard
+              v-for="team in teams"
+              :key="team.teamIndex"
+              class="w-full"
+              :ui="{ root: team.winner ? 'ring-success/30' : '' }"
+            >
               <template #header>
                 <div class="flex items-center justify-between">
-                  <span class="font-medium text-sm">Team {{ team.teamIndex + 1 }}</span>
+                  <span class="font-medium text-sm">
+                    Team {{ team.teamIndex + 1 }}
+                  </span>
+                  <UBadge
+                    v-if="team.winner"
+                    color="success"
+                    variant="subtle"
+                    size="sm"
+                    label="Winner"
+                  />
                 </div>
               </template>
 
@@ -172,12 +186,7 @@ function formatDate(dateString: string) {
                 <div
                   v-for="participant in team.participants"
                   :key="participant.id"
-                  class="flex items-center gap-2 p-2 rounded-lg border border-default"
-                  :class="
-                    participant.winner
-                      ? 'bg-success/10 border-success/30'
-                      : 'bg-default'
-                  "
+                  class="flex items-center gap-2 p-2 rounded-lg border border-default bg-default"
                 >
                   <UAvatar
                     v-if="participant.characterKey"
@@ -195,14 +204,6 @@ function formatDate(dateString: string) {
                       {{ participant.characterName || 'Unknown character' }}
                     </div>
                   </div>
-
-                  <UBadge
-                    v-if="participant.winner"
-                    color="success"
-                    variant="subtle"
-                    size="sm"
-                    label="Winner"
-                  />
                 </div>
               </div>
             </UCard>

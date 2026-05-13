@@ -42,6 +42,7 @@ function groupParticipantsByTeam(participants: Participant[]) {
     .sort((a, b) => a[0] - b[0])
     .map(([teamIndex, teamParticipants]) => ({
       teamIndex,
+      winner: teamParticipants.some((p) => p.winner),
       participants: teamParticipants,
     }));
 }
