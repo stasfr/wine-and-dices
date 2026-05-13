@@ -133,3 +133,14 @@ const page = useRouteQuery<string>('page', '1');
 ```
 
 - All interactions with the user must be in Russian, but all content in the application must be in English.
+
+- Always use @internationalized/date for dates, never use new Date().toLocaleString()
+
+```typescript
+// BAD
+const date = new Date().toLocaleString();
+
+// GOOD
+import { now, getLocalTimeZone } from '@internationalized/date';
+const date = now(getLocalTimeZone());
+```
