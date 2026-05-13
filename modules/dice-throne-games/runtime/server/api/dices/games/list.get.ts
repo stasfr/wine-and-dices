@@ -28,13 +28,14 @@ const querySchema = v.object({
   mode: v.optional(v.picklist(gameModeEnum.enumValues)),
   id: v.optional(v.pipe(v.string(), v.minLength(1))),
   search: v.optional(v.pipe(v.string(), v.minLength(1))),
+  characterIds: v.optional(v.pipe(v.string(), v.minLength(1))),
 });
 
 export default defineEventHandler(async (event) => {
   const db = useDb();
   await requireUserSession(event);
 
-  const { page, perPage, mode, id, search } = await getValidatedQuery(
+  const { page, perPage, mode, id, search, characterIds: characterIdsRaw } = await getValidatedQuery(
     event,
     (data) => v.parse(querySchema, data),
   );
@@ -53,6 +54,23 @@ export default defineEventHandler(async (event) => {
     if (searchFilter) {
       filters.push(searchFilter);
     }
+  }
+
+  if (characterIdsRaw) {
+    const characterIds = characterIdsRaw.split(',');
+
+    const gamesWithCharacters = await db
+      .selectDistinct({ gameId: gameParticipantsTable.gameId })
+      .from(gameParticipantsTable)
+      .where(inArray(gameParticipantsTable.characterId, characterIds));
+
+    const gameIds = gamesWithCharacters.map((g) => g.gameId);
+
+    if (gameIds.length === 0) {
+      return { data: [] };
+    }
+
+    filters.push(inArray(gamesTable.id, gameIds));
   }
 
   const games = await db
