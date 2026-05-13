@@ -1,7 +1,16 @@
 <script setup lang="ts">
 import type { IGameListItem } from '~~/modules/dice-throne-games/runtime/app/types/games';
 
-const { data: gamesData, isLoading, error: gamesError } = useGamesList();
+const requestFetch = useRequestFetch();
+
+const {
+  data: gamesData,
+  isLoading,
+  error: gamesError,
+} = useQuery({
+  key: ['games'],
+  query: () => requestFetch('/api/dices/games/list'),
+});
 const gamesList = computed(() => gamesData.value?.data || []);
 
 function handleViewGame(game: IGameListItem) {
@@ -26,7 +35,10 @@ function handleViewGame(game: IGameListItem) {
       <div v-if="gamesError" class="text-center py-8 text-error">
         {{ getErrorMessage(gamesError) }}
       </div>
-      <div v-else-if="!isLoading && gamesList.length === 0" class="text-center py-8 text-muted">
+      <div
+        v-else-if="!isLoading && gamesList.length === 0"
+        class="text-center py-8 text-muted"
+      >
         No games found
       </div>
       <GamesTable

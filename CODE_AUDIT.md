@@ -51,6 +51,5 @@
 
 | # | Проблема | Где |
 |---|----------|-----|
-| 31 | **Дублирование query-логики**: `useQuery` + `useRequestFetch()` используется inline в 4+ компонентах (characters, users, game detail) вместо вынесения в `app/queries/` — как уже сделано для `useGamesList`. | `CharactersGrid.vue`, `GameCharacterSelect.vue`, `UserSearchInput.vue`, `[gameId].vue` |
 | 32 | **Tight coupling модулей с глобальной схемой БД**: Все модули напрямую импортируют таблицы из `#server/db/schema/schema.js`. `dice-throne-games` напрямую работает с `usersTable`, создавая кросс-модульную зависимость на уровне БД. | Все `modules/*/runtime/server/api/**/*.ts` |
 | 33 | **REST пути с избыточными сегментами**: `dices/games/create.post.ts` и `dices/games/list.get.ts` — `create` и `list` лишние, достаточно `index.post.ts` / `index.get.ts`. | `modules/dice-throne-games/runtime/server/api/dices/games/` |
