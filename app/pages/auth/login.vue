@@ -7,7 +7,7 @@ export interface LoginBody {
   password: string;
 }
 
-export interface RegisterBodyм {
+export interface RegisterBody {
   email: string;
   password: string;
   confirmPassword: string;
