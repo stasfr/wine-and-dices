@@ -70,7 +70,7 @@ const { email } = await readValidatedBody(event, (data) =>
 2. if the reference is to a native HTML element, add `El` to the variable name. For example, `someNameEl = useTemplateRef('someName')`
 3. if the reference is to a custom component, add `Ref` to the variable name. For example, `someNameRef = useTemplateRef('someName')`
 
-- Always use props and emits in components via variables, and extract their types into separate interfaces inside the component's script tag
+- Always use props, emits, and defineModel (except primitives for defineModel) in components via variables, and extract their types into separate interfaces inside the component's script tag
 
 ```vue
 <!-- GOOD -->
@@ -83,8 +83,13 @@ interface Emits {
   someEvent: [value: string];
 }
 
+interface Model {
+  someModel: string;
+}
+
 const props = defineProps<Props>();
 const emit = defineEmits<Emits>();
+const model = defineModel<Model>();
 </script>
 
 <template>
