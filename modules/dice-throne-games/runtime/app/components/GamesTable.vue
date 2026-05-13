@@ -137,7 +137,10 @@ function getModeColor(mode: GameMode) {
           v-for="(team, teamIdx) in row.original.teams"
           :key="team.teamIndex"
         >
-          <div class="flex flex-col gap-1">
+          <div
+            class="flex flex-col gap-1"
+            :class="{ 'text-green-600': team.winner }"
+          >
             <span
               v-for="participant in team.participants"
               :key="participant.id"
