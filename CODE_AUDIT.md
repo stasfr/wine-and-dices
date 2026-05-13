@@ -9,7 +9,6 @@
 
 | # | Проблема | Где |
 |---|----------|-----|
-| 3 | **`useDb()` создаёт новый пул соединений PostgreSQL при каждом вызове** — при нагрузке исчерпаются соединения с БД. | `server/utils/drizzleClient.ts` |
 | 4 | **`postgres:18.3` не существует** — контейнер не запустится. Последняя стабильная версия PostgreSQL — 17.x. | `docker-compose.dev.yaml` |
 | 5 | **Пустые `catch` блоки** — ошибки удаления аватаров игнорируются без логирования. | `modules/users/runtime/server/api/users/avatar.delete.ts`, `avatar.post.ts` |
 | 6 | **Прямые импорты из внутренних путей модулей** — страницы импортируют `~~/modules/dice-throne-games/...`, нарушая границы модулей. | `app/pages/games/index.vue`, `[gameId].vue` |
