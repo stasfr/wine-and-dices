@@ -449,7 +449,7 @@ function onSubmit(event: FormSubmitEvent<Schema>) {
           </div>
         </template>
 
-        <div class="space-y-2">
+        <div class="space-y-4">
           <GameParticipantForm
             v-for="(participant, index) in state.participants"
             :key="index"

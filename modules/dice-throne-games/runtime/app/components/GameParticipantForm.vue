@@ -38,11 +38,9 @@ const participant = defineModel<{
 
 <template>
   <UCard class="w-full">
-    <template #header>
-      <div class="flex items-center justify-between">
-        <span class="text-sm font-medium"> Player </span>
+    <template #header v-if="props.removable">
+      <div class="flex items-center justify-end">
         <UButton
-          v-if="props.removable"
           type="button"
           size="xs"
           color="error"
