@@ -13,6 +13,7 @@ export interface IGameListItem {
   createdAt: string;
   updatedAt: string | null;
   deletedAt: string | null;
+  participants: IGameParticipantDetail[];
 }
 
 export interface IGameParticipantDetail {

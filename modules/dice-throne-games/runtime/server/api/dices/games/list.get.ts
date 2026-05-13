@@ -1,6 +1,12 @@
 import * as v from 'valibot';
-import { eq, and, ilike } from 'drizzle-orm';
-import { games as gamesTable, gameModeEnum } from '#server/db/schema/schema.js';
+import { eq, and, ilike, inArray } from 'drizzle-orm';
+import {
+  games as gamesTable,
+  gameParticipants as gameParticipantsTable,
+  characters as charactersTable,
+  users as usersTable,
+  gameModeEnum,
+} from '#server/db/schema/schema.js';
 import type { SQL } from 'drizzle-orm';
 
 const querySchema = v.object({
@@ -56,5 +62,56 @@ export default defineEventHandler(async (event) => {
     .offset((page - 1) * perPage)
     .where(and(...filters));
 
-  return { data: games };
+  const gameIds = games.map((game) => game.id);
+
+  if (gameIds.length === 0) {
+    return { data: [] };
+  }
+
+  const participants = await db
+    .select({
+      id: gameParticipantsTable.id,
+      playerName: gameParticipantsTable.playerName,
+      winner: gameParticipantsTable.winner,
+      teamIndex: gameParticipantsTable.teamIndex,
+      characterId: gameParticipantsTable.characterId,
+      characterName: charactersTable.name,
+      characterKey: charactersTable.key,
+      userId: gameParticipantsTable.userId,
+      userEmail: usersTable.email,
+      userFirstName: usersTable.firstName,
+      userLastName: usersTable.lastName,
+      userMiddleName: usersTable.middleName,
+      gameId: gameParticipantsTable.gameId,
+    })
+    .from(gameParticipantsTable)
+    .leftJoin(
+      charactersTable,
+      eq(gameParticipantsTable.characterId, charactersTable.id),
+    )
+    .leftJoin(
+      usersTable,
+      eq(gameParticipantsTable.userId, usersTable.id),
+    )
+    .where(inArray(gameParticipantsTable.gameId, gameIds));
+
+  const participantsByGameId = new Map<string, typeof participants>();
+  for (const participant of participants) {
+    const list = participantsByGameId.get(participant.gameId);
+    if (list) {
+      list.push(participant);
+    } else {
+      participantsByGameId.set(participant.gameId, [participant]);
+    }
+  }
+
+  const data = games.map((game) => {
+    const gameParticipants = participantsByGameId.get(game.id);
+    return {
+      ...game,
+      participants: gameParticipants ?? [],
+    };
+  });
+
+  return { data };
 });

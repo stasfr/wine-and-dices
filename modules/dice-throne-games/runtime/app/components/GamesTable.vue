@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type { TableColumn } from '@nuxt/ui';
-import type { IGameListItem, GameMode } from '../types/games';
+import type { IGameListItem, GameMode, IGameParticipantDetail } from '../types/games';
 
 interface Props {
   data: IGameListItem[];
@@ -35,12 +35,11 @@ const modeColorMap: Record<
 
 const columns: TableColumn<IGameListItem>[] = [
   {
-    accessorKey: 'id',
-    header: 'ID',
+    accessorKey: 'participants',
+    header: 'Players',
     meta: {
       class: {
-        th: 'w-24',
-        td: 'font-mono text-muted',
+        th: 'w-64',
       },
     },
   },
@@ -84,6 +83,21 @@ const columns: TableColumn<IGameListItem>[] = [
   },
 ];
 
+function formatParticipant(participant: IGameParticipantDetail) {
+  const character = participant.characterName || participant.characterKey || 'Unknown';
+  let player = 'Unknown';
+
+  if (participant.userFirstName || participant.userLastName) {
+    player = [participant.userFirstName, participant.userLastName]
+      .filter(Boolean)
+      .join(' ');
+  } else if (participant.playerName) {
+    player = participant.playerName;
+  }
+
+  return `${character} - ${player}`;
+}
+
 function formatDate(dateValue: string) {
   return new Date(dateValue).toLocaleString('en-US', {
     day: 'numeric',
@@ -115,7 +129,16 @@ function getModeColor(mode: GameMode) {
     :loading="props.loading"
     class="flex-1"
   >
-    <template #id-cell="{ row }"> #{{ row.original.id }} </template>
+    <template #participants-cell="{ row }">
+      <div class="flex flex-col gap-1">
+        <span
+          v-for="participant in row.original.participants"
+          :key="participant.id"
+        >
+          {{ formatParticipant(participant) }}
+        </span>
+      </div>
+    </template>
 
     <template #mode-cell="{ row }">
       <UBadge

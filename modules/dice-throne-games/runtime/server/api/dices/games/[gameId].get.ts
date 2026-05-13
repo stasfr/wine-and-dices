@@ -60,7 +60,10 @@ export default defineEventHandler(async (event) => {
 
   return {
     data: {
-      game,
+      game: {
+        ...game,
+        participants,
+      },
       participants,
     },
   };
