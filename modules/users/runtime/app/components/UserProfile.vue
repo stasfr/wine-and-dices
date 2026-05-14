@@ -177,21 +177,17 @@ function triggerAvatarInput() {
 
             <div class="flex gap-2">
               <UButton
-                type="button"
                 label="Upload avatar"
                 icon="i-lucide-upload"
-                size="sm"
                 :loading="isUploadingAvatar"
                 @click="triggerAvatarInput"
               />
               <UButton
                 v-if="avatarUrl"
-                type="button"
                 label="Remove"
                 color="error"
                 variant="outline"
                 icon="i-lucide-trash"
-                size="sm"
                 :loading="isDeletingAvatar"
                 @click="handleAvatarDelete"
               />
@@ -237,17 +233,11 @@ function triggerAvatarInput() {
 
         <div class="flex justify-end gap-2">
           <template v-if="!isEditing">
-            <UButton
-              type="button"
-              label="Edit"
-              icon="i-lucide-pencil"
-              @click="handleEdit"
-            />
+            <UButton label="Edit" icon="i-lucide-pencil" @click="handleEdit" />
           </template>
 
           <template v-else>
             <UButton
-              type="button"
               label="Cancel"
               color="neutral"
               variant="outline"
@@ -255,7 +245,6 @@ function triggerAvatarInput() {
               @click="handleCancel"
             />
             <UButton
-              type="button"
               label="Save"
               icon="i-lucide-check"
               :loading="isUpdatingProfile"

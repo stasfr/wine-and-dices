@@ -457,8 +457,6 @@ function onSubmit(event: FormSubmitEvent<Schema>) {
           <div class="flex items-center justify-between">
             <span class="font-medium text-sm">Participants</span>
             <UButton
-              type="button"
-              size="sm"
               color="neutral"
               variant="ghost"
               label="Add"
@@ -489,7 +487,6 @@ function onSubmit(event: FormSubmitEvent<Schema>) {
 
     <div class="flex justify-end gap-2">
       <UButton
-        type="button"
         to="/games"
         color="neutral"
         variant="outline"

@@ -55,7 +55,6 @@ function handleSelectMe() {
     <template v-if="props.removable" #header>
       <div class="flex items-center justify-end">
         <UButton
-          type="button"
           size="xs"
           color="error"
           variant="ghost"

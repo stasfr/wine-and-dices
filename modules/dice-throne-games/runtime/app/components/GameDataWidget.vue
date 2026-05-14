@@ -162,7 +162,6 @@ function formatDate(dateString: string) {
                 v-if="team.winner"
                 color="success"
                 variant="subtle"
-                size="sm"
                 label="Winner"
               />
             </div>
@@ -178,9 +177,8 @@ function formatDate(dateString: string) {
                 v-if="participant.characterKey"
                 :src="`/images/portraits/${participant.characterKey}.png`"
                 :alt="participant.characterName || ''"
-                size="md"
               />
-              <UAvatar v-else size="md" icon="i-lucide-user" />
+              <UAvatar v-else icon="i-lucide-user" />
 
               <div class="flex-1 min-w-0">
                 <div class="text-sm font-medium truncate">
@@ -219,9 +217,8 @@ function formatDate(dateString: string) {
               v-if="participant.characterKey"
               :src="`/images/portraits/${participant.characterKey}.png`"
               :alt="participant.characterName || ''"
-              size="md"
             />
-            <UAvatar v-else size="md" icon="i-lucide-user" />
+            <UAvatar v-else icon="i-lucide-user" />
 
             <div class="flex-1 min-w-0">
               <div class="text-sm font-medium truncate">
@@ -236,7 +233,6 @@ function formatDate(dateString: string) {
               v-if="participant.winner"
               color="success"
               variant="subtle"
-              size="sm"
               label="Winner"
             />
           </div>
