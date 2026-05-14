@@ -3,6 +3,7 @@ import {
   addTypeTemplate,
   createResolver,
   defineNuxtModule,
+  addComponentsDir,
 } from 'nuxt/kit';
 
 export default defineNuxtModule({
@@ -21,5 +22,10 @@ export default defineNuxtModule({
       },
       { nitro: true, nuxt: true },
     );
+
+    addComponentsDir({
+      path: resolver.resolve('./runtime/app/components'),
+      pathPrefix: false,
+    });
   },
 });
