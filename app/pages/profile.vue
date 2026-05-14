@@ -1,13 +1,11 @@
-<script setup lang="ts">
-const { user } = useUserSession();
-</script>
+<script setup lang="ts"></script>
 
 <template>
   <UPage>
     <UPageHeader title="Profile" />
 
     <UPageBody>
-      <UserProfile :user="user" />
+      <UserProfile />
     </UPageBody>
   </UPage>
 </template>

@@ -1,12 +1,7 @@
 <script setup lang="ts">
 import { useMutation } from '@pinia/colada';
-import type { IUserProfile } from '../types/users';
 
-interface Props {
-  user: IUserProfile | null | undefined;
-}
-
-const props = defineProps<Props>();
+const { user } = useUserSession();
 
 const toast = useToast();
 const requestFetch = useRequestFetch();
@@ -25,27 +20,27 @@ const state = ref({
 });
 
 const avatarUrl = computed(() => {
-  const user = props.user;
-  if (!user || !user.avatar) {
+  const currentUser = user.value;
+  if (!currentUser || !currentUser.avatar) {
     return undefined;
   }
 
-  return `/avatars/${user.avatar}`;
+  return `/avatars/${currentUser.avatar}`;
 });
 
 watch(
-  () => props.user,
-  (user) => {
-    if (!user) {
+  () => user.value,
+  (currentUser) => {
+    if (!currentUser) {
       return;
     }
 
-    state.value.id = user.id;
-    state.value.email = user.email;
-    state.value.status = user.isActive ? 'Active' : 'Inactive';
-    state.value.lastName = user.lastName || '';
-    state.value.firstName = user.firstName || '';
-    state.value.middleName = user.middleName || '';
+    state.value.id = currentUser.id;
+    state.value.email = currentUser.email;
+    state.value.status = currentUser.isActive ? 'Active' : 'Inactive';
+    state.value.lastName = currentUser.lastName || '';
+    state.value.firstName = currentUser.firstName || '';
+    state.value.middleName = currentUser.middleName || '';
   },
   { immediate: true },
 );
@@ -124,14 +119,14 @@ function handleEdit() {
 function handleCancel() {
   isEditing.value = false;
 
-  const user = props.user;
-  if (!user) {
+  const currentUser = user.value;
+  if (!currentUser) {
     return;
   }
 
-  state.value.lastName = user.lastName || '';
-  state.value.firstName = user.firstName || '';
-  state.value.middleName = user.middleName || '';
+  state.value.lastName = currentUser.lastName || '';
+  state.value.firstName = currentUser.firstName || '';
+  state.value.middleName = currentUser.middleName || '';
 
   if (avatarFileInputEl.value) {
     avatarFileInputEl.value.value = '';
@@ -162,7 +157,7 @@ function triggerAvatarInput() {
 </script>
 
 <template>
-  <UForm v-if="props.user" :state="state" class="space-y-4">
+  <UForm v-if="user" :state="state" class="space-y-4">
     <UPageCard title="Account">
       <div class="space-y-4">
         <div class="flex items-center gap-4">
