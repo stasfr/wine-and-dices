@@ -81,8 +81,6 @@ function handleSelectMe() {
           />
           <UButton
             v-if="props.showSelectMe"
-            type="button"
-            size="sm"
             color="neutral"
             variant="outline"
             label="Select me"
