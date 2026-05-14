@@ -1,13 +1,12 @@
 import * as v from 'valibot';
 import { eq } from 'drizzle-orm';
-import { users as usersTable } from '#server/db/schema/schema.js';
 
 const paramsSchema = v.object({
   userId: v.pipe(v.string(), v.minLength(1)),
 });
 
 export default defineEventHandler(async (event) => {
-  const db = useDb();
+  const { db, users: usersTable } = useDb();
   await requireUserSession(event);
 
   const params = await getValidatedRouterParams(event, (data) =>

@@ -1,6 +1,5 @@
 import * as v from 'valibot';
 import { eq } from 'drizzle-orm';
-import { users as usersTable } from '#server/db/schema/schema.js';
 import type { ServerFile } from 'nuxt-file-storage';
 
 const bodySchema = v.object({
@@ -25,7 +24,7 @@ const ALLOWED_TYPES = new Set([
 const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
 
 export default defineEventHandler(async (event) => {
-  const db = useDb();
+  const { db, users: usersTable } = useDb();
   const session = await requireUserSession(event);
 
   if (!session.user) {

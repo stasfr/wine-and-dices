@@ -1,9 +1,5 @@
 import * as v from 'valibot';
 import crypto from 'node:crypto';
-import {
-  userActivations as userActivationsTable,
-  users as usersTable,
-} from '#server/db/schema/schema.js';
 
 const passwordSchema = v.pipe(
   v.string(),
@@ -22,7 +18,11 @@ const bodySchema = v.object({
 });
 
 export default defineEventHandler(async (event) => {
-  const db = useDb();
+  const {
+    db,
+    users: usersTable,
+    userActivations: userActivationsTable,
+  } = useDb();
   const config = useRuntimeConfig();
   const { password, email } = await readValidatedBody(event, (data) =>
     v.parse(bodySchema, data),

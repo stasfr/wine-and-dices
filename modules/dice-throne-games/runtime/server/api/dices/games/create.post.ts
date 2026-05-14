@@ -1,13 +1,7 @@
 import * as v from 'valibot';
 import crypto from 'node:crypto';
 import { inArray } from 'drizzle-orm';
-import {
-  games as gamesTable,
-  gameParticipants as gameParticipantsTable,
-  users as usersTable,
-  characters as charactersTable,
-  gameModeEnum,
-} from '#server/db/schema/schema.js';
+import { gameModeEnum } from '#db/schema/schema.js';
 
 type GameMode = (typeof gameModeEnum.enumValues)[number];
 
@@ -53,7 +47,13 @@ const bodySchema = v.object({
 });
 
 export default defineEventHandler(async (event) => {
-  const db = useDb();
+  const {
+    db,
+    games: gamesTable,
+    gameParticipants: gameParticipantsTable,
+    users: usersTable,
+    characters: charactersTable,
+  } = useDb();
   await requireUserSession(event);
 
   const {

@@ -25,5 +25,5 @@ export default defineConfig({
   dbCredentials: { url: connectionString },
   dialect: 'postgresql',
   out: './drizzle',
-  schema: './server/db/schema/schema.ts',
+  schema: './modules/db/runtime/server/db/schema/schema.ts',
 });

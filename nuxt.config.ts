@@ -1,3 +1,5 @@
+import { fileURLToPath } from 'node:url';
+
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
   compatibilityDate: '2025-07-15',
@@ -19,6 +21,12 @@ export default defineNuxtConfig({
     '@nuxt/eslint',
     'nuxt-file-storage',
   ],
+
+  alias: {
+    '#db': fileURLToPath(
+      new URL('./modules/db/runtime/server/db', import.meta.url),
+    ),
+  },
   fileStorage: {
     mount: process.cwd() + '/public/avatars',
   },

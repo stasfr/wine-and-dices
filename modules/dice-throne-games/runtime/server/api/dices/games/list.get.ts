@@ -1,12 +1,6 @@
 import * as v from 'valibot';
 import { eq, and, ilike, inArray } from 'drizzle-orm';
-import {
-  games as gamesTable,
-  gameParticipants as gameParticipantsTable,
-  characters as charactersTable,
-  users as usersTable,
-  gameModeEnum,
-} from '#server/db/schema/schema.js';
+import { gameModeEnum } from '#db/schema/schema.js';
 import type { SQL } from 'drizzle-orm';
 
 const querySchema = v.object({
@@ -69,7 +63,13 @@ function groupParticipantsByTeam(participants: Participant[]) {
 }
 
 export default defineEventHandler(async (event) => {
-  const db = useDb();
+  const {
+    db,
+    games: gamesTable,
+    gameParticipants: gameParticipantsTable,
+    characters: charactersTable,
+    users: usersTable,
+  } = useDb();
   await requireUserSession(event);
 
   const {

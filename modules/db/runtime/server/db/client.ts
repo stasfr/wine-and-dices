@@ -1,10 +1,10 @@
 import { drizzle } from 'drizzle-orm/node-postgres';
-import { relations } from '#server/db/schema/schema';
+import { relations } from '#db/schema/schema.js';
 
-let db: ReturnType<typeof drizzle> | undefined;
+let dbInstance: ReturnType<typeof drizzle> | undefined;
 
-export function useDb() {
-  if (!db) {
+export function getDb() {
+  if (!dbInstance) {
     const config = useRuntimeConfig();
 
     if (
@@ -21,7 +21,7 @@ export function useDb() {
 
     const DB_URL = `postgresql://${config.dbUser}:${config.dbPassword}@${config.dbHost}:${config.dbPort}/${config.dbName}`;
 
-    db = drizzle({
+    dbInstance = drizzle({
       connection: {
         connectionString: DB_URL,
         max: 20,
@@ -32,7 +32,7 @@ export function useDb() {
     });
   }
 
-  return db;
+  return dbInstance;
 }
 
-export type DbClient = ReturnType<typeof useDb>;
+export type DbClient = ReturnType<typeof getDb>;

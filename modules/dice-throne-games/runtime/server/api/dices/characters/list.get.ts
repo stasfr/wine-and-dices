@@ -1,6 +1,5 @@
 import * as v from 'valibot';
 import { eq, and, or, ilike } from 'drizzle-orm';
-import { characters as charactersTable } from '#server/db/schema/schema.js';
 import type { SQL } from 'drizzle-orm';
 
 const querySchema = v.object({
@@ -26,7 +25,7 @@ const querySchema = v.object({
 });
 
 export default defineEventHandler(async (event) => {
-  const db = useDb();
+  const { db, characters: charactersTable } = useDb();
   await requireUserSession(event);
 
   const { page, perPage, key, name, id, search } = await getValidatedQuery(

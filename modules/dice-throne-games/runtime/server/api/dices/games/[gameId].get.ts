@@ -1,11 +1,5 @@
 import * as v from 'valibot';
 import { eq } from 'drizzle-orm';
-import {
-  games as gamesTable,
-  gameParticipants as gameParticipantsTable,
-  characters as charactersTable,
-  users as usersTable,
-} from '#server/db/schema/schema.js';
 
 const paramsSchema = v.object({
   gameId: v.pipe(v.string(), v.minLength(1)),
@@ -48,7 +42,13 @@ function groupParticipantsByTeam(participants: Participant[]) {
 }
 
 export default defineEventHandler(async (event) => {
-  const db = useDb();
+  const {
+    db,
+    games: gamesTable,
+    gameParticipants: gameParticipantsTable,
+    characters: charactersTable,
+    users: usersTable,
+  } = useDb();
   await requireUserSession(event);
 
   const { gameId } = await getValidatedRouterParams(event, (data) =>

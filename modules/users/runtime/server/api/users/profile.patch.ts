@@ -1,6 +1,5 @@
 import * as v from 'valibot';
 import { eq } from 'drizzle-orm';
-import { users as usersTable } from '#server/db/schema/schema.js';
 
 const bodySchema = v.object({
   firstName: v.optional(v.string()),
@@ -10,7 +9,7 @@ const bodySchema = v.object({
 });
 
 export default defineEventHandler(async (event) => {
-  const db = useDb();
+  const { db, users: usersTable } = useDb();
   const session = await requireUserSession(event);
 
   if (!session.user) {

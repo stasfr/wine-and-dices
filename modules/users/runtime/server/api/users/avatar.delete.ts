@@ -1,9 +1,7 @@
 import { eq } from 'drizzle-orm';
 
-import { users as usersTable } from '#server/db/schema/schema.js';
-
 export default defineEventHandler(async (event) => {
-  const db = useDb();
+  const { db, users: usersTable } = useDb();
   const session = await requireUserSession(event);
 
   if (!session.user) {

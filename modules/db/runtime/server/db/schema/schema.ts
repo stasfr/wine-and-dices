@@ -62,9 +62,9 @@ export const gameModeEnum = pgEnum('game_mode', [
 
 export const characters = pgTable('characters', {
   id: uuid('id').primaryKey().defaultRandom(),
-  name: text('name').unique().notNull(), // e.g. "John Doe"
+  name: text('name').unique().notNull(),
   ruName: text('ru_name').notNull(),
-  key: text('key').unique().notNull(), // e.g. "john-doe"
+  key: text('key').unique().notNull(),
   createdAt,
   updatedAt,
   deletedAt,

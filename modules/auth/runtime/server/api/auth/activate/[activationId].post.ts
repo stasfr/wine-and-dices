@@ -1,16 +1,16 @@
 import * as v from 'valibot';
 import { eq } from 'drizzle-orm';
-import {
-  userActivations as userActivationsTable,
-  users as usersTable,
-} from '#server/db/schema/schema.js';
 
 const paramsSchema = v.object({
   activationId: v.pipe(v.string(), v.minLength(1)),
 });
 
 export default defineEventHandler(async (event) => {
-  const db = useDb();
+  const {
+    db,
+    users: usersTable,
+    userActivations: userActivationsTable,
+  } = useDb();
   const session = await requireUserSession(event);
 
   if (!session.user) {
