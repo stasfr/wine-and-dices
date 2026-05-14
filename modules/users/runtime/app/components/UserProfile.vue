@@ -13,7 +13,6 @@ const isEditing = ref(false);
 const state = ref({
   id: '',
   email: '',
-  status: '',
   lastName: '',
   firstName: '',
   middleName: '',
@@ -37,7 +36,6 @@ watch(
 
     state.value.id = currentUser.id;
     state.value.email = currentUser.email;
-    state.value.status = currentUser.isActive ? 'Active' : 'Inactive';
     state.value.lastName = currentUser.lastName || '';
     state.value.firstName = currentUser.firstName || '';
     state.value.middleName = currentUser.middleName || '';
@@ -207,10 +205,6 @@ function triggerAvatarInput() {
 
         <UFormField label="Email" name="email">
           <UInput v-model="state.email" disabled class="w-full" />
-        </UFormField>
-
-        <UFormField label="Status" name="status">
-          <UInput v-model="state.status" disabled class="w-full" />
         </UFormField>
       </div>
     </UPageCard>

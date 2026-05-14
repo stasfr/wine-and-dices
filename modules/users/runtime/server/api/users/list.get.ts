@@ -32,7 +32,7 @@ export default defineEventHandler(async (event) => {
     (data) => v.parse(querySchema, data),
   );
 
-  const filters: SQL[] = [];
+  const filters: SQL[] = [eq(usersTable.isActive, true)];
 
   if (email) {
     filters.push(eq(usersTable.email, email));
@@ -57,7 +57,6 @@ export default defineEventHandler(async (event) => {
     .select({
       id: usersTable.id,
       email: usersTable.email,
-      isActive: usersTable.isActive,
       lastName: usersTable.lastName,
       firstName: usersTable.firstName,
       middleName: usersTable.middleName,

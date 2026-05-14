@@ -1,5 +1,5 @@
 import * as v from 'valibot';
-import { eq } from 'drizzle-orm';
+import { eq, and } from 'drizzle-orm';
 
 const paramsSchema = v.object({
   userId: v.pipe(v.string(), v.minLength(1)),
@@ -19,14 +19,13 @@ export default defineEventHandler(async (event) => {
     .select({
       id: usersTable.id,
       email: usersTable.email,
-      isActive: usersTable.isActive,
       lastName: usersTable.lastName,
       firstName: usersTable.firstName,
       middleName: usersTable.middleName,
       avatar: usersTable.avatar,
     })
     .from(usersTable)
-    .where(eq(usersTable.id, userId));
+    .where(and(eq(usersTable.id, userId), eq(usersTable.isActive, true)));
 
   const user = userSelectResult[0];
 

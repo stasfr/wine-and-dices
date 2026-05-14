@@ -12,7 +12,6 @@ export default defineEventHandler(async (event) => {
     .select({
       id: usersTable.id,
       email: usersTable.email,
-      isActive: usersTable.isActive,
       firstName: usersTable.firstName,
       lastName: usersTable.lastName,
       middleName: usersTable.middleName,
@@ -71,5 +70,14 @@ export default defineEventHandler(async (event) => {
     loggedInAt: session.loggedInAt,
   });
 
-  return { data: user };
+  return {
+    data: {
+      id: user.id,
+      email: user.email,
+      firstName: user.firstName,
+      lastName: user.lastName,
+      middleName: user.middleName,
+      avatar: user.avatar,
+    },
+  };
 });
