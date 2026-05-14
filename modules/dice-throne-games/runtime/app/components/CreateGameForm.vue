@@ -17,6 +17,7 @@ const requestFetch = useRequestFetch();
 const toast = useToast();
 const queryCache = useQueryCache();
 const { handleError } = useErrorHandler();
+const { user } = useUserSession();
 
 const { mutate: createGame, isLoading: isCreatingGame } = useMutation({
   mutation: (data: ICreateGameBody) =>
@@ -214,6 +215,21 @@ const disabledUsers = computed(() =>
   state.value.participants
     .map((participant) => participant.playerName)
     .filter((playerName) => playerName !== ''),
+);
+
+const currentUserEmail = computed(() => {
+  const currentUser = user.value;
+  if (!currentUser) {
+    return '';
+  }
+
+  return currentUser.email;
+});
+
+const isCurrentUserSelected = computed(() =>
+  state.value.participants.some(
+    (participant) => participant.playerName === currentUserEmail.value,
+  ),
 );
 
 const teamCount = computed(() => {
@@ -426,6 +442,7 @@ function onSubmit(event: FormSubmitEvent<Schema>) {
               :disabled-characters="disabledCharacters"
               :disabled-users="disabledUsers"
               :removable="false"
+              :show-select-me="!isCurrentUserSelected"
               @toggle-winner="handleToggleWinner"
               @update:participant="state.participants[item.index] = $event"
             />
@@ -461,6 +478,7 @@ function onSubmit(event: FormSubmitEvent<Schema>) {
             :disabled-characters="disabledCharacters"
             :disabled-users="disabledUsers"
             :removable="state.participants.length > 3"
+            :show-select-me="!isCurrentUserSelected"
             @remove="removeParticipant"
             @toggle-winner="handleToggleWinner"
             @update:participant="state.participants[index] = $event"

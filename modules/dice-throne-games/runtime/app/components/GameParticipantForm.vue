@@ -13,6 +13,7 @@ interface Props {
   disabledCharacters: string[] | undefined;
   disabledUsers: string[] | undefined;
   removable: boolean;
+  showSelectMe: boolean;
 }
 
 const props = defineProps<Props>();
@@ -36,6 +37,17 @@ interface Model {
 }
 
 const participant = defineModel<Model>('participant', { required: true });
+
+const { user } = useUserSession();
+
+function handleSelectMe() {
+  const currentUser = user.value;
+  if (!currentUser) {
+    return;
+  }
+
+  participant.value.playerName = currentUser.email;
+}
 </script>
 
 <template>
@@ -61,11 +73,22 @@ const participant = defineModel<Model>('participant', { required: true });
       class="space-y-2 flex flex-col w-full"
     >
       <UFormField name="playerName" label="Player Name">
-        <UserSearchInput
-          v-model="participant.playerName"
-          :disabled-users="props.disabledUsers"
-          class="w-full"
-        />
+        <div class="flex items-center gap-2">
+          <UserSearchInput
+            v-model="participant.playerName"
+            :disabled-users="props.disabledUsers"
+            class="w-full"
+          />
+          <UButton
+            v-if="props.showSelectMe"
+            type="button"
+            size="sm"
+            color="neutral"
+            variant="outline"
+            label="Select me"
+            @click="handleSelectMe"
+          />
+        </div>
       </UFormField>
 
       <UFormField name="characterId" label="Character">
