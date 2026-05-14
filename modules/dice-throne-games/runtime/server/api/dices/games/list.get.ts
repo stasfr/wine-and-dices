@@ -72,10 +72,14 @@ export default defineEventHandler(async (event) => {
   const db = useDb();
   await requireUserSession(event);
 
-  const { page, perPage, mode, id, search, characterIds: characterIdsRaw } = await getValidatedQuery(
-    event,
-    (data) => v.parse(querySchema, data),
-  );
+  const {
+    page,
+    perPage,
+    mode,
+    id,
+    search,
+    characterIds: characterIdsRaw,
+  } = await getValidatedQuery(event, (data) => v.parse(querySchema, data));
 
   const filters: SQL[] = [];
 
@@ -144,10 +148,7 @@ export default defineEventHandler(async (event) => {
       charactersTable,
       eq(gameParticipantsTable.characterId, charactersTable.id),
     )
-    .leftJoin(
-      usersTable,
-      eq(gameParticipantsTable.userId, usersTable.id),
-    )
+    .leftJoin(usersTable, eq(gameParticipantsTable.userId, usersTable.id))
     .where(inArray(gameParticipantsTable.gameId, gameIds));
 
   const participantsByGameId = new Map<string, Participant[]>();

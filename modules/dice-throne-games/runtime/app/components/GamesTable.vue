@@ -1,6 +1,10 @@
 <script setup lang="ts">
 import type { TableColumn } from '@nuxt/ui';
-import type { IGameListItem, GameMode, IGameParticipantDetail } from '../types/games';
+import type {
+  IGameListItem,
+  GameMode,
+  IGameParticipantDetail,
+} from '../types/games';
 import { parseAbsoluteToLocal } from '@internationalized/date';
 
 interface Props {
@@ -85,7 +89,8 @@ const columns: TableColumn<IGameListItem>[] = [
 ];
 
 function formatParticipant(participant: IGameParticipantDetail) {
-  const character = participant.characterName || participant.characterKey || 'Unknown';
+  const character =
+    participant.characterName || participant.characterKey || 'Unknown';
   let player = 'Unknown';
 
   if (participant.userFirstName || participant.userLastName) {

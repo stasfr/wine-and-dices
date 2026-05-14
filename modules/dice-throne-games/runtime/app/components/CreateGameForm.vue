@@ -39,7 +39,10 @@ const { mutate: createGame, isLoading: isCreatingGame } = useMutation({
     navigateTo('/games');
   },
   onError: (err) => {
-    handleError(err, { title: 'Failed to create game', fallback: 'An error occurred' });
+    handleError(err, {
+      title: 'Failed to create game',
+      fallback: 'An error occurred',
+    });
   },
   onSettled: () => {
     queryCache.invalidateQueries({ key: ['games'] });
@@ -57,8 +60,14 @@ const schema = v.object({
   participants: v.pipe(
     v.array(
       v.object({
-        playerName: v.pipe(v.string(), v.minLength(1, 'Player name is required')),
-        characterId: v.pipe(v.string(), v.minLength(1, 'Character is required')),
+        playerName: v.pipe(
+          v.string(),
+          v.minLength(1, 'Player name is required'),
+        ),
+        characterId: v.pipe(
+          v.string(),
+          v.minLength(1, 'Character is required'),
+        ),
         winner: v.boolean(),
         teamIndex: v.pipe(v.number(), v.integer(), v.minValue(0)),
       }),
@@ -135,10 +144,7 @@ function validateWinners() {
       });
     }
   } else {
-    const participantsByTeam = new Map<
-      number,
-      Schema['participants']
-    >();
+    const participantsByTeam = new Map<number, Schema['participants']>();
 
     for (const participant of state.value.participants) {
       const team = participantsByTeam.get(participant.teamIndex) || [];

@@ -1,4 +1,9 @@
-import { addComponentsDir, addServerScanDir, createResolver, defineNuxtModule } from 'nuxt/kit';
+import {
+  addComponentsDir,
+  addServerScanDir,
+  createResolver,
+  defineNuxtModule,
+} from 'nuxt/kit';
 
 export default defineNuxtModule({
   meta: {

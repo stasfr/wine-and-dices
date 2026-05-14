@@ -56,10 +56,12 @@ export default defineEventHandler(async (event) => {
   const db = useDb();
   await requireUserSession(event);
 
-  const { date, comment, mode, participants: bodyParticipants } = await readValidatedBody(
-    event,
-    (data) => v.parse(bodySchema, data),
-  );
+  const {
+    date,
+    comment,
+    mode,
+    participants: bodyParticipants,
+  } = await readValidatedBody(event, (data) => v.parse(bodySchema, data));
 
   const emails: string[] = [];
   for (const participant of bodyParticipants) {
@@ -149,7 +151,8 @@ export default defineEventHandler(async (event) => {
       if (teamIndexCounts.get(i) !== 1) {
         throw createError({
           status: 400,
-          statusMessage: 'Mode "one_vs_one" requires exactly 1 participant per team',
+          statusMessage:
+            'Mode "one_vs_one" requires exactly 1 participant per team',
         });
       }
     }
@@ -158,7 +161,8 @@ export default defineEventHandler(async (event) => {
       if (teamIndexCounts.get(i) !== 2) {
         throw createError({
           status: 400,
-          statusMessage: 'Mode "two_vs_two" requires exactly 2 participants per team',
+          statusMessage:
+            'Mode "two_vs_two" requires exactly 2 participants per team',
         });
       }
     }
@@ -167,7 +171,8 @@ export default defineEventHandler(async (event) => {
       if (teamIndexCounts.get(i) !== 3) {
         throw createError({
           status: 400,
-          statusMessage: 'Mode "three_vs_three" requires exactly 3 participants per team',
+          statusMessage:
+            'Mode "three_vs_three" requires exactly 3 participants per team',
         });
       }
     }
@@ -176,7 +181,8 @@ export default defineEventHandler(async (event) => {
       if (teamIndexCounts.get(i) !== 2) {
         throw createError({
           status: 400,
-          statusMessage: 'Mode "two_vs_two_vs_two" requires exactly 2 participants per team',
+          statusMessage:
+            'Mode "two_vs_two_vs_two" requires exactly 2 participants per team',
         });
       }
     }

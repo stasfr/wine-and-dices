@@ -88,10 +88,7 @@ export default defineEventHandler(async (event) => {
       charactersTable,
       eq(gameParticipantsTable.characterId, charactersTable.id),
     )
-    .leftJoin(
-      usersTable,
-      eq(gameParticipantsTable.userId, usersTable.id),
-    )
+    .leftJoin(usersTable, eq(gameParticipantsTable.userId, usersTable.id))
     .where(eq(gameParticipantsTable.gameId, gameId));
 
   const teams = groupParticipantsByTeam(participants);

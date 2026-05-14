@@ -18,7 +18,10 @@ export default defineEventHandler(async (event) => {
   }
 
   if (session.user.isActive) {
-    throw createError({ status: 400, statusMessage: 'User is already activated' });
+    throw createError({
+      status: 400,
+      statusMessage: 'User is already activated',
+    });
   }
 
   const params = await getValidatedRouterParams(event, (data) =>
