@@ -83,8 +83,8 @@ function createDefaultParticipants(mode: string) {
   if (mode === 'king_of_the_hill') {
     return [
       { playerName: '', characterId: '', winner: false, teamIndex: 0 },
-      { playerName: '', characterId: '', winner: false, teamIndex: 0 },
-      { playerName: '', characterId: '', winner: false, teamIndex: 0 },
+      { playerName: '', characterId: '', winner: false, teamIndex: 1 },
+      { playerName: '', characterId: '', winner: false, teamIndex: 2 },
     ];
   }
 
@@ -338,12 +338,22 @@ function addParticipant() {
     playerName: '',
     characterId: '',
     winner: false,
-    teamIndex: 0,
+    teamIndex: state.value.participants.length,
   });
 }
 
 function removeParticipant(index: number) {
   state.value.participants.splice(index, 1);
+
+  if (state.value.mode === 'king_of_the_hill') {
+    for (let i = 0; i < state.value.participants.length; i++) {
+      const participant = state.value.participants[i];
+      if (!participant) {
+        continue;
+      }
+      participant.teamIndex = i;
+    }
+  }
 }
 
 function onSubmit(event: FormSubmitEvent<Schema>) {
