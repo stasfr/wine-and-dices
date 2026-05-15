@@ -33,6 +33,7 @@ const { mutate: createGame, isLoading: isCreatingGame } = useMutation({
 
     date.value = today(getLocalTimeZone());
     time.value = new Time();
+    hasTime.value = false;
     state.value.comment = '';
     state.value.mode = 'one_vs_one';
     state.value.participants = createDefaultParticipants('one_vs_one');
@@ -54,6 +55,7 @@ const inputDateRef = useTemplateRef('inputDate');
 
 const date = shallowRef(today(getLocalTimeZone()));
 const time = shallowRef(new Time());
+const hasTime = ref(false);
 
 const schema = v.object({
   comment: v.string(),
@@ -207,7 +209,7 @@ const isFormValid = computed(() => {
     return false;
   }
 
-  if (!time.value) {
+  if (hasTime.value && !time.value) {
     return false;
   }
 
@@ -295,7 +297,7 @@ function validate() {
     errors.push({ name: 'date', message: 'Date is required' });
   }
 
-  if (!time.value) {
+  if (hasTime.value && !time.value) {
     errors.push({ name: 'time', message: 'Time is required' });
   }
 
@@ -380,10 +382,6 @@ function onSubmit(event: FormSubmitEvent<v.InferOutput<typeof schema>>) {
     return;
   }
 
-  if (!currentTime) {
-    return;
-  }
-
   const { comment, mode, participants } = event.data;
 
   const mappedParticipants = participants.map((participant) => ({
@@ -394,18 +392,31 @@ function onSubmit(event: FormSubmitEvent<v.InferOutput<typeof schema>>) {
     teamIndex: participant.teamIndex,
   }));
 
-  const dateTime = new CalendarDateTime(
+  const dateStr = new CalendarDateTime(
     currentDate.year,
     currentDate.month,
     currentDate.day,
-    currentTime.hour,
-    currentTime.minute,
-    currentTime.second || 0,
-    currentTime.millisecond || 0,
-  );
+    0,
+    0,
+    0,
+    0,
+  ).toString();
+
+  const timeStr = hasTime.value && currentTime
+    ? new CalendarDateTime(
+        currentDate.year,
+        currentDate.month,
+        currentDate.day,
+        currentTime.hour,
+        currentTime.minute,
+        currentTime.second || 0,
+        currentTime.millisecond || 0,
+      ).toString()
+    : null;
 
   createGame({
-    date: dateTime.toString(),
+    date: dateStr,
+    time: timeStr,
     comment,
     mode,
     participants: mappedParticipants,
@@ -423,7 +434,7 @@ function onSubmit(event: FormSubmitEvent<v.InferOutput<typeof schema>>) {
     @submit="onSubmit"
     @keydown.enter.prevent
   >
-    <div class="flex gap-2 w-full">
+    <div class="flex gap-2 w-full items-start">
       <UFormField label="Date" name="date" class="flex-1">
         <UInputDate ref="inputDate" v-model="date">
           <template #trailing>
@@ -445,10 +456,12 @@ function onSubmit(event: FormSubmitEvent<v.InferOutput<typeof schema>>) {
         </UInputDate>
       </UFormField>
 
-      <UFormField label="Time" name="time" class="flex-1">
+      <UFormField v-if="hasTime" label="Time" name="time" class="flex-1">
         <UInputTime v-model="time" :hour-cycle="24" />
       </UFormField>
     </div>
+
+    <UCheckbox v-model="hasTime" label="Add time of the game" />
 
     <UFormField label="Comment" name="comment">
       <UTextarea v-model="state.comment" class="w-full" />

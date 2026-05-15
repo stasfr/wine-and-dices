@@ -80,6 +80,10 @@ export const games = pgTable('games', {
   })
     .defaultNow()
     .notNull(),
+  time: timestamp('time', {
+    mode: 'string',
+    withTimezone: true,
+  }),
   createdAt,
   updatedAt,
   deletedAt,

@@ -104,16 +104,20 @@ function formatParticipant(participant: IGameParticipantDetail) {
   return `${character} - ${player}`;
 }
 
-function formatDate(dateValue: string) {
-  const zoned = parseAbsoluteToLocal(dateValue.replace(' ', 'T'));
-  return zoned.toDate().toLocaleString('en-US', {
+function formatDate(dateValue: string, timeValue: string | null) {
+  const str = timeValue || dateValue;
+  const zoned = parseAbsoluteToLocal(str.replace(' ', 'T'));
+  const options: Intl.DateTimeFormatOptions = {
     day: 'numeric',
     month: 'short',
     year: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit',
-    hour12: false,
-  });
+  };
+  if (timeValue) {
+    options.hour = '2-digit';
+    options.minute = '2-digit';
+    options.hour12 = false;
+  }
+  return zoned.toDate().toLocaleString('en-US', options);
 }
 
 function getModeLabel(mode: GameMode) {
@@ -171,7 +175,7 @@ function getModeColor(mode: GameMode) {
     </template>
 
     <template #date-cell="{ row }">
-      {{ formatDate(row.original.date) }}
+      {{ formatDate(row.original.date, row.original.time) }}
     </template>
 
     <template #comment-cell="{ row }">

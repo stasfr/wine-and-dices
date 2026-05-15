@@ -90,16 +90,20 @@ function formatUserName(participant: IGameParticipantDetail) {
   return participant.userEmail || 'Unknown';
 }
 
-function formatDate(dateString: string) {
-  const zoned = parseAbsoluteToLocal(dateString.replace(' ', 'T'));
-  return zoned.toDate().toLocaleString('en-US', {
+function formatDate(dateString: string, timeString: string | null) {
+  const str = timeString || dateString;
+  const zoned = parseAbsoluteToLocal(str.replace(' ', 'T'));
+  const options: Intl.DateTimeFormatOptions = {
     day: 'numeric',
     month: 'short',
     year: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit',
-    hour12: false,
-  });
+  };
+  if (timeString) {
+    options.hour = '2-digit';
+    options.minute = '2-digit';
+    options.hour12 = false;
+  }
+  return zoned.toDate().toLocaleString('en-US', options);
 }
 </script>
 
@@ -122,7 +126,7 @@ function formatDate(dateString: string) {
         <template #header>
           <span class="font-medium text-sm">Date</span>
         </template>
-        <span class="text-base">{{ formatDate(game.date) }}</span>
+        <span class="text-base">{{ formatDate(game.date, game.time) }}</span>
       </UCard>
 
       <UCard class="flex-1">

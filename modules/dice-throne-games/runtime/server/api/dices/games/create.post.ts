@@ -23,6 +23,7 @@ const modeTeamCount: Record<GameMode, number> = {
 
 const bodySchema = v.object({
   date: v.pipe(v.string(), v.minLength(1)),
+  time: v.union([v.pipe(v.string(), v.minLength(1)), v.null()]),
   comment: v.optional(v.string()),
   mode: v.picklist(gameModeEnum.enumValues),
   participants: v.pipe(
@@ -51,6 +52,7 @@ export default defineEventHandler(async (event) => {
 
   const {
     date,
+    time,
     comment,
     mode,
     participants: bodyParticipants,
@@ -262,6 +264,7 @@ export default defineEventHandler(async (event) => {
         mode,
         comment: comment || null,
         date,
+        time,
         updatedAt: new Date().toISOString(),
       })
       .returning();

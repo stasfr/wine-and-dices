@@ -31,6 +31,7 @@ export interface IGameListItem {
   mode: GameMode;
   comment: string | null;
   date: string;
+  time: string | null;
   createdAt: string;
   updatedAt: string | null;
   deletedAt: string | null;
