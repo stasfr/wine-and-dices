@@ -4,6 +4,7 @@ export default defineEventHandler(async (event) => {
   if (
     path === '/api/auth/login' ||
     path === '/api/auth/register' ||
+    path === '/api/auth/resend-activation' ||
     path.startsWith('/api/auth/activate/')
   ) {
     return;

@@ -8,6 +8,26 @@ const requestFetch = useRequestFetch();
 const { handleError } = useErrorHandler();
 const { fetch } = useUserSession();
 
+const { mutate: resendActivation, isLoading: isResendingActivation } = useMutation({
+  mutation: () =>
+    requestFetch('/api/auth/resend-activation', {
+      method: 'POST',
+    }),
+  onSuccess: () => {
+    toast.add({
+      title: 'Activation email sent',
+      color: 'success',
+    });
+  },
+  onError: (err) => {
+    handleError(err, { title: 'Failed to resend activation email' });
+  },
+});
+
+function handleResendActivation() {
+  resendActivation();
+}
+
 const isEditing = ref(false);
 
 const state = ref({
@@ -202,6 +222,22 @@ function triggerAvatarInput() {
         <UFormField label="Email" name="email">
           <UInput v-model="state.email" disabled class="w-full" />
         </UFormField>
+
+        <UFormField label="Status" name="status">
+          <UBadge
+            :label="user.isActive ? 'Active' : 'Inactive'"
+            :color="user.isActive ? 'success' : 'warning'"
+            variant="subtle"
+          />
+        </UFormField>
+
+        <UButton
+          v-if="!user.isActive"
+          label="Send activation email again"
+          icon="i-lucide-mail"
+          :loading="isResendingActivation"
+          @click="handleResendActivation"
+        />
       </div>
     </UPageCard>
 
