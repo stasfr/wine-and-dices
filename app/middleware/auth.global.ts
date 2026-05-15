@@ -1,5 +1,5 @@
 export default defineNuxtRouteMiddleware(function authMiddleware(to) {
-  const { loggedIn } = useUserSession();
+  const { loggedIn, user } = useUserSession();
 
   const isPublicRoute =
     to.path === '/' ||
@@ -13,5 +13,13 @@ export default defineNuxtRouteMiddleware(function authMiddleware(to) {
 
   if (!loggedIn.value) {
     return navigateTo('/auth/login');
+  }
+
+  if (!user.value) {
+    return navigateTo('/auth/login');
+  }
+
+  if (user.value.isActive !== true && to.path !== '/profile') {
+    return navigateTo('/profile');
   }
 });
