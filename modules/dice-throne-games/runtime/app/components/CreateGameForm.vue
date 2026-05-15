@@ -65,6 +65,7 @@ const schema = v.object({
           v.string(),
           v.minLength(1, 'Player name is required'),
         ),
+        userId: v.optional(v.pipe(v.string(), v.minLength(1))),
         characterId: v.pipe(
           v.string(),
           v.minLength(1, 'Character is required'),
@@ -77,14 +78,26 @@ const schema = v.object({
   ),
 });
 
-type Schema = v.InferOutput<typeof schema>;
+interface Participant {
+  playerName: string;
+  userId: string | undefined;
+  characterId: string;
+  winner: boolean;
+  teamIndex: number;
+}
+
+interface Schema {
+  comment: string;
+  mode: string;
+  participants: Participant[];
+}
 
 function createDefaultParticipants(mode: string) {
   if (mode === 'king_of_the_hill') {
     return [
-      { playerName: '', characterId: '', winner: false, teamIndex: 0 },
-      { playerName: '', characterId: '', winner: false, teamIndex: 1 },
-      { playerName: '', characterId: '', winner: false, teamIndex: 2 },
+      { playerName: '', userId: undefined, characterId: '', winner: false, teamIndex: 0 },
+      { playerName: '', userId: undefined, characterId: '', winner: false, teamIndex: 1 },
+      { playerName: '', userId: undefined, characterId: '', winner: false, teamIndex: 2 },
     ];
   }
 
@@ -102,6 +115,7 @@ function createDefaultParticipants(mode: string) {
     for (let player = 0; player < config.playersPerTeam; player++) {
       participants.push({
         playerName: '',
+        userId: undefined,
         characterId: '',
         winner: false,
         teamIndex: team,
@@ -213,22 +227,23 @@ const disabledCharacters = computed(() =>
 
 const disabledUsers = computed(() =>
   state.value.participants
+    .filter((participant) => participant.userId !== undefined)
     .map((participant) => participant.playerName)
     .filter((playerName) => playerName !== ''),
 );
 
-const currentUserEmail = computed(() => {
+const currentUserId = computed(() => {
   const currentUser = user.value;
   if (!currentUser) {
     return '';
   }
 
-  return currentUser.email;
+  return currentUser.id;
 });
 
 const isCurrentUserSelected = computed(() =>
   state.value.participants.some(
-    (participant) => participant.playerName === currentUserEmail.value,
+    (participant) => participant.userId === currentUserId.value,
   ),
 );
 
@@ -336,6 +351,7 @@ function addParticipant() {
 
   state.value.participants.push({
     playerName: '',
+    userId: undefined,
     characterId: '',
     winner: false,
     teamIndex: state.value.participants.length,
@@ -356,7 +372,7 @@ function removeParticipant(index: number) {
   }
 }
 
-function onSubmit(event: FormSubmitEvent<Schema>) {
+function onSubmit(event: FormSubmitEvent<v.InferOutput<typeof schema>>) {
   const currentDate = date.value;
   const currentTime = time.value;
 
@@ -369,6 +385,14 @@ function onSubmit(event: FormSubmitEvent<Schema>) {
   }
 
   const { comment, mode, participants } = event.data;
+
+  const mappedParticipants = participants.map((participant) => ({
+    playerName: participant.playerName,
+    userId: participant.userId,
+    characterId: participant.characterId,
+    winner: participant.winner,
+    teamIndex: participant.teamIndex,
+  }));
 
   const dateTime = new CalendarDateTime(
     currentDate.year,
@@ -384,7 +408,7 @@ function onSubmit(event: FormSubmitEvent<Schema>) {
     date: dateTime.toString(),
     comment,
     mode,
-    participants,
+    participants: mappedParticipants,
   });
 }
 </script>

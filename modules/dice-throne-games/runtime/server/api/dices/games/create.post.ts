@@ -27,20 +27,13 @@ const bodySchema = v.object({
   mode: v.picklist(gameModeEnum.enumValues),
   participants: v.pipe(
     v.array(
-      v.union([
-        v.object({
-          email: v.pipe(v.string(), v.minLength(1), v.email()),
-          characterId: v.pipe(v.string(), v.minLength(1)),
-          winner: v.boolean(),
-          teamIndex: v.pipe(v.number(), v.integer(), v.minValue(0)),
-        }),
-        v.object({
-          playerName: v.pipe(v.string(), v.minLength(1)),
-          characterId: v.pipe(v.string(), v.minLength(1)),
-          winner: v.boolean(),
-          teamIndex: v.pipe(v.number(), v.integer(), v.minValue(0)),
-        }),
-      ]),
+      v.object({
+        playerName: v.pipe(v.string(), v.minLength(1)),
+        userId: v.optional(v.pipe(v.string(), v.minLength(1))),
+        characterId: v.pipe(v.string(), v.minLength(1)),
+        winner: v.boolean(),
+        teamIndex: v.pipe(v.number(), v.integer(), v.minValue(0)),
+      }),
     ),
     v.maxLength(6),
   ),
@@ -63,54 +56,45 @@ export default defineEventHandler(async (event) => {
     participants: bodyParticipants,
   } = await readValidatedBody(event, (data) => v.parse(bodySchema, data));
 
-  const emails: string[] = [];
+  const userIds: string[] = [];
   for (const participant of bodyParticipants) {
-    if ('email' in participant) {
-      emails.push(participant.email);
+    if (participant.userId) {
+      userIds.push(participant.userId);
     }
   }
 
-  const emailToUserId = new Map<string, string>();
-  if (emails.length > 0) {
-    const usersByEmail = await db
-      .select({ email: usersTable.email, id: usersTable.id })
+  if (userIds.length > 0) {
+    const usersById = await db
+      .select({ id: usersTable.id, email: usersTable.email })
       .from(usersTable)
-      .where(inArray(usersTable.email, emails));
+      .where(inArray(usersTable.id, userIds));
 
-    for (const user of usersByEmail) {
-      emailToUserId.set(user.email, user.id);
+    const userIdToEmail = new Map<string, string>();
+    for (const user of usersById) {
+      userIdToEmail.set(user.id, user.email);
     }
 
     for (const participant of bodyParticipants) {
-      if ('email' in participant && !emailToUserId.has(participant.email)) {
+      if (!participant.userId) {
+        continue;
+      }
+
+      const expectedEmail = userIdToEmail.get(participant.userId);
+      if (!expectedEmail) {
         throw createError({
           status: 400,
-          statusMessage: `User with email "${participant.email}" does not exist`,
+          statusMessage: `User with id "${participant.userId}" does not exist`,
+        });
+      }
+
+      if (expectedEmail !== participant.playerName) {
+        throw createError({
+          status: 400,
+          statusMessage: `User email mismatch for userId "${participant.userId}"`,
         });
       }
     }
   }
-
-  const normalizedParticipants = bodyParticipants.map((participant) => {
-    if ('email' in participant) {
-      const userId = emailToUserId.get(participant.email);
-      if (!userId) {
-        throw createError({
-          status: 400,
-          statusMessage: `User with email "${participant.email}" does not exist`,
-        });
-      }
-      return {
-        userId,
-        characterId: participant.characterId,
-        winner: participant.winner,
-        teamIndex: participant.teamIndex,
-      };
-    }
-    return participant;
-  });
-
-  const participants = normalizedParticipants;
 
   if (new Date(date) > new Date()) {
     throw createError({
@@ -120,7 +104,7 @@ export default defineEventHandler(async (event) => {
   }
 
   const { min, max } = modeParticipantsCount[mode];
-  if (participants.length < min || participants.length > max) {
+  if (bodyParticipants.length < min || bodyParticipants.length > max) {
     throw createError({
       status: 422,
       statusMessage: `Game mode "${mode}" requires ${min === max ? min : `${min}-${max}`} participants`,
@@ -130,7 +114,7 @@ export default defineEventHandler(async (event) => {
   const expectedTeamCount = modeTeamCount[mode];
   const teamIndexCounts = new Map<number, number>();
 
-  for (const participant of participants) {
+  for (const participant of bodyParticipants) {
     if (
       participant.teamIndex < 0 ||
       participant.teamIndex >= expectedTeamCount
@@ -187,17 +171,17 @@ export default defineEventHandler(async (event) => {
       }
     }
   } else if (mode === 'king_of_the_hill') {
-    for (let i = 0; i < participants.length; i++) {
+    for (let i = 0; i < bodyParticipants.length; i++) {
       if (teamIndexCounts.get(i) !== 1) {
         throw createError({
           status: 400,
-          statusMessage: `Mode "king_of_the_hill" requires unique team index for each participant (0-${participants.length - 1})`,
+          statusMessage: `Mode "king_of_the_hill" requires unique team index for each participant (0-${bodyParticipants.length - 1})`,
         });
       }
     }
   }
 
-  const winnerCount = participants.filter((p) => p.winner).length;
+  const winnerCount = bodyParticipants.filter((p) => p.winner).length;
   if (winnerCount === 0) {
     throw createError({
       status: 400,
@@ -206,8 +190,8 @@ export default defineEventHandler(async (event) => {
   }
 
   if (mode !== 'king_of_the_hill') {
-    const participantsByTeam = new Map<number, typeof participants>();
-    for (const participant of participants) {
+    const participantsByTeam = new Map<number, typeof bodyParticipants>();
+    for (const participant of bodyParticipants) {
       const team = participantsByTeam.get(participant.teamIndex) || [];
       team.push(participant);
       participantsByTeam.set(participant.teamIndex, team);
@@ -230,8 +214,8 @@ export default defineEventHandler(async (event) => {
   }
 
   const userIdsSet = new Set<string>();
-  for (const participant of participants) {
-    if ('userId' in participant) {
+  for (const participant of bodyParticipants) {
+    if (participant.userId) {
       if (userIdsSet.has(participant.userId)) {
         throw createError({
           status: 400,
@@ -243,7 +227,7 @@ export default defineEventHandler(async (event) => {
   }
 
   const characterIdsSet = new Set<string>();
-  for (const participant of participants) {
+  for (const participant of bodyParticipants) {
     if (characterIdsSet.has(participant.characterId)) {
       throw createError({
         status: 400,
@@ -253,13 +237,7 @@ export default defineEventHandler(async (event) => {
     characterIdsSet.add(participant.characterId);
   }
 
-  const characterIds = participants.map((p) => p.characterId);
-  const userIds: string[] = [];
-  for (const participant of participants) {
-    if ('userId' in participant) {
-      userIds.push(participant.userId);
-    }
-  }
+  const characterIds = bodyParticipants.map((p) => p.characterId);
 
   const existingCharacters = await db
     .select({ id: charactersTable.id })
@@ -267,29 +245,12 @@ export default defineEventHandler(async (event) => {
     .where(inArray(charactersTable.id, characterIds));
 
   const existingCharacterIds = new Set(existingCharacters.map((c) => c.id));
-  for (const participant of participants) {
+  for (const participant of bodyParticipants) {
     if (!existingCharacterIds.has(participant.characterId)) {
       throw createError({
         status: 400,
         statusMessage: `Character with id "${participant.characterId}" does not exist`,
       });
-    }
-  }
-
-  if (userIds.length > 0) {
-    const existingUsers = await db
-      .select({ id: usersTable.id })
-      .from(usersTable)
-      .where(inArray(usersTable.id, userIds));
-
-    const existingUserIds = new Set(existingUsers.map((u) => u.id));
-    for (const participant of participants) {
-      if ('userId' in participant && !existingUserIds.has(participant.userId)) {
-        throw createError({
-          status: 400,
-          statusMessage: `User with id "${participant.userId}" does not exist`,
-        });
-      }
     }
   }
 
@@ -310,11 +271,11 @@ export default defineEventHandler(async (event) => {
       return null;
     }
 
-    const participantValues = participants.map((participant) => ({
+    const participantValues = bodyParticipants.map((participant) => ({
       id: crypto.randomUUID(),
       gameId: createdGame.id,
-      userId: 'userId' in participant ? participant.userId : null,
-      playerName: 'playerName' in participant ? participant.playerName : null,
+      userId: participant.userId || null,
+      playerName: participant.playerName,
       characterId: participant.characterId,
       winner: participant.winner,
       teamIndex: participant.teamIndex,

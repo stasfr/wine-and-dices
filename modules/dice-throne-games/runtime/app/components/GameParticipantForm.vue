@@ -3,6 +3,7 @@ import * as v from 'valibot';
 
 const participantSchema = v.object({
   playerName: v.pipe(v.string(), v.minLength(1, 'Player name is required')),
+  userId: v.optional(v.pipe(v.string(), v.minLength(1))),
   characterId: v.pipe(v.string(), v.minLength(1, 'Character is required')),
   winner: v.boolean(),
   teamIndex: v.pipe(v.number(), v.integer(), v.minValue(0)),
@@ -31,6 +32,7 @@ function handleRemove() {
 
 interface Model {
   playerName: string;
+  userId: string | undefined;
   characterId: string;
   winner: boolean;
   teamIndex: number;
@@ -39,6 +41,8 @@ interface Model {
 const participant = defineModel<Model>('participant', { required: true });
 
 const { user } = useUserSession();
+const findUsersOpen = ref(false);
+const participantFormRef = useTemplateRef('participantForm');
 
 function handleSelectMe() {
   const currentUser = user.value;
@@ -47,6 +51,19 @@ function handleSelectMe() {
   }
 
   participant.value.playerName = currentUser.email;
+  participant.value.userId = currentUser.id;
+  participantFormRef.value?.clear('playerName');
+}
+
+function handlePlayerNameInput() {
+  participant.value.userId = undefined;
+}
+
+function handleUserSelected(selectedUser: { email: string; userId: string }) {
+  participant.value.playerName = selectedUser.email;
+  participant.value.userId = selectedUser.userId;
+  findUsersOpen.value = false;
+  participantFormRef.value?.clear('playerName');
 }
 </script>
 
@@ -66,6 +83,7 @@ function handleSelectMe() {
     </template>
 
     <UForm
+      ref="participantForm"
       :name="`participants.${props.index}`"
       :schema="participantSchema"
       nested
@@ -73,17 +91,35 @@ function handleSelectMe() {
     >
       <UFormField name="playerName" label="Player Name">
         <div class="flex items-center gap-2">
-          <UserSearchInput
+          <UInput
             v-model="participant.playerName"
-            :disabled-users="props.disabledUsers"
             class="w-full"
-          />
+            :ui="{ trailing: 'pe-1' }"
+            @update:model-value="handlePlayerNameInput"
+          >
+            <template v-if="participant.playerName.length > 0" #trailing>
+              <UButton
+                color="neutral"
+                variant="link"
+                size="sm"
+                icon="i-lucide-circle-x"
+                aria-label="Clear input"
+                @click="participant.playerName = ''; participant.userId = undefined"
+              />
+            </template>
+          </UInput>
           <UButton
             v-if="props.showSelectMe"
             color="neutral"
             variant="outline"
             label="Select me"
             @click="handleSelectMe"
+          />
+          <UButton
+            color="neutral"
+            variant="outline"
+            label="Find users"
+            @click="findUsersOpen = true"
           />
         </div>
       </UFormField>
@@ -103,5 +139,11 @@ function handleSelectMe() {
         @update:model-value="emit('toggleWinner', props.index)"
       />
     </UForm>
+
+    <FindUsersModal
+      v-model:open="findUsersOpen"
+      :disabled-users="props.disabledUsers"
+      @select="handleUserSelected"
+    />
   </UCard>
 </template>
