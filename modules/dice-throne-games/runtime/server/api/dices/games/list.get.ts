@@ -101,7 +101,7 @@ export default defineEventHandler(async (event) => {
     }
   }
 
-  if (userId || playerName) {
+  if (userId || playerName || characterIdsRaw) {
     const participantFilters: SQL[] = [];
 
     if (userId) {
@@ -112,36 +112,22 @@ export default defineEventHandler(async (event) => {
         ilike(gameParticipantsTable.playerName, `%${playerName}%`),
       );
     }
-
-    const gamesWithParticipants = await db
-      .selectDistinct({ gameId: gameParticipantsTable.gameId })
-      .from(gameParticipantsTable)
-      .where(and(...participantFilters));
-
-    const gameIds = gamesWithParticipants.map((g) => g.gameId);
-
-    if (gameIds.length === 0) {
-      return { data: [] };
+    if (characterIdsRaw) {
+      const characterIds = characterIdsRaw.split(',');
+      participantFilters.push(
+        inArray(gameParticipantsTable.characterId, characterIds),
+      );
     }
 
-    filters.push(inArray(gamesTable.id, gameIds));
-  }
-
-  if (characterIdsRaw) {
-    const characterIds = characterIdsRaw.split(',');
-
-    const gamesWithCharacters = await db
-      .selectDistinct({ gameId: gameParticipantsTable.gameId })
-      .from(gameParticipantsTable)
-      .where(inArray(gameParticipantsTable.characterId, characterIds));
-
-    const gameIds = gamesWithCharacters.map((g) => g.gameId);
-
-    if (gameIds.length === 0) {
-      return { data: [] };
-    }
-
-    filters.push(inArray(gamesTable.id, gameIds));
+    filters.push(
+      inArray(
+        gamesTable.id,
+        db
+          .selectDistinct({ gameId: gameParticipantsTable.gameId })
+          .from(gameParticipantsTable)
+          .where(and(...participantFilters)),
+      ),
+    );
   }
 
   const games = await db
