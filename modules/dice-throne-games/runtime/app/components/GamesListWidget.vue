@@ -219,13 +219,20 @@ function clearFilters() {
       <template #footer>
         <div class="flex gap-2 w-full">
           <UButton
-            color="neutral"
+            color="error"
             variant="outline"
             label="Clear"
-            class="flex-1"
+            icon="i-lucide-trash"
+            class="flex-1 flex items-center justify-center"
             @click="clearFilters"
           />
-          <UButton label="Apply" class="flex-1" @click="applyFilters" />
+          <UButton
+            label="Apply"
+            class="flex-1 flex items-center justify-center"
+            color="success"
+            icon="i-lucide-check"
+            @click="applyFilters"
+          />
         </div>
       </template>
     </USlideover>
