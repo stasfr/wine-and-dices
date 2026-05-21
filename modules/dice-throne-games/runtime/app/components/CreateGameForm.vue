@@ -461,7 +461,11 @@ function onSubmit(event: FormSubmitEvent<v.InferOutput<typeof schema>>) {
       </UFormField>
     </div>
 
-    <UCheckbox v-model="hasTime" label="Add time of the game" />
+    <UCheckbox
+      v-model="hasTime"
+      class="self-start"
+      label="Add time of the game"
+    />
 
     <UFormField label="Comment" name="comment">
       <UTextarea v-model="state.comment" class="w-full" />
