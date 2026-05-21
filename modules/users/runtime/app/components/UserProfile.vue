@@ -8,21 +8,22 @@ const requestFetch = useRequestFetch();
 const { handleError } = useErrorHandler();
 const { fetch } = useUserSession();
 
-const { mutate: resendActivation, isLoading: isResendingActivation } = useMutation({
-  mutation: () =>
-    requestFetch('/api/auth/resend-activation', {
-      method: 'POST',
-    }),
-  onSuccess: () => {
-    toast.add({
-      title: 'Activation email sent',
-      color: 'success',
-    });
-  },
-  onError: (err) => {
-    handleError(err, { title: 'Failed to resend activation email' });
-  },
-});
+const { mutate: resendActivation, isLoading: isResendingActivation } =
+  useMutation({
+    mutation: () =>
+      requestFetch('/api/auth/resend-activation', {
+        method: 'POST',
+      }),
+    onSuccess: () => {
+      toast.add({
+        title: 'Activation email sent',
+        color: 'success',
+      });
+    },
+    onError: (err) => {
+      handleError(err, { title: 'Failed to resend activation email' });
+    },
+  });
 
 function handleResendActivation() {
   resendActivation();

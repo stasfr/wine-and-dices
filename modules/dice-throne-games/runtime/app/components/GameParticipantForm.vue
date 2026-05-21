@@ -104,7 +104,10 @@ function handleUserSelected(selectedUser: { email: string; userId: string }) {
                 size="sm"
                 icon="i-lucide-circle-x"
                 aria-label="Clear input"
-                @click="participant.playerName = ''; participant.userId = undefined"
+                @click="
+                  participant.playerName = '';
+                  participant.userId = undefined;
+                "
               />
             </template>
           </UInput>

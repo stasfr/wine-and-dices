@@ -97,9 +97,27 @@ interface Schema {
 function createDefaultParticipants(mode: string) {
   if (mode === 'king_of_the_hill') {
     return [
-      { playerName: '', userId: undefined, characterId: '', winner: false, teamIndex: 0 },
-      { playerName: '', userId: undefined, characterId: '', winner: false, teamIndex: 1 },
-      { playerName: '', userId: undefined, characterId: '', winner: false, teamIndex: 2 },
+      {
+        playerName: '',
+        userId: undefined,
+        characterId: '',
+        winner: false,
+        teamIndex: 0,
+      },
+      {
+        playerName: '',
+        userId: undefined,
+        characterId: '',
+        winner: false,
+        teamIndex: 1,
+      },
+      {
+        playerName: '',
+        userId: undefined,
+        characterId: '',
+        winner: false,
+        teamIndex: 2,
+      },
     ];
   }
 
@@ -402,17 +420,18 @@ function onSubmit(event: FormSubmitEvent<v.InferOutput<typeof schema>>) {
     0,
   ).toString();
 
-  const timeStr = hasTime.value && currentTime
-    ? new CalendarDateTime(
-        currentDate.year,
-        currentDate.month,
-        currentDate.day,
-        currentTime.hour,
-        currentTime.minute,
-        currentTime.second || 0,
-        currentTime.millisecond || 0,
-      ).toString()
-    : null;
+  const timeStr =
+    hasTime.value && currentTime
+      ? new CalendarDateTime(
+          currentDate.year,
+          currentDate.month,
+          currentDate.day,
+          currentTime.hour,
+          currentTime.minute,
+          currentTime.second || 0,
+          currentTime.millisecond || 0,
+        ).toString()
+      : null;
 
   createGame({
     date: dateStr,
