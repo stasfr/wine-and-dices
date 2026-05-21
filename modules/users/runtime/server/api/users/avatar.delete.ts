@@ -1,4 +1,6 @@
 import { eq } from 'drizzle-orm';
+import { rm } from 'node:fs/promises';
+import { join } from 'node:path';
 
 export default defineEventHandler(async (event) => {
   const { db, users: usersTable } = useDb();
@@ -28,7 +30,13 @@ export default defineEventHandler(async (event) => {
 
   if (existingUser.avatar) {
     try {
-      await deleteFile(existingUser.avatar, '');
+      const oldPath = join(
+        process.cwd(),
+        'public',
+        'avatars',
+        existingUser.avatar,
+      );
+      await rm(oldPath, { force: true });
     } catch (error) {
       console.error('Failed to delete old avatar:', error);
     }

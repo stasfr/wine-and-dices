@@ -19,16 +19,12 @@ export default defineNuxtConfig({
     'nuxt-auth-utils',
     'nuxt-nodemailer',
     '@nuxt/eslint',
-    'nuxt-file-storage',
   ],
 
   alias: {
     '#db': fileURLToPath(
       new URL('./modules/db/runtime/server/db', import.meta.url),
     ),
-  },
-  fileStorage: {
-    mount: process.cwd() + '/public/avatars',
   },
   nodemailer: {
     from: '"Wine and Dices" <sfworking@yandex.ru>',

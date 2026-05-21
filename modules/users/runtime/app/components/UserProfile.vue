@@ -87,17 +87,18 @@ const { mutate: updateProfile, isLoading: isUpdatingProfile } = useMutation({
   },
 });
 
-const { handleFileInput, files: avatarFiles } = useFileStorage();
 const avatarFileInputEl = useTemplateRef('avatarFileInput');
 
 const { mutate: uploadAvatar, isLoading: isUploadingAvatar } = useMutation({
-  mutation: () =>
-    requestFetch('/api/users/avatar', {
+  mutation: (file: File) => {
+    const formData = new FormData();
+    formData.append('avatar', file);
+
+    return requestFetch('/api/users/avatar', {
       method: 'POST',
-      body: {
-        files: avatarFiles.value,
-      },
-    }),
+      body: formData,
+    });
+  },
   onSuccess: async () => {
     toast.add({
       title: 'Avatar updated',
@@ -156,11 +157,12 @@ function handleSave() {
   updateProfile();
 }
 
-async function handleAvatarInput(event: Event) {
-  await handleFileInput(event);
+function handleAvatarInput(event: Event) {
+  const target = event.target as HTMLInputElement;
+  const file = target.files?.[0];
 
-  if (avatarFiles.value.length > 0) {
-    uploadAvatar();
+  if (file) {
+    uploadAvatar(file);
   }
 }
 
