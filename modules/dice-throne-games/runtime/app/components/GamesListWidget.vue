@@ -92,18 +92,29 @@ const {
       playerName: playerNameFilter.value,
     },
   ],
-  query: () =>
-    requestFetch('/api/dices/games/list', {
-      query: {
-        ...(modeFilter.value && { mode: modeFilter.value }),
-        ...(searchFilter.value && { search: searchFilter.value }),
-        ...(characterIdsFilter.value.length > 0 && {
-          characterIds: characterIdsFilter.value.join(','),
-        }),
-        ...(userIdFilter.value && { userId: userIdFilter.value }),
-        ...(playerNameFilter.value && { playerName: playerNameFilter.value }),
-      },
-    }),
+  query: () => {
+    const query: Record<string, string> = {};
+
+    if (modeFilter.value) {
+      query.mode = modeFilter.value;
+    }
+    if (searchFilter.value) {
+      query.search = searchFilter.value;
+    }
+    if (characterIdsFilter.value.length > 0) {
+      query.characterIds = characterIdsFilter.value.join(',');
+    }
+    if (userIdFilter.value) {
+      query.userId = userIdFilter.value;
+    }
+    if (playerNameFilter.value) {
+      query.playerName = playerNameFilter.value;
+    }
+
+    return requestFetch('/api/dices/games/list', {
+      query,
+    });
+  },
 });
 
 const { data: charactersData } = useQuery({
