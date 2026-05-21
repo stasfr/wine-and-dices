@@ -6,6 +6,8 @@ const requestFetch = useRequestFetch();
 const modeFilter = useRouteQuery<string>('mode', '');
 const searchFilter = useRouteQuery<string>('search', '');
 const rawCharacterIdsFilter = useRouteQuery<string>('characterIds', '');
+const userIdFilter = useRouteQuery<string>('userId', '');
+const playerNameFilter = useRouteQuery<string>('playerName', '');
 
 const characterIdsFilter = computed(() => {
   if (!rawCharacterIdsFilter.value) {
@@ -27,11 +29,16 @@ const filtersOpen = ref(false);
 const draftMode = ref('');
 const draftSearch = ref('');
 const draftCharacterIds = ref<string[]>([]);
+const draftUserId = ref('');
+const draftPlayerName = ref('');
+const findUsersOpen = ref(false);
 
 function initDraftFilters() {
   draftMode.value = modeFilter.value;
   draftSearch.value = searchFilter.value;
   draftCharacterIds.value = [...characterIdsFilter.value];
+  draftUserId.value = userIdFilter.value;
+  draftPlayerName.value = playerNameFilter.value;
 }
 
 watch(filtersOpen, (open) => {
@@ -64,6 +71,9 @@ const activeFiltersCount = computed(() => {
   if (characterIdsFilter.value.length > 0) {
     count++;
   }
+  if (userIdFilter.value || playerNameFilter.value) {
+    count++;
+  }
   return count;
 });
 
@@ -78,6 +88,8 @@ const {
       mode: modeFilter.value,
       search: searchFilter.value,
       characterIds: characterIdsFilter.value,
+      userId: userIdFilter.value,
+      playerName: playerNameFilter.value,
     },
   ],
   query: () =>
@@ -88,6 +100,8 @@ const {
         ...(characterIdsFilter.value.length > 0 && {
           characterIds: characterIdsFilter.value.join(','),
         }),
+        ...(userIdFilter.value && { userId: userIdFilter.value }),
+        ...(playerNameFilter.value && { playerName: playerNameFilter.value }),
       },
     }),
 });
@@ -115,10 +129,30 @@ function handleViewGame(game: IGameListItem) {
   navigateTo(`/games/${game.id}`);
 }
 
+const { user } = useUserSession();
+
+function handleSelectMe() {
+  const currentUser = user.value;
+  if (!currentUser) {
+    return;
+  }
+
+  draftPlayerName.value = currentUser.email;
+  draftUserId.value = currentUser.id;
+}
+
+function handleUserSelected(selectedUser: { email: string; userId: string }) {
+  draftPlayerName.value = selectedUser.email;
+  draftUserId.value = selectedUser.userId;
+  findUsersOpen.value = false;
+}
+
 function applyFilters() {
   modeFilter.value = draftMode.value;
   searchFilter.value = draftSearch.value;
   setCharacterIdsFilter([...draftCharacterIds.value]);
+  userIdFilter.value = draftUserId.value;
+  playerNameFilter.value = draftPlayerName.value;
   filtersOpen.value = false;
 }
 
@@ -126,9 +160,13 @@ function clearFilters() {
   draftMode.value = '';
   draftSearch.value = '';
   draftCharacterIds.value = [];
+  draftUserId.value = '';
+  draftPlayerName.value = '';
   modeFilter.value = '';
   searchFilter.value = '';
   rawCharacterIdsFilter.value = '';
+  userIdFilter.value = '';
+  playerNameFilter.value = '';
 }
 </script>
 
@@ -213,6 +251,44 @@ function clearFilters() {
               class="w-full"
             />
           </UFormField>
+
+          <UFormField label="Player">
+            <div class="flex items-center gap-2">
+              <UInput
+                v-model="draftPlayerName"
+                class="w-full"
+                placeholder="Player name or email..."
+                :ui="{ trailing: 'pe-1' }"
+                @update:model-value="draftUserId = ''"
+              >
+                <template v-if="draftPlayerName.length > 0" #trailing>
+                  <UButton
+                    color="neutral"
+                    variant="link"
+                    size="sm"
+                    icon="i-lucide-circle-x"
+                    aria-label="Clear input"
+                    @click="
+                      draftPlayerName = '';
+                      draftUserId = '';
+                    "
+                  />
+                </template>
+              </UInput>
+              <UButton
+                color="neutral"
+                variant="outline"
+                label="Select me"
+                @click="handleSelectMe"
+              />
+              <UButton
+                color="neutral"
+                variant="outline"
+                label="Find users"
+                @click="findUsersOpen = true"
+              />
+            </div>
+          </UFormField>
         </div>
       </template>
 
@@ -236,5 +312,11 @@ function clearFilters() {
         </div>
       </template>
     </USlideover>
+
+    <FindUsersModal
+      v-model:open="findUsersOpen"
+      :disabled-users="undefined"
+      @select="handleUserSelected"
+    />
   </UPage>
 </template>

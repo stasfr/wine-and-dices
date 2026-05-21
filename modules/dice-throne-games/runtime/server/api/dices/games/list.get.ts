@@ -23,6 +23,8 @@ const querySchema = v.object({
   id: v.optional(v.pipe(v.string(), v.minLength(1))),
   search: v.optional(v.pipe(v.string(), v.minLength(1))),
   characterIds: v.optional(v.pipe(v.string(), v.minLength(1))),
+  userId: v.optional(v.pipe(v.string(), v.minLength(1))),
+  playerName: v.optional(v.pipe(v.string(), v.minLength(1))),
 });
 
 interface Participant {
@@ -79,6 +81,8 @@ export default defineEventHandler(async (event) => {
     id,
     search,
     characterIds: characterIdsRaw,
+    userId,
+    playerName,
   } = await getValidatedQuery(event, (data) => v.parse(querySchema, data));
 
   const filters: SQL[] = [];
@@ -95,6 +99,32 @@ export default defineEventHandler(async (event) => {
     if (searchFilter) {
       filters.push(searchFilter);
     }
+  }
+
+  if (userId || playerName) {
+    const participantFilters: SQL[] = [];
+
+    if (userId) {
+      participantFilters.push(eq(gameParticipantsTable.userId, userId));
+    }
+    if (playerName) {
+      participantFilters.push(
+        ilike(gameParticipantsTable.playerName, `%${playerName}%`),
+      );
+    }
+
+    const gamesWithParticipants = await db
+      .selectDistinct({ gameId: gameParticipantsTable.gameId })
+      .from(gameParticipantsTable)
+      .where(and(...participantFilters));
+
+    const gameIds = gamesWithParticipants.map((g) => g.gameId);
+
+    if (gameIds.length === 0) {
+      return { data: [] };
+    }
+
+    filters.push(inArray(gamesTable.id, gameIds));
   }
 
   if (characterIdsRaw) {
