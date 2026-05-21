@@ -55,6 +55,7 @@
   "devDependencies": {
     "@iconify-json/lucide": "^1.2.105",
     "@iconify-json/simple-icons": "^1.2.81",
+    "@vue/language-core": "^3.3.1",
     "dotenv": "^17.4.2",
     "drizzle-kit": "1.0.0-beta.22",
     "oxfmt": "^0.49.0"
