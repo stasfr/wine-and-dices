@@ -1,6 +1,4 @@
 <script setup lang="ts">
-import type { IGameListItem, GameMode } from '../types/games';
-
 const requestFetch = useRequestFetch();
 
 const modeFilter = useRouteQuery<string>('mode', '');

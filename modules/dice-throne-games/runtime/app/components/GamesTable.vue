@@ -1,11 +1,7 @@
 <script setup lang="ts">
-import type { TableColumn } from '@nuxt/ui';
-import type {
-  IGameListItem,
-  GameMode,
-  IGameParticipantDetail,
-} from '../types/games';
 import { parseAbsoluteToLocal } from '@internationalized/date';
+
+import type { TableColumn } from '@nuxt/ui';
 
 interface Props {
   data: IGameListItem[];

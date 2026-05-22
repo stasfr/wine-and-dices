@@ -3,6 +3,7 @@ import {
   addServerScanDir,
   createResolver,
   defineNuxtModule,
+  addImports,
 } from 'nuxt/kit';
 
 export default defineNuxtModule({
@@ -18,5 +19,18 @@ export default defineNuxtModule({
     });
 
     addServerScanDir(resolver.resolve('./runtime/server'));
+
+    addImports([
+      {
+        name: 'IUserListItem',
+        from: resolver.resolve('./runtime/app/types'),
+        type: true,
+      },
+      {
+        name: 'IUserProfile',
+        from: resolver.resolve('./runtime/app/types'),
+        type: true,
+      },
+    ]);
   },
 });
