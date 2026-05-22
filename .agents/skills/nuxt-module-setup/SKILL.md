@@ -89,10 +89,123 @@ Place server files under `modules/{name}/runtime/server/`. Nitro treats this dir
 
 Server files inside a module can use all the same aliases and imports as root server files (e.g. `#server/db/schema/schema.js`).
 
-### Type declarations inside a module
+### Types in modules
 
-Use `addTypeTemplate` from `@nuxt/kit` to register `.d.ts` files that augment third-party modules or declare global types. Keep the declaration file inside the module (e.g. `modules/{name}/types/`) and reference it via `src` so you do not hard-code the text in `index.ts`.
+There are three ways to expose types from a module depending on where they are needed.
 
+#### 1. Client types
+
+If your module exposes TypeScript interfaces or types that should be available in Vue components without manual imports, place them in `runtime/app/types/` (one type per file or logically grouped), re-export everything through `runtime/app/types/index.ts`, and register each symbol individually via `addImports` with `type: true`.
+
+`modules/dice-throne-games/runtime/app/types/index.ts`
+```typescript
+export * from './games';
+export * from './create';
+```
+
+`modules/dice-throne-games/index.ts`
+```typescript
+import {
+  addComponentsDir,
+  addServerScanDir,
+  createResolver,
+  defineNuxtModule,
+  addImports,
+} from 'nuxt/kit';
+
+export default defineNuxtModule({
+  meta: {
+    name: 'dice-throne-games',
+  },
+  setup() {
+    const resolver = createResolver(import.meta.url);
+
+    addComponentsDir({
+      path: resolver.resolve('./runtime/app/components'),
+      pathPrefix: false,
+    });
+
+    addServerScanDir(resolver.resolve('./runtime/server'));
+
+    addImports([
+      {
+        name: 'ICreateGameBody',
+        from: resolver.resolve('./runtime/app/types'),
+        type: true,
+      },
+      {
+        name: 'GameMode',
+        from: resolver.resolve('./runtime/app/types'),
+        type: true,
+      },
+      {
+        name: 'IGameParticipantDetail',
+        from: resolver.resolve('./runtime/app/types'),
+        type: true,
+      },
+      {
+        name: 'IGameTeam',
+        from: resolver.resolve('./runtime/app/types'),
+        type: true,
+      },
+      {
+        name: 'IGameListItem',
+        from: resolver.resolve('./runtime/app/types'),
+        type: true,
+      },
+      {
+        name: 'IGameDetail',
+        from: resolver.resolve('./runtime/app/types'),
+        type: true,
+      },
+    ]);
+  },
+});
+```
+
+**Important:**
+- Always set `type: true` when registering pure type imports. Without this flag, Nuxt will treat the symbol as a runtime value and the generated `.nuxt/imports.d.ts` will emit a regular import instead of `import type`, which causes TypeScript errors when the symbol does not exist at runtime.
+- The `from` path must resolve to a real file that exports the type. Point it to the barrel `index.ts` inside the types directory.
+- Run `pnpm nuxt prepare` after changing `addImports` so that `.nuxt/imports.d.ts` is regenerated and the IDE picks up the new declarations.
+
+#### 2. Server types
+
+If types are needed only on the server (e.g. inside API routes or server utilities), place them in `runtime/server/types/`, re-export through `runtime/server/types/index.ts`, and register each symbol via `addServerImports` with `type: true`.
+
+```typescript
+addServerImports([
+  {
+    name: 'IServerExportType',
+    from: resolver.resolve('./runtime/server/types'),
+    type: true,
+  },
+]);
+```
+
+The rules for `type: true` and barrel files are the same as for client types.
+
+#### 3. Shared declarations (simulating a shared layer)
+
+To augment third-party modules or declare global types that must be visible in **both** app and server contexts, create a `.d.ts` file inside the module's `types/` directory and register it with `addTypeTemplate`.
+
+`modules/auth/types/auth.d.ts`
+```typescript
+declare module '#auth-utils' {
+  interface User {
+    id: string;
+    email: string;
+    isActive: boolean;
+    firstName: string | null | undefined;
+    lastName: string | null | undefined;
+    middleName: string | null | undefined;
+    avatar: string | null | undefined;
+  }
+}
+
+export {};
+```
+
+`modules/auth/index.ts`
 ```typescript
 import {
   addServerScanDir,
@@ -132,46 +245,6 @@ export default defineNuxtModule({
 3. Register the directories in `index.ts` using the appropriate `add*` utility
 4. Remove the original files to avoid duplicates
 5. Run `pnpm nuxt prepare` and verify that dev server starts without errors
-
-### Auto-importing types for the client
-
-If your module exposes TypeScript interfaces or types that should be available in Vue components without manual imports, register them via `addImports` with `type: true`.
-
-```typescript
-import {
-  addComponentsDir,
-  addImports,
-  addServerScanDir,
-  createResolver,
-  defineNuxtModule,
-} from 'nuxt/kit';
-
-export default defineNuxtModule({
-  meta: {
-    name: 'module-name',
-  },
-  setup() {
-    const resolver = createResolver(import.meta.url);
-
-    addComponentsDir({
-      path: resolver.resolve('./runtime/app/components'),
-      pathPrefix: false,
-    });
-
-    addServerScanDir(resolver.resolve('./runtime/server'));
-
-    // Auto-import types for the client
-    addImports([
-      { name: 'ITestInterface', as: 'ITestInterface', from: resolver.resolve('./runtime/app/types'), type: true },
-    ]);
-  },
-});
-```
-
-**Important:**
-- Always set `type: true` when registering pure type imports. Without this flag, Nuxt will treat the symbol as a runtime value and the generated `.nuxt/imports.d.ts` will emit a regular import instead of `import type`, which causes TypeScript errors when the symbol does not exist at runtime.
-- The `from` path must resolve to a real file that exports the type. If you keep types in a directory (e.g. `runtime/app/types/`), point `from` to the concrete file (e.g. `runtime/app/types/index.ts`) or to a barrel file.
-- Run `pnpm nuxt prepare` after changing `addImports` so that `.nuxt/imports.d.ts` is regenerated and the IDE picks up the new declarations.
 
 ### Important notes
 
