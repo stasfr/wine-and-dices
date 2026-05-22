@@ -133,6 +133,46 @@ export default defineNuxtModule({
 4. Remove the original files to avoid duplicates
 5. Run `pnpm nuxt prepare` and verify that dev server starts without errors
 
+### Auto-importing types for the client
+
+If your module exposes TypeScript interfaces or types that should be available in Vue components without manual imports, register them via `addImports` with `type: true`.
+
+```typescript
+import {
+  addComponentsDir,
+  addImports,
+  addServerScanDir,
+  createResolver,
+  defineNuxtModule,
+} from 'nuxt/kit';
+
+export default defineNuxtModule({
+  meta: {
+    name: 'module-name',
+  },
+  setup() {
+    const resolver = createResolver(import.meta.url);
+
+    addComponentsDir({
+      path: resolver.resolve('./runtime/app/components'),
+      pathPrefix: false,
+    });
+
+    addServerScanDir(resolver.resolve('./runtime/server'));
+
+    // Auto-import types for the client
+    addImports([
+      { name: 'ITestInterface', as: 'ITestInterface', from: resolver.resolve('./runtime/app/types'), type: true },
+    ]);
+  },
+});
+```
+
+**Important:**
+- Always set `type: true` when registering pure type imports. Without this flag, Nuxt will treat the symbol as a runtime value and the generated `.nuxt/imports.d.ts` will emit a regular import instead of `import type`, which causes TypeScript errors when the symbol does not exist at runtime.
+- The `from` path must resolve to a real file that exports the type. If you keep types in a directory (e.g. `runtime/app/types/`), point `from` to the concrete file (e.g. `runtime/app/types/index.ts`) or to a barrel file.
+- Run `pnpm nuxt prepare` after changing `addImports` so that `.nuxt/imports.d.ts` is regenerated and the IDE picks up the new declarations.
+
 ### Important notes
 
 - Always use `resolver.resolve()` for paths inside `runtime/` so they are resolved relative to the module file.
