@@ -39,10 +39,6 @@ export default defineNuxtConfig({
 
   css: ['~/assets/css/main.css'],
 
-  imports: {
-    dirs: ['queries', 'mutations'],
-  },
-
   runtimeConfig: {
     // Private (server-only)
     nodeEnv: '',
