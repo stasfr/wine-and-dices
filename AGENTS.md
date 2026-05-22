@@ -58,7 +58,7 @@ const { email } = await readValidatedBody(event, (data) =>
 );
 ```
 
-- To check TypeScript types, run `pnpm nuxt typecheck`
+- To check TypeScript types, run `pnpm typecheck`
 - Run all package related commands using `pnpm`
 - Never split the code into multiple files (like vue composables or utility functions). Keep all related code in a single file. If the user asks to split into files, then split
 - Always extract types into separate files in the types directory
