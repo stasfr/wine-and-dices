@@ -144,3 +144,5 @@ const date = new Date().toLocaleString();
 import { now, getLocalTimeZone } from '@internationalized/date';
 const date = now(getLocalTimeZone());
 ```
+
+- Always use `import.meta.client` instead of `process.client` for client-side checks. `process.client` is deprecated and may be removed in Nuxt v5.
