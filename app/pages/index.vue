@@ -1,4 +1,8 @@
-<script setup lang="ts"></script>
+<script setup lang="ts">
+definePageMeta({
+  public: true,
+});
+</script>
 
 <template>
   <div class="flex flex-col items-center justify-center min-h-[60vh] gap-6">
