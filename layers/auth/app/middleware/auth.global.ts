@@ -6,6 +6,15 @@ export default defineNuxtRouteMiddleware(async (to) => {
   }
 
   if (!loggedIn.value || !user.value) {
+    if (import.meta.client) {
+      const toast = useToast();
+      toast.add({
+        title: 'Access denied',
+        description: 'Please sign in to access this page.',
+        icon: 'i-lucide-lock',
+        color: 'error',
+      });
+    }
     return navigateTo('/auth/login');
   }
 
@@ -14,6 +23,15 @@ export default defineNuxtRouteMiddleware(async (to) => {
   }
 
   if (user.value.isActive !== true) {
+    if (import.meta.client) {
+      const toast = useToast();
+      toast.add({
+        title: 'Account inactive',
+        description: 'Please activate your profile to continue.',
+        icon: 'i-lucide-user-x',
+        color: 'error',
+      });
+    }
     return navigateTo('/profile');
   }
 });
