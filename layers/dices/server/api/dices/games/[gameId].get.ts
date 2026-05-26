@@ -41,7 +41,7 @@ function groupParticipantsByTeam(participants: Participant[]) {
     }));
 }
 
-export default defineEventHandler(async (event) => {
+export default defineAuthenticatedHandler(async (event) => {
   const {
     db,
     games: gamesTable,
@@ -49,7 +49,6 @@ export default defineEventHandler(async (event) => {
     characters: charactersTable,
     users: usersTable,
   } = useDb();
-  await requireUserSession(event);
 
   const { gameId } = await getValidatedRouterParams(event, (data) =>
     v.parse(paramsSchema, data),

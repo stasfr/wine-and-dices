@@ -23,9 +23,8 @@ const querySchema = v.object({
   search: v.optional(v.pipe(v.string(), v.minLength(1))),
 });
 
-export default defineEventHandler(async (event) => {
+export default defineAuthenticatedHandler(async (event) => {
   const { db, users: usersTable } = useDb();
-  await requireUserSession(event);
 
   const { page, perPage, email, id, search } = await getValidatedQuery(
     event,

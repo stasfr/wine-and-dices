@@ -5,9 +5,8 @@ const paramsSchema = v.object({
   characterKey: v.pipe(v.string(), v.minLength(1)),
 });
 
-export default defineEventHandler(async (event) => {
+export default defineAuthenticatedHandler(async (event) => {
   const { db, characters: charactersTable } = useDb();
-  await requireUserSession(event);
 
   const params = await getValidatedRouterParams(event, (data) =>
     v.parse(paramsSchema, data),

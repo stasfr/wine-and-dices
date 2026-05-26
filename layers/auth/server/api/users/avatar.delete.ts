@@ -2,13 +2,8 @@ import { eq } from 'drizzle-orm';
 import { rm } from 'node:fs/promises';
 import { join } from 'node:path';
 
-export default defineEventHandler(async (event) => {
+export default defineAuthenticatedHandler(async (event, session) => {
   const { db, users: usersTable } = useDb();
-  const session = await requireUserSession(event);
-
-  if (!session.user) {
-    throw createError({ status: 401, statusMessage: 'Unauthorized' });
-  }
 
   const userSelectResult = await db
     .select({

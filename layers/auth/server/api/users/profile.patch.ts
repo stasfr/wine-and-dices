@@ -8,13 +8,8 @@ const bodySchema = v.object({
   avatar: v.optional(v.string()),
 });
 
-export default defineEventHandler(async (event) => {
+export default defineAuthenticatedHandler(async (event, session) => {
   const { db, users: usersTable } = useDb();
-  const session = await requireUserSession(event);
-
-  if (!session.user) {
-    throw createError({ status: 401, statusMessage: 'Unauthorized' });
-  }
 
   const body = await readValidatedBody(event, (data) =>
     v.parse(bodySchema, data),

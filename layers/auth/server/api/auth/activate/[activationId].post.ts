@@ -5,17 +5,12 @@ const paramsSchema = v.object({
   activationId: v.pipe(v.string(), v.minLength(1)),
 });
 
-export default defineEventHandler(async (event) => {
+export default defineAuthenticatedHandler(async (event, session) => {
   const {
     db,
     users: usersTable,
     userActivations: userActivationsTable,
   } = useDb();
-  const session = await requireUserSession(event);
-
-  if (!session.user) {
-    throw createError({ status: 401, statusMessage: 'Unauthorized' });
-  }
 
   if (session.user.isActive) {
     throw createError({

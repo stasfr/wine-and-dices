@@ -40,7 +40,7 @@ const bodySchema = v.object({
   ),
 });
 
-export default defineEventHandler(async (event) => {
+export default defineAuthenticatedHandler(async (event) => {
   const {
     db,
     games: gamesTable,
@@ -48,7 +48,6 @@ export default defineEventHandler(async (event) => {
     users: usersTable,
     characters: charactersTable,
   } = useDb();
-  await requireUserSession(event);
 
   const {
     date,

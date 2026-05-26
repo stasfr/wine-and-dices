@@ -12,13 +12,8 @@ const ALLOWED_MIME_TYPES = [
 
 const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
 
-export default defineEventHandler(async (event) => {
+export default defineAuthenticatedHandler(async (event, session) => {
   const { db, users: usersTable } = useDb();
-  const session = await requireUserSession(event);
-
-  if (!session.user) {
-    throw createError({ status: 401, statusMessage: 'Unauthorized' });
-  }
 
   const formData = await readMultipartFormData(event);
   const file = formData?.find((f) => f.name === 'avatar');

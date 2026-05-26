@@ -1,14 +1,9 @@
 import crypto from 'node:crypto';
 import { eq } from 'drizzle-orm';
 
-export default defineEventHandler(async (event) => {
+export default defineAuthenticatedHandler(async (event, session) => {
   const { db, userActivations: userActivationsTable } = useDb();
   const config = useRuntimeConfig();
-  const session = await requireUserSession(event);
-
-  if (!session.user) {
-    throw createError({ status: 401, statusMessage: 'Unauthorized' });
-  }
 
   if (session.user.isActive) {
     throw createError({
