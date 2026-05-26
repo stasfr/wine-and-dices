@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import { parseAbsoluteToLocal } from '@internationalized/date';
 
+import type { GameMode, IGameDetail, IGameParticipantDetail } from '../types';
+
 const gameId = useRouteParams<string>('gameId', '');
 const requestFetch = useRequestFetch();
 

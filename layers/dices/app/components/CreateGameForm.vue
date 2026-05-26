@@ -9,6 +9,7 @@ import { useMutation, useQueryCache } from '@pinia/colada';
 import * as v from 'valibot';
 
 import type { FormError, FormSubmitEvent } from '@nuxt/ui';
+import type { ICreateGameBody } from '../types';
 
 const FORM_ID = 'create-game-form';
 

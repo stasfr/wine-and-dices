@@ -2,6 +2,7 @@
 import { parseAbsoluteToLocal } from '@internationalized/date';
 
 import type { TableColumn } from '@nuxt/ui';
+import type { GameMode, IGameListItem, IGameParticipantDetail } from '../types';
 
 interface Props {
   data: IGameListItem[];
