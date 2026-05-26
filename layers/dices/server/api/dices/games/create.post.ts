@@ -1,5 +1,3 @@
-import crypto from 'node:crypto';
-
 export default defineAuthenticatedHandler(async (event) => {
   const {
     db,
@@ -18,7 +16,7 @@ export default defineAuthenticatedHandler(async (event) => {
     const [createdGame] = await tx
       .insert(gamesTable)
       .values({
-        id: crypto.randomUUID(),
+        id: generateUUID(),
         mode: validGame.mode,
         comment: validGame.comment ?? null,
         date: validGame.date,
@@ -33,7 +31,7 @@ export default defineAuthenticatedHandler(async (event) => {
     }
 
     const participantValues = validGame.participants.map((participant) => ({
-      id: crypto.randomUUID(),
+      id: generateUUID(),
       gameId: createdGame.id,
       userId: participant.userId ?? null,
       playerName: participant.playerName,

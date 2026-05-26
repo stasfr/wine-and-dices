@@ -1,5 +1,4 @@
 import * as v from 'valibot';
-import crypto from 'node:crypto';
 
 const passwordSchema = v.pipe(
   v.string(),
@@ -30,7 +29,7 @@ export default defineEventHandler(async (event) => {
 
   const user = await db.transaction(async (tx) => {
     const passwordHash = await hashPassword(password);
-    const userId = crypto.randomUUID();
+    const userId = generateUUID();
 
     const [createdUser] = await tx
       .insert(usersTable)
@@ -46,7 +45,7 @@ export default defineEventHandler(async (event) => {
       return;
     }
 
-    const activationId = crypto.randomUUID();
+    const activationId = generateUUID();
 
     const [createdActivation] = await tx
       .insert(userActivationsTable)

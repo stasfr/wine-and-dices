@@ -1,4 +1,3 @@
-import crypto from 'node:crypto';
 import { eq } from 'drizzle-orm';
 
 export default defineAuthenticatedHandler(async (event, session) => {
@@ -23,7 +22,7 @@ export default defineAuthenticatedHandler(async (event, session) => {
       .where(eq(userActivationsTable.userId, session.user.id));
   }
 
-  const activationId = crypto.randomUUID();
+  const activationId = generateUUID();
 
   const [createdActivation] = await db
     .insert(userActivationsTable)

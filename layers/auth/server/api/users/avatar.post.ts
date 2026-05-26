@@ -76,7 +76,7 @@ export default defineAuthenticatedHandler(async (event, session) => {
   }
 
   const ext = fileType.ext;
-  const randomName = crypto.randomUUID();
+  const randomName = generateUUID();
   const fileName = `${randomName}.${ext}`;
   const filePath = join(process.cwd(), 'public', 'avatars', fileName);
 
