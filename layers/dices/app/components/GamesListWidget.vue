@@ -111,7 +111,7 @@ const {
       query.playerName = playerNameFilter.value;
     }
 
-    query.perPage = '500';
+    query.perPage = '100';
 
     return getGamesList(query);
   },
