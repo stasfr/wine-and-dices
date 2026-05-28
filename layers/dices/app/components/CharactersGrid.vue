@@ -1,9 +1,9 @@
 <script setup lang="ts">
-const requestFetch = useRequestFetch();
+const { getCharactersList } = useDicesApi();
 
 const { data, error: charactersError } = useQuery({
   key: ['characters'],
-  query: () => requestFetch('/api/dices/characters/list'),
+  query: () => getCharactersList(),
 });
 
 const charactersList = computed(() => data.value?.data || []);

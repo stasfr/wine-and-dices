@@ -13,18 +13,14 @@ import type { ICreateGameBody } from '../types';
 
 const FORM_ID = 'create-game-form';
 
-const requestFetch = useRequestFetch();
+const { createGame: createGameRequest } = useDicesApi();
 const toast = useToast();
 const queryCache = useQueryCache();
 const { handleError } = useErrorHandler();
 const { user } = useUserSession();
 
 const { mutate: createGame, isLoading: isCreatingGame } = useMutation({
-  mutation: (data: ICreateGameBody) =>
-    requestFetch('/api/dices/games/create', {
-      method: 'POST',
-      body: data,
-    }),
+  mutation: (data: ICreateGameBody) => createGameRequest(data),
   onSuccess: () => {
     toast.add({
       title: 'Game created',

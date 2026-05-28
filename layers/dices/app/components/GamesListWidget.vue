@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { GameMode, IGameListItem } from '../types';
 
-const requestFetch = useRequestFetch();
+const { getGamesList, getCharactersList } = useDicesApi();
 
 const modeFilter = useRouteQuery<string>('mode', '');
 const searchFilter = useRouteQuery<string>('search', '');
@@ -111,15 +111,13 @@ const {
       query.playerName = playerNameFilter.value;
     }
 
-    return requestFetch('/api/dices/games/list', {
-      query,
-    });
+    return getGamesList(query);
   },
 });
 
 const { data: charactersData } = useQuery({
   key: ['characters'],
-  query: () => requestFetch('/api/dices/characters/list'),
+  query: () => getCharactersList(),
 });
 
 const characterItems = computed(() =>

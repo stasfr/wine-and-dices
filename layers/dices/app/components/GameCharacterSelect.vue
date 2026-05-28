@@ -7,11 +7,11 @@ const props = defineProps<Props>();
 
 const value = defineModel<string>({ required: true });
 
-const requestFetch = useRequestFetch();
+const { getCharactersList } = useDicesApi();
 
 const { data: charactersData } = useQuery({
   key: ['characters'],
-  query: () => requestFetch('/api/dices/characters/list'),
+  query: () => getCharactersList(),
 });
 
 const charactersList = computed(() => charactersData.value?.data || []);

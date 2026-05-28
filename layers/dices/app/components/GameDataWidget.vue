@@ -4,7 +4,7 @@ import { parseAbsoluteToLocal } from '@internationalized/date';
 import type { GameMode, IGameDetail, IGameParticipantDetail } from '../types';
 
 const gameId = useRouteParams<string>('gameId', '');
-const requestFetch = useRequestFetch();
+const { getGame } = useDicesApi();
 
 const {
   data: gameData,
@@ -12,8 +12,7 @@ const {
   error: gameError,
 } = useQuery({
   key: () => ['games', gameId.value],
-  query: () =>
-    requestFetch<{ data: IGameDetail }>(`/api/dices/games/${gameId.value}`),
+  query: () => getGame(gameId.value),
 });
 
 const game = computed(() => gameData.value?.data.game);
