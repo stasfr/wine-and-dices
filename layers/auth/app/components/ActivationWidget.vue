@@ -1,11 +1,12 @@
 <script setup lang="ts">
 const { user, fetch: fetchSession } = useUserSession();
 const { handleError } = useErrorHandler();
-const requestFetch = useRequestFetch();
 
 const activationId = useRouteParams<string>('activationId', '');
 
 const isAlreadyActivated = computed(() => user.value?.isActive === true);
+
+const { activateUser } = useAuthApi();
 
 const {
   mutate: activate,
@@ -13,13 +14,9 @@ const {
   status,
   error,
 } = useMutation({
-  mutation: () =>
-    requestFetch(`/api/auth/activate/${activationId.value}`, {
-      method: 'POST',
-    }),
+  mutation: () => activateUser(activationId.value),
   onSuccess: async () => {
     await fetchSession();
-
     start();
   },
   onError: (err) => {

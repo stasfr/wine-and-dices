@@ -1,14 +1,6 @@
 <script setup lang="ts">
 import type { InputMenuItem } from '@nuxt/ui';
-
-interface UserListItem {
-  id: string;
-  email: string;
-  lastName: string | null;
-  firstName: string | null;
-  middleName: string | null;
-  avatar: string | null;
-}
+import type { IUserListItem } from '../types/users';
 
 interface Props {
   disabledUsers: string[] | undefined;
@@ -25,21 +17,18 @@ const emit = defineEmits<Emits>();
 
 const open = defineModel<boolean>('open', { required: true });
 
-const requestFetch = useRequestFetch();
+const { searchUsers } = useAuthApi();
 const searchTerm = ref('');
 const debouncedSearchTerm = refDebounced(searchTerm, 300);
 const selectedEmail = ref('');
 
 const { data: usersData, asyncStatus } = useQuery({
   key: () => ['users', 'search', debouncedSearchTerm.value],
-  query: () =>
-    requestFetch<{ data: UserListItem[] }>('/api/users/list', {
-      query: { search: debouncedSearchTerm.value },
-    }),
+  query: () => searchUsers(debouncedSearchTerm.value),
   enabled: () => debouncedSearchTerm.value.length >= 1,
 });
 
-function formatUserName(user: UserListItem) {
+function formatUserName(user: IUserListItem) {
   const parts: string[] = [];
   if (user.lastName) {
     parts.push(user.lastName);

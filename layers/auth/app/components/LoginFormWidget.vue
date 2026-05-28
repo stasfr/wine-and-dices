@@ -21,6 +21,7 @@ const FORM_ID = 'login-form';
 const mode = ref<'login' | 'register'>('login');
 const loading = ref(false);
 const { fetch } = useUserSession();
+const { login: loginRequest, register: registerRequest } = useAuthApi();
 
 const passwordSchema = v.pipe(
   v.string(),
@@ -76,23 +77,17 @@ async function onSubmit(_event: FormSubmitEvent<AuthFormBody>) {
 
   try {
     if (mode.value === 'login') {
-      await $fetch('/api/auth/login', {
-        method: 'POST',
-        body: {
-          email: formData.value.email,
-          password: formData.value.password,
-        },
+      await loginRequest({
+        email: formData.value.email,
+        password: formData.value.password,
       });
 
       await fetch();
       await navigateTo('/profile');
     } else {
-      await $fetch('/api/auth/register', {
-        method: 'POST',
-        body: {
-          email: formData.value.email,
-          password: formData.value.password,
-        },
+      await registerRequest({
+        email: formData.value.email,
+        password: formData.value.password,
       });
 
       await fetch();

@@ -2,7 +2,7 @@
 import { useMutation } from '@pinia/colada';
 
 const toast = useToast();
-const requestFetch = useRequestFetch();
+const { uploadAvatar: uploadAvatarRequest, deleteAvatar: deleteAvatarRequest } = useAuthApi();
 const { handleError } = useErrorHandler();
 const { user, fetch } = useUserSession();
 
@@ -18,15 +18,7 @@ const avatarUrl = computed(() => {
 });
 
 const { mutate: uploadAvatar, isLoading: isUploadingAvatar } = useMutation({
-  mutation: (file: File) => {
-    const formData = new FormData();
-    formData.append('avatar', file);
-
-    return requestFetch('/api/users/avatar', {
-      method: 'POST',
-      body: formData,
-    });
-  },
+  mutation: (file: File) => uploadAvatarRequest(file),
   onSuccess: async () => {
     toast.add({
       title: 'Avatar updated',
@@ -44,10 +36,7 @@ const { mutate: uploadAvatar, isLoading: isUploadingAvatar } = useMutation({
 });
 
 const { mutate: deleteAvatar, isLoading: isDeletingAvatar } = useMutation({
-  mutation: () =>
-    requestFetch('/api/users/avatar', {
-      method: 'DELETE',
-    }),
+  mutation: () => deleteAvatarRequest(),
   onSuccess: async () => {
     toast.add({
       title: 'Avatar removed',

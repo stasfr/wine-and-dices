@@ -4,16 +4,16 @@ import { useMutation } from '@pinia/colada';
 const { user } = useUserSession();
 
 const toast = useToast();
-const requestFetch = useRequestFetch();
+const {
+  resendActivation: resendActivationRequest,
+  updateProfile: updateProfileRequest,
+} = useAuthApi();
 const { handleError } = useErrorHandler();
 const { fetch } = useUserSession();
 
 const { mutate: resendActivation, isLoading: isResendingActivation } =
   useMutation({
-    mutation: () =>
-      requestFetch('/api/auth/resend-activation', {
-        method: 'POST',
-      }),
+    mutation: () => resendActivationRequest(),
     onSuccess: () => {
       toast.add({
         title: 'Activation email sent',
@@ -57,13 +57,10 @@ watch(
 
 const { mutate: updateProfile, isLoading: isUpdatingProfile } = useMutation({
   mutation: () =>
-    requestFetch('/api/users/profile', {
-      method: 'PATCH',
-      body: {
-        firstName: state.value.firstName,
-        lastName: state.value.lastName,
-        middleName: state.value.middleName,
-      },
+    updateProfileRequest({
+      firstName: state.value.firstName,
+      lastName: state.value.lastName,
+      middleName: state.value.middleName,
     }),
   onSuccess: async () => {
     toast.add({

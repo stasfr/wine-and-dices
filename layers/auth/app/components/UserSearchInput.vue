@@ -8,7 +8,7 @@ interface Props {
 
 const props = defineProps<Props>();
 
-const requestFetch = useRequestFetch();
+const { searchUsers } = useAuthApi();
 
 function formatUserName(user: IUserListItem) {
   const parts: string[] = [];
@@ -33,10 +33,7 @@ const debouncedSearchTerm = refDebounced(searchTerm, 300);
 
 const { data: usersData, asyncStatus } = useQuery({
   key: () => ['users', 'search', debouncedSearchTerm.value],
-  query: () =>
-    requestFetch<{ data: IUserListItem[] }>('/api/users/list', {
-      query: { search: debouncedSearchTerm.value },
-    }),
+  query: () => searchUsers(debouncedSearchTerm.value),
   enabled: () => debouncedSearchTerm.value.length >= 1,
 });
 
