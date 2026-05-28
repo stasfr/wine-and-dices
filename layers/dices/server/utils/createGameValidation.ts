@@ -28,6 +28,7 @@ export interface ValidParticipant {
   userId: string | undefined;
   characterId: string;
   winner: boolean;
+  ultimateCount: number;
   teamIndex: number;
 }
 
@@ -53,6 +54,7 @@ export const bodySchema = v.object({
         userId: v.optional(v.pipe(v.string(), v.minLength(1))),
         characterId: v.pipe(v.string(), v.minLength(1)),
         winner: v.boolean(),
+        ultimateCount: v.pipe(v.number(), v.integer(), v.minValue(0)),
         teamIndex: v.pipe(v.number(), v.integer(), v.minValue(0)),
       }),
     ),
@@ -74,6 +76,7 @@ export function validateBodySchema(data: unknown) {
       userId: participant.userId,
       characterId: participant.characterId,
       winner: participant.winner,
+      ultimateCount: participant.ultimateCount,
       teamIndex: participant.teamIndex,
     })),
   };

@@ -6,6 +6,7 @@ const participantSchema = v.object({
   userId: v.optional(v.pipe(v.string(), v.minLength(1))),
   characterId: v.pipe(v.string(), v.minLength(1, 'Character is required')),
   winner: v.boolean(),
+  ultimateCount: v.pipe(v.number(), v.integer(), v.minValue(0)),
   teamIndex: v.pipe(v.number(), v.integer(), v.minValue(0)),
 });
 
@@ -36,6 +37,7 @@ interface Model {
   userId: string | undefined;
   characterId: string;
   winner: boolean;
+  ultimateCount: number;
   teamIndex: number;
 }
 
@@ -143,6 +145,10 @@ function handleUserSelected(selectedUser: { email: string; userId: string }) {
         :disabled="props.winnerDisabled"
         @update:model-value="emit('toggleWinner', props.index)"
       />
+
+      <UFormField name="ultimateCount" label="Ultimate count">
+        <UInputNumber v-model="participant.ultimateCount" :min="0" class="w-full" />
+      </UFormField>
     </UForm>
 
     <FindUsersModal

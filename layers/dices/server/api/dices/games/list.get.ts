@@ -31,6 +31,7 @@ interface Participant {
   id: string;
   playerName: string | null;
   winner: boolean;
+  ultimateCount: number;
   teamIndex: number;
   characterId: string;
   characterName: string | null;
@@ -147,6 +148,7 @@ export default defineAuthenticatedHandler(async (event) => {
       id: gameParticipantsTable.id,
       playerName: gameParticipantsTable.playerName,
       winner: gameParticipantsTable.winner,
+      ultimateCount: gameParticipantsTable.ultimateCount,
       teamIndex: gameParticipantsTable.teamIndex,
       characterId: gameParticipantsTable.characterId,
       characterName: charactersTable.name,

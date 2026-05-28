@@ -9,6 +9,7 @@ export interface IGameParticipantDetail {
   id: string;
   playerName: string | null;
   winner: boolean;
+  ultimateCount: number;
   teamIndex: number;
   characterId: string;
   characterName: string | null;

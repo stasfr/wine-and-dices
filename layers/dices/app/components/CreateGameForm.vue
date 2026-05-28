@@ -71,6 +71,7 @@ const schema = v.object({
           v.minLength(1, 'Character is required'),
         ),
         winner: v.boolean(),
+        ultimateCount: v.pipe(v.number(), v.integer(), v.minValue(0)),
         teamIndex: v.pipe(v.number(), v.integer(), v.minValue(0)),
       }),
     ),
@@ -83,6 +84,7 @@ interface Participant {
   userId: string | undefined;
   characterId: string;
   winner: boolean;
+  ultimateCount: number;
   teamIndex: number;
 }
 
@@ -101,6 +103,7 @@ function createDefaultParticipants(mode: string) {
         userId: undefined,
         characterId: '',
         winner: false,
+        ultimateCount: 0,
         teamIndex: 0,
       },
       {
@@ -108,6 +111,7 @@ function createDefaultParticipants(mode: string) {
         userId: undefined,
         characterId: '',
         winner: false,
+        ultimateCount: 0,
         teamIndex: 1,
       },
       {
@@ -115,6 +119,7 @@ function createDefaultParticipants(mode: string) {
         userId: undefined,
         characterId: '',
         winner: false,
+        ultimateCount: 0,
         teamIndex: 2,
       },
     ];
@@ -137,6 +142,7 @@ function createDefaultParticipants(mode: string) {
         userId: undefined,
         characterId: '',
         winner: false,
+        ultimateCount: 0,
         teamIndex: team,
       });
     }
@@ -400,6 +406,7 @@ function addParticipant() {
     userId: undefined,
     characterId: '',
     winner: false,
+    ultimateCount: 0,
     teamIndex: state.value.participants.length,
   });
 }
@@ -433,6 +440,7 @@ function onSubmit(event: FormSubmitEvent<v.InferOutput<typeof schema>>) {
     userId: participant.userId,
     characterId: participant.characterId,
     winner: participant.winner,
+    ultimateCount: participant.ultimateCount,
     teamIndex: participant.teamIndex,
   }));
 

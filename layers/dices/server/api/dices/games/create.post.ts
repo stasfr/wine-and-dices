@@ -38,6 +38,7 @@ export default defineAuthenticatedHandler(async (event) => {
       playerName: participant.playerName,
       characterId: participant.characterId,
       winner: participant.winner,
+      ultimateCount: participant.ultimateCount,
       teamIndex: participant.teamIndex,
       updatedAt: new Date().toISOString(),
     }));

@@ -193,6 +193,13 @@ function formatDate(dateString: string, timeString: string | null) {
                   {{ participant.characterName || 'Unknown character' }}
                 </div>
               </div>
+
+              <UBadge
+                v-if="participant.ultimateCount > 0"
+                color="info"
+                variant="subtle"
+                :label="`Ultimate x${participant.ultimateCount}`"
+              />
             </div>
           </div>
         </UCard>
@@ -235,6 +242,13 @@ function formatDate(dateString: string, timeString: string | null) {
                 {{ participant.characterName || 'Unknown character' }}
               </div>
             </div>
+
+            <UBadge
+              v-if="participant.ultimateCount > 0"
+              color="info"
+              variant="subtle"
+              :label="`Ultimate x${participant.ultimateCount}`"
+            />
 
             <UBadge
               v-if="game.isTie"

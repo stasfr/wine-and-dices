@@ -150,8 +150,16 @@ function getModeColor(mode: GameMode) {
             <span
               v-for="participant in team.participants"
               :key="participant.id"
+              class="flex items-center gap-1"
             >
               {{ formatParticipant(participant) }}
+              <UBadge
+                v-if="participant.ultimateCount > 0"
+                color="info"
+                variant="subtle"
+                size="xs"
+                :label="`Ult x${participant.ultimateCount}`"
+              />
             </span>
           </div>
           <USeparator

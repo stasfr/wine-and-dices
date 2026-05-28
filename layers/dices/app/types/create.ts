@@ -9,6 +9,7 @@ export interface ICreateGameBody {
     userId: string | undefined;
     characterId: string;
     winner: boolean;
+    ultimateCount: number;
     teamIndex: number;
   }[];
 }

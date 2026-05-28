@@ -110,6 +110,7 @@ export const gameParticipants = pgTable('game_participants', {
       onUpdate: 'cascade',
     }),
   winner: boolean('winner').default(false).notNull(),
+  ultimateCount: integer('ultimate_count').default(0).notNull(),
   teamIndex: integer('team_index').notNull(),
   createdAt,
   updatedAt,
