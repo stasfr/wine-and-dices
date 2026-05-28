@@ -31,6 +31,7 @@ const { mutate: createGame, isLoading: isCreatingGame } = useMutation({
     time.value = new Time();
     hasTime.value = false;
     state.value.comment = '';
+    state.value.isTie = false;
     state.value.mode = 'one_vs_one';
     state.value.participants = createDefaultParticipants('one_vs_one');
 
@@ -56,6 +57,7 @@ const hasTime = ref(false);
 const schema = v.object({
   comment: v.string(),
   mode: v.pipe(v.string(), v.minLength(1, 'Mode is required')),
+  isTie: v.boolean(),
   participants: v.pipe(
     v.array(
       v.object({
@@ -87,6 +89,7 @@ interface Participant {
 interface Schema {
   comment: string;
   mode: string;
+  isTie: boolean;
   participants: Participant[];
 }
 
@@ -145,6 +148,7 @@ function createDefaultParticipants(mode: string) {
 const state = ref<Schema>({
   comment: '',
   mode: 'one_vs_one',
+  isTie: false,
   participants: createDefaultParticipants('one_vs_one'),
 });
 
@@ -155,9 +159,31 @@ watch(
   },
 );
 
+watch(
+  () => state.value.isTie,
+  (isTie) => {
+    if (isTie) {
+      for (const participant of state.value.participants) {
+        participant.winner = false;
+      }
+    }
+  },
+);
+
 function validateWinners() {
   const errors: FormError[] = [];
   const winnerCount = state.value.participants.filter((p) => p.winner).length;
+
+  if (state.value.isTie) {
+    if (winnerCount !== 0) {
+      errors.push({
+        name: 'participants',
+        message: 'Tie game cannot have winners',
+      });
+    }
+
+    return errors;
+  }
 
   if (winnerCount === 0) {
     errors.push({
@@ -337,6 +363,10 @@ function validate() {
 }
 
 function handleToggleWinner(index: number) {
+  if (state.value.isTie) {
+    return;
+  }
+
   const participant = state.value.participants[index];
   if (!participant) {
     return;
@@ -396,7 +426,7 @@ function onSubmit(event: FormSubmitEvent<v.InferOutput<typeof schema>>) {
     return;
   }
 
-  const { comment, mode, participants } = event.data;
+  const { comment, mode, isTie, participants } = event.data;
 
   const mappedParticipants = participants.map((participant) => ({
     playerName: participant.playerName,
@@ -434,6 +464,7 @@ function onSubmit(event: FormSubmitEvent<v.InferOutput<typeof schema>>) {
     time: timeStr,
     comment,
     mode,
+    isTie,
     participants: mappedParticipants,
   });
 }
@@ -486,6 +517,12 @@ function onSubmit(event: FormSubmitEvent<v.InferOutput<typeof schema>>) {
       <UTextarea v-model="state.comment" class="w-full" />
     </UFormField>
 
+    <UCheckbox
+      v-model="state.isTie"
+      class="self-start"
+      label="Tie game"
+    />
+
     <GameModeSelect v-model="state.mode" />
 
     <div v-if="state.mode !== 'king_of_the_hill'" class="space-y-2">
@@ -509,6 +546,7 @@ function onSubmit(event: FormSubmitEvent<v.InferOutput<typeof schema>>) {
               :disabled-users="disabledUsers"
               :removable="false"
               :show-select-me="!isCurrentUserSelected"
+              :winner-disabled="state.isTie"
               @toggle-winner="handleToggleWinner"
               @update:participant="state.participants[item.index] = $event"
             />
@@ -543,6 +581,7 @@ function onSubmit(event: FormSubmitEvent<v.InferOutput<typeof schema>>) {
             :disabled-users="disabledUsers"
             :removable="state.participants.length > 3"
             :show-select-me="!isCurrentUserSelected"
+            :winner-disabled="state.isTie"
             @remove="removeParticipant"
             @toggle-winner="handleToggleWinner"
             @update:participant="state.participants[index] = $event"

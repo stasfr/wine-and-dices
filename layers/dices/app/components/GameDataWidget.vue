@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { parseAbsoluteToLocal } from '@internationalized/date';
 
-import type { GameMode, IGameDetail, IGameParticipantDetail } from '../types';
+import type { GameMode, IGameParticipantDetail } from '../types';
 
 const gameId = useRouteParams<string>('gameId', '');
 const { getGame } = useDicesApi();
@@ -158,7 +158,13 @@ function formatDate(dateString: string, timeString: string | null) {
                 Team {{ team.teamIndex + 1 }}
               </span>
               <UBadge
-                v-if="team.winner"
+                v-if="game.isTie"
+                color="warning"
+                variant="subtle"
+                label="Tie"
+              />
+              <UBadge
+                v-else-if="team.winner"
                 color="success"
                 variant="subtle"
                 label="Winner"
@@ -207,9 +213,11 @@ function formatDate(dateString: string, timeString: string | null) {
             :key="participant.id"
             class="flex items-center gap-2 p-2 rounded-lg border border-default"
             :class="
-              participant.winner
-                ? 'bg-success/10 border-success/30'
-                : 'bg-default'
+              game.isTie
+                ? 'bg-warning/10 border-warning/30'
+                : participant.winner
+                  ? 'bg-success/10 border-success/30'
+                  : 'bg-default'
             "
           >
             <UAvatar
@@ -229,7 +237,13 @@ function formatDate(dateString: string, timeString: string | null) {
             </div>
 
             <UBadge
-              v-if="participant.winner"
+              v-if="game.isTie"
+              color="warning"
+              variant="subtle"
+              label="Tie"
+            />
+            <UBadge
+              v-else-if="participant.winner"
               color="success"
               variant="subtle"
               label="Winner"

@@ -3,6 +3,7 @@ export interface ICreateGameBody {
   time: string | null;
   comment: string | undefined;
   mode: string;
+  isTie: boolean;
   participants: {
     playerName: string;
     userId: string | undefined;

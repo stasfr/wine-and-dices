@@ -30,6 +30,7 @@ export interface IGameListItem {
   id: string;
   mode: GameMode;
   comment: string | null;
+  isTie: boolean;
   date: string;
   time: string | null;
   createdAt: string;

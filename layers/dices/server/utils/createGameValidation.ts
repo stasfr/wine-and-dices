@@ -36,6 +36,7 @@ export interface ValidCreateGameBody {
   time: string | null;
   comment: string | undefined;
   mode: GameMode;
+  isTie: boolean;
   participants: ValidParticipant[];
 }
 
@@ -44,6 +45,7 @@ export const bodySchema = v.object({
   time: v.union([v.pipe(v.string(), v.minLength(1)), v.null()]),
   comment: v.optional(v.string()),
   mode: v.picklist(gameModeEnum.enumValues),
+  isTie: v.boolean(),
   participants: v.pipe(
     v.array(
       v.object({
@@ -66,6 +68,7 @@ export function validateBodySchema(data: unknown) {
     time: parsed.time,
     comment: parsed.comment,
     mode: parsed.mode,
+    isTie: parsed.isTie,
     participants: parsed.participants.map((participant) => ({
       playerName: participant.playerName,
       userId: participant.userId,
@@ -224,8 +227,21 @@ export function validateTeamIndices(
 export function validateWinners(
   mode: GameMode,
   participants: ValidParticipant[],
+  isTie: boolean,
 ) {
   const winnerCount = participants.filter((p) => p.winner).length;
+
+  if (isTie) {
+    if (winnerCount !== 0) {
+      throw createError({
+        status: 400,
+        statusMessage: 'Tie game cannot have winners',
+      });
+    }
+
+    return;
+  }
+
   if (winnerCount === 0) {
     throw createError({
       status: 400,
@@ -324,7 +340,7 @@ export async function validateCreateBody(
   validateDate(body.date);
   validateParticipantCount(body.mode, body.participants);
   validateTeamIndices(body.mode, body.participants);
-  validateWinners(body.mode, body.participants);
+  validateWinners(body.mode, body.participants, body.isTie);
   validateUniqueUserIds(body.participants);
   validateUniqueCharacterIds(body.participants);
   await validateCharacters(db, tables.characters, body.participants);

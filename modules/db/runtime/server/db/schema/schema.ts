@@ -74,6 +74,7 @@ export const games = pgTable('games', {
   id: uuid('id').primaryKey().defaultRandom(),
   mode: gameModeEnum('mode').notNull(),
   comment: text('comment'),
+  isTie: boolean('is_tie').default(false).notNull(),
   date: timestamp('date', {
     mode: 'string',
     withTimezone: true,

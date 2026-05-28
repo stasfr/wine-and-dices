@@ -19,6 +19,7 @@ export default defineAuthenticatedHandler(async (event) => {
         id: generateUUID(),
         mode: validGame.mode,
         comment: validGame.comment ?? null,
+        isTie: validGame.isTie,
         date: validGame.date,
         time: validGame.time,
         updatedAt: new Date().toISOString(),

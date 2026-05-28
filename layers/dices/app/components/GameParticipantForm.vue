@@ -15,6 +15,7 @@ interface Props {
   disabledUsers: string[] | undefined;
   removable: boolean;
   showSelectMe: boolean;
+  winnerDisabled: boolean;
 }
 
 const props = defineProps<Props>();
@@ -139,6 +140,7 @@ function handleUserSelected(selectedUser: { email: string; userId: string }) {
         name="winner"
         :model-value="participant.winner"
         label="Winner"
+        :disabled="props.winnerDisabled"
         @update:model-value="emit('toggleWinner', props.index)"
       />
     </UForm>
