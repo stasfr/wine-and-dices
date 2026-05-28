@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type { InputMenuItem } from '@nuxt/ui';
-import type { IUserListItem } from '../types/users';
+import type { IUserListItem } from '../../types/users';
 
 interface Props {
   disabledUsers: string[] | undefined;

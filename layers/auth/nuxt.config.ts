@@ -3,9 +3,12 @@ export default defineNuxtConfig({
     name: 'auth',
   },
   imports: {
-    // @pinia/nuxt only scans the root srcDir's stores by default; opt the
-    // layer's stores into the auto-import scan so useAuthStore() is callable
-    // anywhere without an explicit import.
     dirs: ['stores'],
   },
+  components: [
+    { path: '~/layers/auth/components/activation', pathPrefix: false },
+    { path: '~/layers/auth/components/auth', pathPrefix: false },
+    { path: '~/layers/auth/components/profile', pathPrefix: false },
+    { path: '~/layers/auth/components/ui', pathPrefix: false },
+  ],
 });
