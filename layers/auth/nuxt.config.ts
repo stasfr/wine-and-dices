@@ -6,9 +6,9 @@ export default defineNuxtConfig({
     dirs: ['stores'],
   },
   components: [
-    { path: '~/layers/auth/components/activation', pathPrefix: false },
-    { path: '~/layers/auth/components/auth', pathPrefix: false },
-    { path: '~/layers/auth/components/profile', pathPrefix: false },
-    { path: '~/layers/auth/components/ui', pathPrefix: false },
+    { path: './components/activation', pathPrefix: false },
+    { path: './components/auth', pathPrefix: false },
+    { path: './components/profile', pathPrefix: false },
+    { path: './components/ui', pathPrefix: false },
   ],
 });
